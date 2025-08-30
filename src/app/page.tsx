@@ -1,103 +1,110 @@
-import Image from "next/image";
+'use client';
+
+import Link from 'next/link';
+import { Package, Tags, Building2, ShoppingCart, BarChart3, Database, Wifi } from 'lucide-react';
+
+const stats = [
+  { name: 'Total Products', value: '0', icon: Package, href: '/products' },
+  { name: 'Categories', value: '0', icon: Tags, href: '/categories' },
+  { name: 'Shop Connections', value: '1', icon: Wifi, href: '/connections' },
+  { name: 'Orders', value: '0', icon: ShoppingCart, href: '/orders' },
+];
+
+const quickActions = [
+  { name: 'Manage Shops', href: '/connections', icon: Wifi, description: 'Connect and sync WooCommerce shops' },
+  { name: 'View Products', href: '/products', icon: Package, description: 'Browse synchronized product catalog' },
+  { name: 'Manage Categories', href: '/categories', icon: Tags, description: 'Organize products into categories' },
+  { name: 'View Brands', href: '/brands', icon: Building2, description: 'Manage product brands and manufacturers' },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3, description: 'View sales and product analytics' },
+];
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="space-y-6">{/* Page Header */}
+      <div className="px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-gray-600">
+            Welcome to WooCommerce Product Manager v2. Manage your product catalog efficiently.
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+
+      {/* Database Status */}
+      <div className="px-4 sm:px-6 lg:px-8">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <Database className="h-5 w-5 text-green-600" />
+            <span className="ml-2 text-sm font-medium text-green-800">
+              Connected to PostgreSQL Database
+            </span>
+          </div>
+          <div className="mt-1 text-sm text-green-700">
+            Host: 192.168.0.180:5432 | Database: wpm2 | Status: Active
+          </div>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <Link
+                key={stat.name}
+                href={stat.href}
+                className="relative bg-white pt-5 px-4 pb-12 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+              >
+                <dt>
+                  <div className="absolute bg-indigo-500 rounded-md p-3">
+                    <Icon className="h-6 w-6 text-white" />
+                  </div>
+                  <p className="ml-16 text-sm font-medium text-gray-500 truncate">
+                    {stat.name}
+                  </p>
+                </dt>
+                <dd className="ml-16 pb-6 flex items-baseline sm:pb-7">
+                  <p className="text-2xl font-semibold text-gray-900">
+                    {stat.value}
+                  </p>
+                </dd>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="px-4 sm:px-6 lg:px-8">
+        <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {quickActions.map((action) => {
+            const Icon = action.icon;
+            return (
+              <Link
+                key={action.name}
+                href={action.href}
+                className="relative group bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200"
+              >
+                <div>
+                  <span className="rounded-lg inline-flex p-3 bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100">
+                    <Icon className="h-6 w-6" />
+                  </span>
+                </div>
+                <div className="mt-8">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    {action.name}
+                  </h3>
+                  <p className="mt-2 text-sm text-gray-500">
+                    {action.description}
+                  </p>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

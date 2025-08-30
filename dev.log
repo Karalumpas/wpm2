@@ -1,0 +1,571 @@
+
+> wpm2@0.1.0 dev
+> next dev --turbopack
+
+   Ôû▓ Next.js 15.5.2 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.5:3000
+   - Environments: .env.local
+
+ Ô£ô Starting...
+ Ô£ô Ready in 1649ms
+ Ôùï Compiling /api/settings/user ...
+ Ô£ô Compiled /api/settings/user in 1948ms
+Failed to get user settings: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at GET (src\app\api\settings\user\route.ts:24:31)
+  22 | export async function GET() {
+  23 |   try {
+> 24 |     const session = await auth();
+     |                               ^
+  25 |     if (!session?.user?.email) {
+  26 |       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  27 |     }
+Error details: {
+  message: '(0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function',
+  stack: 'TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function\n' +
+    '    at GET (E:\\wpm2\\.next\\server\\chunks\\[root-of-the-server]__c4a82f46._.js:609:170)\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:59:14)\n' +
+    '    at AppRouteRouteModule.do (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:38775)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48915\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:170:36\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NoopTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18093)\n' +
+    '    at ProxyTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18854)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:103\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NextTracerImpl.trace (E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:28)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48760\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46097\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46054\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at AppRouteRouteModule.handle (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46008)'
+}
+ GET /api/settings/user 500 in 2582ms
+ Ô£ô Compiled /api/health in 149ms
+ GET /api/health 200 in 458ms
+ Ôùï Compiling /products ...
+ Ô£ô Compiled /products in 2.7s
+­ƒûÑ´©Å ProductsPage state: {
+  data: undefined,
+  error: undefined,
+  isLoading: true,
+  params: {
+    sortBy: 'updatedAt',
+    sortOrder: 'desc',
+    brandIds: [],
+    categoryIds: [],
+    limit: 25,
+    viewMode: 'grid',
+    paginationMode: 'pages'
+  },
+  productsCount: undefined,
+  paginationTotal: undefined
+}
+ GET /products 200 in 3408ms
+ Ô£ô Compiled /favicon.ico in 179ms
+ GET /favicon.ico?favicon.0b3bf435.ico 200 in 485ms
+ Ô£ô Compiled /api/products in 247ms
+­ƒöì Products API called with params: {
+  cursor: undefined,
+  limit: '25',
+  page: undefined,
+  search: undefined,
+  sortBy: 'updatedAt',
+  sortOrder: 'desc',
+  status: undefined,
+  type: undefined,
+  brandIds: [],
+  categoryIds: []
+}
+Ô£à Validated query: {
+  cursor: undefined,
+  limit: 25,
+  page: undefined,
+  search: undefined,
+  sortBy: 'updatedAt',
+  sortOrder: 'desc',
+  status: undefined,
+  type: undefined,
+  brandIds: [],
+  categoryIds: []
+}
+­ƒôè Raw products query result count: 3
+­ƒôª First product (if any): {
+  id: 'f508c2c2-aea4-4f81-b3b5-11b45af207c9',
+  sku: 'B011F',
+  name: 'B&amp;C Queen hooded',
+  basePrice: '14.29',
+  status: 'published',
+  type: 'variable',
+  updatedAt: 2025-08-30T07:05:57.721Z
+}
+­ƒôñ Final response: { itemCount: 3, hasMore: false, nextCursor: undefined }
+ GET /api/products?sortBy=updatedAt&sortOrder=desc&limit=25 200 in 617ms
+Failed to get user settings: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at GET (src\app\api\settings\user\route.ts:24:31)
+  22 | export async function GET() {
+  23 |   try {
+> 24 |     const session = await auth();
+     |                               ^
+  25 |     if (!session?.user?.email) {
+  26 |       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  27 |     }
+Error details: {
+  message: '(0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function',
+  stack: 'TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function\n' +
+    '    at GET (E:\\wpm2\\.next\\server\\chunks\\[root-of-the-server]__c4a82f46._.js:609:170)\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:59:14)\n' +
+    '    at AppRouteRouteModule.do (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:38775)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48915\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:170:36\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NoopTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18093)\n' +
+    '    at ProxyTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18854)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:103\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NextTracerImpl.trace (E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:28)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48760\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46097\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46054\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at AppRouteRouteModule.handle (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46008)'
+}
+ GET /api/settings/user 500 in 390ms
+Failed to get user settings: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at GET (src\app\api\settings\user\route.ts:24:31)
+  22 | export async function GET() {
+  23 |   try {
+> 24 |     const session = await auth();
+     |                               ^
+  25 |     if (!session?.user?.email) {
+  26 |       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  27 |     }
+Error details: {
+  message: '(0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function',
+  stack: 'TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function\n' +
+    '    at GET (E:\\wpm2\\.next\\server\\chunks\\[root-of-the-server]__c4a82f46._.js:609:170)\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:59:14)\n' +
+    '    at AppRouteRouteModule.do (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:38775)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48915\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:170:36\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NoopTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18093)\n' +
+    '    at ProxyTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18854)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:103\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NextTracerImpl.trace (E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:28)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48760\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46097\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46054\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at AppRouteRouteModule.handle (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46008)'
+}
+ GET /api/settings/user 500 in 356ms
+Failed to get user settings: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at GET (src\app\api\settings\user\route.ts:24:31)
+  22 | export async function GET() {
+  23 |   try {
+> 24 |     const session = await auth();
+     |                               ^
+  25 |     if (!session?.user?.email) {
+  26 |       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  27 |     }
+Error details: {
+  message: '(0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function',
+  stack: 'TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function\n' +
+    '    at GET (E:\\wpm2\\.next\\server\\chunks\\[root-of-the-server]__c4a82f46._.js:609:170)\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:59:14)\n' +
+    '    at AppRouteRouteModule.do (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:38775)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48915\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:170:36\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NoopTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18093)\n' +
+    '    at ProxyTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18854)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:103\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NextTracerImpl.trace (E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:28)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48760\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46097\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46054\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at AppRouteRouteModule.handle (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46008)'
+}
+ GET /api/settings/user 500 in 334ms
+Failed to get user settings: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at GET (src\app\api\settings\user\route.ts:24:31)
+  22 | export async function GET() {
+  23 |   try {
+> 24 |     const session = await auth();
+     |                               ^
+  25 |     if (!session?.user?.email) {
+  26 |       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  27 |     }
+Error details: {
+  message: '(0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function',
+  stack: 'TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function\n' +
+    '    at GET (E:\\wpm2\\.next\\server\\chunks\\[root-of-the-server]__c4a82f46._.js:609:170)\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:59:14)\n' +
+    '    at AppRouteRouteModule.do (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:38775)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48915\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:170:36\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NoopTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18093)\n' +
+    '    at ProxyTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18854)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:103\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NextTracerImpl.trace (E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:28)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48760\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46097\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46054\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at AppRouteRouteModule.handle (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46008)'
+}
+ GET /api/settings/user 500 in 341ms
+Failed to get user settings: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at GET (src\app\api\settings\user\route.ts:24:31)
+  22 | export async function GET() {
+  23 |   try {
+> 24 |     const session = await auth();
+     |                               ^
+  25 |     if (!session?.user?.email) {
+  26 |       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  27 |     }
+Error details: {
+  message: '(0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function',
+  stack: 'TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function\n' +
+    '    at GET (E:\\wpm2\\.next\\server\\chunks\\[root-of-the-server]__c4a82f46._.js:609:170)\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:59:14)\n' +
+    '    at AppRouteRouteModule.do (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:38775)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48915\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:170:36\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NoopTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18093)\n' +
+    '    at ProxyTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18854)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:103\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NextTracerImpl.trace (E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:28)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48760\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46097\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46054\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at AppRouteRouteModule.handle (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46008)'
+}
+ GET /api/settings/user 500 in 334ms
+Failed to get user settings: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at GET (src\app\api\settings\user\route.ts:24:31)
+  22 | export async function GET() {
+  23 |   try {
+> 24 |     const session = await auth();
+     |                               ^
+  25 |     if (!session?.user?.email) {
+  26 |       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  27 |     }
+Error details: {
+  message: '(0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function',
+  stack: 'TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function\n' +
+    '    at GET (E:\\wpm2\\.next\\server\\chunks\\[root-of-the-server]__c4a82f46._.js:609:170)\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:59:14)\n' +
+    '    at AppRouteRouteModule.do (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:38775)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48915\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:170:36\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NoopTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18093)\n' +
+    '    at ProxyTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18854)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:103\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NextTracerImpl.trace (E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:28)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48760\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46097\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46054\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at AppRouteRouteModule.handle (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46008)'
+}
+ GET /api/settings/user 500 in 345ms
+ Ô£ô Compiled /_not-found/page in 269ms
+ GET /products/f508c2c2-aea4-4f81-b3b5-11b45af207c9 404 in 360ms
+ GET /products/f508c2c2-aea4-4f81-b3b5-11b45af207c9 404 in 143ms
+­ƒûÑ´©Å ProductsPage state: {
+  data: undefined,
+  error: undefined,
+  isLoading: true,
+  params: {
+    sortBy: 'updatedAt',
+    sortOrder: 'desc',
+    brandIds: [],
+    categoryIds: [],
+    limit: 25,
+    viewMode: 'grid',
+    paginationMode: 'pages'
+  },
+  productsCount: undefined,
+  paginationTotal: undefined
+}
+ GET /products 200 in 333ms
+­ƒöì Products API called with params: {
+  cursor: undefined,
+  limit: '25',
+  page: undefined,
+  search: undefined,
+  sortBy: 'updatedAt',
+  sortOrder: 'desc',
+  status: undefined,
+  type: undefined,
+  brandIds: [],
+  categoryIds: []
+}
+Ô£à Validated query: {
+  cursor: undefined,
+  limit: 25,
+  page: undefined,
+  search: undefined,
+  sortBy: 'updatedAt',
+  sortOrder: 'desc',
+  status: undefined,
+  type: undefined,
+  brandIds: [],
+  categoryIds: []
+}
+­ƒôè Raw products query result count: 3
+­ƒôª First product (if any): {
+  id: 'f508c2c2-aea4-4f81-b3b5-11b45af207c9',
+  sku: 'B011F',
+  name: 'B&amp;C Queen hooded',
+  basePrice: '14.29',
+  status: 'published',
+  type: 'variable',
+  updatedAt: 2025-08-30T07:05:57.721Z
+}
+­ƒôñ Final response: { itemCount: 3, hasMore: false, nextCursor: undefined }
+ GET /api/products?sortBy=updatedAt&sortOrder=desc&limit=25 200 in 304ms
+Failed to get user settings: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at GET (src\app\api\settings\user\route.ts:24:31)
+  22 | export async function GET() {
+  23 |   try {
+> 24 |     const session = await auth();
+     |                               ^
+  25 |     if (!session?.user?.email) {
+  26 |       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  27 |     }
+Error details: {
+  message: '(0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function',
+  stack: 'TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function\n' +
+    '    at GET (E:\\wpm2\\.next\\server\\chunks\\[root-of-the-server]__c4a82f46._.js:609:170)\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:59:14)\n' +
+    '    at AppRouteRouteModule.do (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:38775)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48915\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:170:36\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NoopTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18093)\n' +
+    '    at ProxyTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18854)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:103\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NextTracerImpl.trace (E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:28)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48760\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46097\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46054\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at AppRouteRouteModule.handle (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46008)'
+}
+ GET /api/settings/user 500 in 331ms
+Failed to get user settings: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at GET (src\app\api\settings\user\route.ts:24:31)
+  22 | export async function GET() {
+  23 |   try {
+> 24 |     const session = await auth();
+     |                               ^
+  25 |     if (!session?.user?.email) {
+  26 |       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  27 |     }
+Error details: {
+  message: '(0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function',
+  stack: 'TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function\n' +
+    '    at GET (E:\\wpm2\\.next\\server\\chunks\\[root-of-the-server]__c4a82f46._.js:609:170)\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:59:14)\n' +
+    '    at AppRouteRouteModule.do (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:38775)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48915\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:170:36\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NoopTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18093)\n' +
+    '    at ProxyTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18854)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:103\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NextTracerImpl.trace (E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:28)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48760\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46097\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46054\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at AppRouteRouteModule.handle (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46008)'
+}
+ GET /api/settings/user 500 in 321ms
+Failed to get user settings: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at GET (src\app\api\settings\user\route.ts:24:31)
+  22 | export async function GET() {
+  23 |   try {
+> 24 |     const session = await auth();
+     |                               ^
+  25 |     if (!session?.user?.email) {
+  26 |       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  27 |     }
+Error details: {
+  message: '(0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function',
+  stack: 'TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function\n' +
+    '    at GET (E:\\wpm2\\.next\\server\\chunks\\[root-of-the-server]__c4a82f46._.js:609:170)\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:59:14)\n' +
+    '    at AppRouteRouteModule.do (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:38775)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48915\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:170:36\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NoopTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18093)\n' +
+    '    at ProxyTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18854)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:103\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NextTracerImpl.trace (E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:28)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48760\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46097\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46054\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at AppRouteRouteModule.handle (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46008)'
+}
+ GET /api/settings/user 500 in 321ms
+Failed to get user settings: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at GET (src\app\api\settings\user\route.ts:24:31)
+  22 | export async function GET() {
+  23 |   try {
+> 24 |     const session = await auth();
+     |                               ^
+  25 |     if (!session?.user?.email) {
+  26 |       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  27 |     }
+Error details: {
+  message: '(0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function',
+  stack: 'TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function\n' +
+    '    at GET (E:\\wpm2\\.next\\server\\chunks\\[root-of-the-server]__c4a82f46._.js:609:170)\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:59:14)\n' +
+    '    at AppRouteRouteModule.do (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:38775)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48915\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:170:36\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NoopTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18093)\n' +
+    '    at ProxyTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18854)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:103\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NextTracerImpl.trace (E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:28)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48760\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46097\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46054\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at AppRouteRouteModule.handle (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46008)'
+}
+ GET /api/settings/user 500 in 327ms
+Failed to get user settings: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at GET (src\app\api\settings\user\route.ts:24:31)
+  22 | export async function GET() {
+  23 |   try {
+> 24 |     const session = await auth();
+     |                               ^
+  25 |     if (!session?.user?.email) {
+  26 |       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  27 |     }
+Error details: {
+  message: '(0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function',
+  stack: 'TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function\n' +
+    '    at GET (E:\\wpm2\\.next\\server\\chunks\\[root-of-the-server]__c4a82f46._.js:609:170)\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:59:14)\n' +
+    '    at AppRouteRouteModule.do (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:38775)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48915\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:170:36\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NoopTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18093)\n' +
+    '    at ProxyTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18854)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:103\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NextTracerImpl.trace (E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:28)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48760\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46097\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46054\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at AppRouteRouteModule.handle (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46008)'
+}
+ GET /api/settings/user 500 in 321ms
+Failed to get user settings: TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function
+    at GET (src\app\api\settings\user\route.ts:24:31)
+  22 | export async function GET() {
+  23 |   try {
+> 24 |     const session = await auth();
+     |                               ^
+  25 |     if (!session?.user?.email) {
+  26 |       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  27 |     }
+Error details: {
+  message: '(0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function',
+  stack: 'TypeError: (0 , __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2d$config$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.auth) is not a function\n' +
+    '    at GET (E:\\wpm2\\.next\\server\\chunks\\[root-of-the-server]__c4a82f46._.js:609:170)\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:59:14)\n' +
+    '    at AppRouteRouteModule.do (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:38775)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48915\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:170:36\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NoopTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18093)\n' +
+    '    at ProxyTracer.startActiveSpan (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:18854)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:103\n' +
+    '    at NoopContextManager.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:7062)\n' +
+    '    at ContextAPI.with (E:\\wpm2\\node_modules\\next\\dist\\compiled\\@opentelemetry\\api\\index.js:1:518)\n' +
+    '    at NextTracerImpl.trace (E:\\wpm2\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:152:28)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:48760\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46097\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46054\n' +
+    '    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)\n' +
+    '    at AppRouteRouteModule.handle (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46008)'
+}
+ GET /api/settings/user 500 in 318ms

@@ -1,36 +1,217 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WooCommerce Product Manager v2
 
-## Getting Started
+En produktionsklar Next.js applikation til håndtering af WooCommerce produkter.
 
-First, run the development server:
+## 🚀 Teknisk Stack
+
+- **Next.js 14** med App Router
+- **TypeScript** i strict mode
+- **PostgreSQL** database
+- **Drizzle ORM** med migreringer
+- **NextAuth** til autentificering
+- **Tailwind CSS** til styling
+- **Vitest** til testing
+- **ESLint + Prettier** til kodekvalitet
+
+## 📋 Forudsætninger
+
+- Node.js 18+
+- Docker og Docker Compose
+- Git
+
+## 🛠️ Installation og Opsætning
+
+### 1. Klon og installer dependencies
+
+```bash
+git clone <repository-url>
+cd wpm2
+npm install
+```
+
+### 2. Start PostgreSQL database
+
+```bash
+# Start database container
+npm run docker:up
+
+# Verificer at containeren kører
+docker ps
+```
+
+### 3. Kør database migreringer
+
+```bash
+# Generer migreringer (allerede gjort)
+npm run db:generate
+
+# Kør migreringer mod databasen
+npm run db:migrate
+```
+
+### 4. Miljøvariabler
+
+Kopier `.env.local` og tilpas efter behov:
+
+```bash
+# Database
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/wpm2
+
+# NextAuth
+NEXTAUTH_SECRET=your-secret-key-change-this-in-production
+NEXTAUTH_URL=http://localhost:3000
+```
+
+### 5. Start udviklingsserveren
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Applikationen er nu tilgængelig på [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🧪 Testing
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Kør alle tests
+npm test
 
-## Learn More
+# Kør tests i watch mode
+npm run test:watch
 
-To learn more about Next.js, take a look at the following resources:
+# Kør tests med coverage
+npm run test:coverage
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📊 Database Administration
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Åbn Drizzle Studio (database browser)
+npm run db:studio
+```
 
-## Deploy on Vercel
+## 🔐 Autentificering Endpoints
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Registrer ny bruger
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+POST /api/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "StrongPassword123"
+}
+```
+
+### Login
+
+```bash
+POST /api/auth/signin
+# Eller brug NextAuth login page: /api/auth/signin
+```
+
+### Logout
+
+```bash
+POST /api/auth/signout
+```
+
+## 🏥 Healthcheck
+
+```bash
+GET /api/health
+```
+
+Svarer med:
+
+```json
+{
+  "status": "ok",
+  "version": "0.1.0",
+  "db": "ok",
+  "timestamp": "2024-..."
+}
+```
+
+## 📁 Projektstruktur
+
+```
+src/
+├── app/
+│   ├── api/
+│   │   ├── auth/[...nextauth]/
+│   │   ├── register/
+│   │   └── health/
+│   └── page.tsx
+├── db/
+│   ├── index.ts          # Database forbindelse
+│   └── schema.ts         # Database schema
+└── lib/
+    ├── auth.ts           # Password utilities
+    ├── auth-config.ts    # NextAuth konfiguration
+    └── validations.ts    # Zod schemas
+
+drizzle/
+└── migrations/           # Database migreringer
+
+tests/
+├── setup.ts
+├── auth.test.ts          # Password utility tests
+├── api.test.ts           # API endpoint tests
+└── health.test.ts        # Healthcheck tests
+```
+
+## 🔧 Udvikling Scripts
+
+```bash
+# Udvikling
+npm run dev              # Start development server
+npm run build            # Build for production
+npm run start            # Start production server
+
+# Database
+npm run db:generate      # Generer nye migreringer
+npm run db:migrate       # Kør migreringer
+npm run db:push         # Push schema changes (development)
+npm run db:studio       # Åbn database browser
+
+# Docker
+npm run docker:up       # Start PostgreSQL
+npm run docker:down     # Stop PostgreSQL
+
+# Kodekvalitet
+npm run lint            # Check ESLint
+npm run lint:fix        # Fix ESLint issues
+npm run format          # Format with Prettier
+npm run format:check    # Check Prettier formatting
+npm run type-check      # TypeScript type checking
+```
+
+## ✅ Kvalitetssikring
+
+Dette projekt har følgende kvalitetssikring:
+
+1. **TypeScript strict mode** - Fuld type safety
+2. **ESLint** - Kodekvalitet og konsistens
+3. **Prettier** - Ensartet kodeformatering
+4. **Husky** - Pre-commit hooks
+5. **Vitest** - Unit og integration tests
+6. **Zod** - Runtime input validering
+
+## 🔒 Sikkerhed
+
+- Passwords hashet med bcryptjs (12 rounds)
+- Input validering med Zod
+- SQL injection beskyttelse via Drizzle ORM
+- Server-side sessions (ikke JWT)
+- Environment variable validering
+
+## 📝 Næste Skridt
+
+Etape 1 er nu komplet! Næste etape vil indeholde:
+
+- UI komponenter til login/registrering
+- Dashboard med produkthåndtering
+- WooCommerce API integration
+- Avanceret testing og monitoring

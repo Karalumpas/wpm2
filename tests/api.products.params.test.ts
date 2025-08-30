@@ -51,4 +51,3 @@ describe('Products API query parsing', () => {
     expect(() => getProductsQuerySchema.parse(requestParams)).toThrow();
   });
 });
-

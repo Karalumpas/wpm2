@@ -1,6 +1,6 @@
 /**
  * Image Synchronization Service
- * 
+ *
  * Handles downloading images from connected WooCommerce shops to central MinIO storage
  * and distributing them to other shops when products are pushed.
  */
@@ -56,7 +56,10 @@ export class ImageSyncService {
   /**
    * Download image from external URL and store in MinIO
    */
-  async downloadImageToMinIO(imageUrl: string, shopId: string): Promise<SyncedImage | null> {
+  async downloadImageToMinIO(
+    imageUrl: string,
+    shopId: string
+  ): Promise<SyncedImage | null> {
     try {
       // Validate URL
       if (!imageUrl || !this.isValidImageUrl(imageUrl)) {
@@ -72,7 +75,7 @@ export class ImageSyncService {
       try {
         await this.minioClient.statObject(this.bucketName, minioPath);
         console.log(`📷 Image already exists in MinIO: ${minioPath}`);
-        
+
         return {
           originalUrl: imageUrl,
           centralUrl: `http://localhost:9000/${this.bucketName}/${minioPath}`,
@@ -88,7 +91,7 @@ export class ImageSyncService {
       // Download image from external URL
       console.log(`📥 Downloading image: ${imageUrl}`);
       const response = await fetch(imageUrl);
-      
+
       if (!response.ok) {
         console.error(`❌ Failed to download image: ${response.statusText}`);
         return null;
@@ -134,7 +137,10 @@ export class ImageSyncService {
 
     // Sync featured image
     if (featuredImage) {
-      const syncedImage = await this.downloadImageToMinIO(featuredImage, shopId);
+      const syncedImage = await this.downloadImageToMinIO(
+        featuredImage,
+        shopId
+      );
       if (syncedImage) {
         results.featuredImage = syncedImage.centralUrl;
       }
@@ -167,13 +173,16 @@ export class ImageSyncService {
   ): Promise<string | null> {
     try {
       // Get image from MinIO
-      const imageStream = await this.minioClient.getObject(this.bucketName, centralImagePath);
+      const imageStream = await this.minioClient.getObject(
+        this.bucketName,
+        centralImagePath
+      );
       const chunks: Buffer[] = [];
-      
+
       for await (const chunk of imageStream) {
         chunks.push(chunk);
       }
-      
+
       const imageBuffer = Buffer.concat(chunks);
 
       // Upload to target WooCommerce shop
@@ -181,13 +190,16 @@ export class ImageSyncService {
       const formData = new FormData();
       formData.append('file', new Blob([imageBuffer]), 'product-image.jpg');
 
-      const uploadResponse = await fetch(`${targetShopConfig.url}/wp-json/wc/v3/media`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Basic ${Buffer.from(`${targetShopConfig.apiKey}:${targetShopConfig.apiSecret}`).toString('base64')}`,
-        },
-        body: formData,
-      });
+      const uploadResponse = await fetch(
+        `${targetShopConfig.url}/wp-json/wc/v3/media`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Basic ${Buffer.from(`${targetShopConfig.apiKey}:${targetShopConfig.apiSecret}`).toString('base64')}`,
+          },
+          body: formData,
+        }
+      );
 
       if (uploadResponse.ok) {
         const uploadResult = await uploadResponse.json();
@@ -208,8 +220,15 @@ export class ImageSyncService {
     try {
       const urlObj = new URL(url);
       const pathname = urlObj.pathname.toLowerCase();
-      const validExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
-      return validExtensions.some(ext => pathname.endsWith(ext));
+      const validExtensions = [
+        '.jpg',
+        '.jpeg',
+        '.png',
+        '.gif',
+        '.webp',
+        '.svg',
+      ];
+      return validExtensions.some((ext) => pathname.endsWith(ext));
     } catch {
       return false;
     }
@@ -222,10 +241,15 @@ export class ImageSyncService {
     try {
       const url = new URL(originalUrl);
       const originalName = url.pathname.split('/').pop() || 'image';
-      const extension = originalName.includes('.') ? originalName.split('.').pop() : 'jpg';
+      const extension = originalName.includes('.')
+        ? originalName.split('.').pop()
+        : 'jpg';
       const uniqueId = uuidv4().substring(0, 8);
-      
-      return `${shopId}_${uniqueId}_${originalName}`.replace(/[^a-zA-Z0-9._-]/g, '_');
+
+      return `${shopId}_${uniqueId}_${originalName}`.replace(
+        /[^a-zA-Z0-9._-]/g,
+        '_'
+      );
     } catch {
       return `${shopId}_${uuidv4()}.jpg`;
     }

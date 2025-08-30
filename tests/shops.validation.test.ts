@@ -55,19 +55,39 @@ describe('Shops validation schemas', () => {
     it('should reject invalid data', () => {
       const invalidCases = [
         {
-          data: { name: '', url: 'https://example.com', consumerKey: 'ck_test123456789', consumerSecret: 'cs_test123456789' },
+          data: {
+            name: '',
+            url: 'https://example.com',
+            consumerKey: 'ck_test123456789',
+            consumerSecret: 'cs_test123456789',
+          },
           error: 'name',
         },
         {
-          data: { name: 'Test Shop', url: '', consumerKey: 'ck_test123456789', consumerSecret: 'cs_test123456789' },
+          data: {
+            name: 'Test Shop',
+            url: '',
+            consumerKey: 'ck_test123456789',
+            consumerSecret: 'cs_test123456789',
+          },
           error: 'url',
         },
         {
-          data: { name: 'Test Shop', url: 'https://example.com', consumerKey: 'short', consumerSecret: 'cs_test123456789' },
+          data: {
+            name: 'Test Shop',
+            url: 'https://example.com',
+            consumerKey: 'short',
+            consumerSecret: 'cs_test123456789',
+          },
           error: 'consumerKey',
         },
         {
-          data: { name: 'Test Shop', url: 'https://example.com', consumerKey: 'ck_test123456789', consumerSecret: 'short' },
+          data: {
+            name: 'Test Shop',
+            url: 'https://example.com',
+            consumerKey: 'ck_test123456789',
+            consumerSecret: 'short',
+          },
           error: 'consumerSecret',
         },
       ];
@@ -79,13 +99,15 @@ describe('Shops validation schemas', () => {
 
     it('should handle long shop names', () => {
       const longName = 'a'.repeat(256);
-      
-      expect(() => createShopSchema.parse({
-        name: longName,
-        url: 'https://example.com',
-        consumerKey: 'ck_test123456789',
-        consumerSecret: 'cs_test123456789',
-      })).toThrow();
+
+      expect(() =>
+        createShopSchema.parse({
+          name: longName,
+          url: 'https://example.com',
+          consumerKey: 'ck_test123456789',
+          consumerSecret: 'cs_test123456789',
+        })
+      ).toThrow();
     });
   });
 
@@ -115,9 +137,11 @@ describe('Shops validation schemas', () => {
     });
 
     it('should reject invalid status values', () => {
-      expect(() => updateShopSchema.parse({
-        status: 'invalid-status',
-      })).toThrow();
+      expect(() =>
+        updateShopSchema.parse({
+          status: 'invalid-status',
+        })
+      ).toThrow();
     });
 
     it('should allow empty object', () => {

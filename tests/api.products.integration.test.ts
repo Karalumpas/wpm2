@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { db } from '@/db';
-import { 
-  products, 
-  productVariants, 
-  categories, 
+import {
+  products,
+  productVariants,
+  categories,
   brands,
   productCategories,
-  productBrands 
+  productBrands,
 } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
@@ -77,7 +77,7 @@ describe('Products API Integration Tests', () => {
   beforeEach(async () => {
     // Clean up before each test to ensure isolation
     await cleanupTestData();
-    
+
     // Insert fresh test data
     await db.insert(brands).values(testBrand);
     await db.insert(categories).values(testCategory);
@@ -95,9 +95,15 @@ describe('Products API Integration Tests', () => {
 
   async function cleanupTestData() {
     // Delete in correct order due to foreign key constraints
-    await db.delete(productCategories).where(eq(productCategories.productId, testProduct.id));
-    await db.delete(productBrands).where(eq(productBrands.productId, testProduct.id));
-    await db.delete(productVariants).where(eq(productVariants.productId, testProduct.id));
+    await db
+      .delete(productCategories)
+      .where(eq(productCategories.productId, testProduct.id));
+    await db
+      .delete(productBrands)
+      .where(eq(productBrands.productId, testProduct.id));
+    await db
+      .delete(productVariants)
+      .where(eq(productVariants.productId, testProduct.id));
     await db.delete(products).where(eq(products.id, testProduct.id));
     await db.delete(categories).where(eq(categories.id, testCategory.id));
     await db.delete(brands).where(eq(brands.id, testBrand.id));
@@ -105,7 +111,9 @@ describe('Products API Integration Tests', () => {
 
   describe('GET /api/products/filters', () => {
     it('should return available filters', async () => {
-      const response = await fetch('http://localhost:3000/api/products/filters');
+      const response = await fetch(
+        'http://localhost:3000/api/products/filters'
+      );
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -142,19 +150,23 @@ describe('Products API Integration Tests', () => {
 
     it('should return cached results on subsequent requests', async () => {
       const start1 = Date.now();
-      const response1 = await fetch('http://localhost:3000/api/products/filters');
+      const response1 = await fetch(
+        'http://localhost:3000/api/products/filters'
+      );
       const duration1 = Date.now() - start1;
-      
+
       const start2 = Date.now();
-      const response2 = await fetch('http://localhost:3000/api/products/filters');
+      const response2 = await fetch(
+        'http://localhost:3000/api/products/filters'
+      );
       const duration2 = Date.now() - start2;
 
       expect(response1.status).toBe(200);
       expect(response2.status).toBe(200);
-      
+
       const data1 = await response1.json();
       const data2 = await response2.json();
-      
+
       expect(data1).toEqual(data2);
       // Second request should be faster due to caching
       expect(duration2).toBeLessThan(duration1);
@@ -172,7 +184,9 @@ describe('Products API Integration Tests', () => {
       expect(Array.isArray(data.items)).toBe(true);
 
       // Should include our test product
-      const testProductItem = data.items.find((item: any) => item.id === testProduct.id);
+      const testProductItem = data.items.find(
+        (item: any) => item.id === testProduct.id
+      );
       expect(testProductItem).toBeDefined();
       expect(testProductItem).toMatchObject({
         id: testProduct.id,
@@ -186,71 +200,97 @@ describe('Products API Integration Tests', () => {
     });
 
     it('should filter by status', async () => {
-      const response = await fetch('http://localhost:3000/api/products?status=published');
+      const response = await fetch(
+        'http://localhost:3000/api/products?status=published'
+      );
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.items.every((item: any) => item.status === 'published')).toBe(true);
+      expect(data.items.every((item: any) => item.status === 'published')).toBe(
+        true
+      );
     });
 
     it('should filter by type', async () => {
-      const response = await fetch('http://localhost:3000/api/products?type=simple');
+      const response = await fetch(
+        'http://localhost:3000/api/products?type=simple'
+      );
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.items.every((item: any) => item.type === 'simple')).toBe(true);
+      expect(data.items.every((item: any) => item.type === 'simple')).toBe(
+        true
+      );
     });
 
     it('should filter by brand', async () => {
-      const response = await fetch(`http://localhost:3000/api/products?brandIds=${testBrand.id}`);
+      const response = await fetch(
+        `http://localhost:3000/api/products?brandIds=${testBrand.id}`
+      );
       const data = await response.json();
 
       expect(response.status).toBe(200);
       expect(data.items.length).toBeGreaterThanOrEqual(1);
-      
-      const testProductItem = data.items.find((item: any) => item.id === testProduct.id);
+
+      const testProductItem = data.items.find(
+        (item: any) => item.id === testProduct.id
+      );
       expect(testProductItem).toBeDefined();
     });
 
     it('should filter by category', async () => {
-      const response = await fetch(`http://localhost:3000/api/products?categoryIds=${testCategory.id}`);
+      const response = await fetch(
+        `http://localhost:3000/api/products?categoryIds=${testCategory.id}`
+      );
       const data = await response.json();
 
       expect(response.status).toBe(200);
       expect(data.items.length).toBeGreaterThanOrEqual(1);
-      
-      const testProductItem = data.items.find((item: any) => item.id === testProduct.id);
+
+      const testProductItem = data.items.find(
+        (item: any) => item.id === testProduct.id
+      );
       expect(testProductItem).toBeDefined();
     });
 
     it('should search products by name', async () => {
-      const response = await fetch('http://localhost:3000/api/products?search=Test Product');
+      const response = await fetch(
+        'http://localhost:3000/api/products?search=Test Product'
+      );
       const data = await response.json();
 
       expect(response.status).toBe(200);
       expect(data.items.length).toBeGreaterThanOrEqual(1);
-      
-      const testProductItem = data.items.find((item: any) => item.id === testProduct.id);
+
+      const testProductItem = data.items.find(
+        (item: any) => item.id === testProduct.id
+      );
       expect(testProductItem).toBeDefined();
     });
 
     it('should search products by SKU', async () => {
-      const response = await fetch('http://localhost:3000/api/products?search=TEST-SKU-001');
+      const response = await fetch(
+        'http://localhost:3000/api/products?search=TEST-SKU-001'
+      );
       const data = await response.json();
 
       expect(response.status).toBe(200);
       expect(data.items.length).toBeGreaterThanOrEqual(1);
-      
-      const testProductItem = data.items.find((item: any) => item.id === testProduct.id);
+
+      const testProductItem = data.items.find(
+        (item: any) => item.id === testProduct.id
+      );
       expect(testProductItem).toBeDefined();
     });
 
     it('should sort by name ascending', async () => {
-      const response = await fetch('http://localhost:3000/api/products?sortBy=name&sortOrder=asc');
+      const response = await fetch(
+        'http://localhost:3000/api/products?sortBy=name&sortOrder=asc'
+      );
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      
+
       if (data.items.length > 1) {
         const names = data.items.map((item: any) => item.name);
         const sortedNames = [...names].sort();
@@ -259,16 +299,18 @@ describe('Products API Integration Tests', () => {
     });
 
     it('should sort by price descending', async () => {
-      const response = await fetch('http://localhost:3000/api/products?sortBy=basePrice&sortOrder=desc');
+      const response = await fetch(
+        'http://localhost:3000/api/products?sortBy=basePrice&sortOrder=desc'
+      );
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      
+
       if (data.items.length > 1) {
-        const prices = data.items.map((item: any) => 
+        const prices = data.items.map((item: any) =>
           item.basePrice ? parseFloat(item.basePrice) : 0
         );
-        
+
         for (let i = 1; i < prices.length; i++) {
           expect(prices[i]).toBeLessThanOrEqual(prices[i - 1]);
         }
@@ -276,7 +318,9 @@ describe('Products API Integration Tests', () => {
     });
 
     it('should respect limit parameter', async () => {
-      const response = await fetch('http://localhost:3000/api/products?limit=5');
+      const response = await fetch(
+        'http://localhost:3000/api/products?limit=5'
+      );
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -284,21 +328,29 @@ describe('Products API Integration Tests', () => {
     });
 
     it('should validate limit constraints', async () => {
-      const response1 = await fetch('http://localhost:3000/api/products?limit=0');
+      const response1 = await fetch(
+        'http://localhost:3000/api/products?limit=0'
+      );
       expect(response1.status).toBe(400);
 
-      const response2 = await fetch('http://localhost:3000/api/products?limit=101');
+      const response2 = await fetch(
+        'http://localhost:3000/api/products?limit=101'
+      );
       expect(response2.status).toBe(400);
     });
 
     it('should validate sort field whitelist', async () => {
-      const response = await fetch('http://localhost:3000/api/products?sortBy=invalid_field');
+      const response = await fetch(
+        'http://localhost:3000/api/products?sortBy=invalid_field'
+      );
       expect(response.status).toBe(400);
     });
 
     it('should handle cursor pagination', async () => {
       // Get first page
-      const response1 = await fetch('http://localhost:3000/api/products?limit=1');
+      const response1 = await fetch(
+        'http://localhost:3000/api/products?limit=1'
+      );
       const data1 = await response1.json();
 
       expect(response1.status).toBe(200);
@@ -306,19 +358,23 @@ describe('Products API Integration Tests', () => {
 
       if (data1.hasMore && data1.nextCursor) {
         // Get second page using cursor
-        const response2 = await fetch(`http://localhost:3000/api/products?limit=1&cursor=${data1.nextCursor}`);
+        const response2 = await fetch(
+          `http://localhost:3000/api/products?limit=1&cursor=${data1.nextCursor}`
+        );
         const data2 = await response2.json();
 
         expect(response2.status).toBe(200);
         expect(data2.items.length).toBe(1);
-        
+
         // Should be different products
         expect(data1.items[0].id).not.toBe(data2.items[0].id);
       }
     });
 
     it('should handle invalid cursor gracefully', async () => {
-      const response = await fetch('http://localhost:3000/api/products?cursor=invalid-cursor');
+      const response = await fetch(
+        'http://localhost:3000/api/products?cursor=invalid-cursor'
+      );
       expect(response.status).toBe(400);
     });
 
@@ -334,18 +390,23 @@ describe('Products API Integration Tests', () => {
         limit: '10',
       });
 
-      const response = await fetch(`http://localhost:3000/api/products?${queryParams}`);
+      const response = await fetch(
+        `http://localhost:3000/api/products?${queryParams}`
+      );
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.items.every((item: any) => 
-        item.status === 'published' && 
-        item.type === 'simple'
-      )).toBe(true);
+      expect(
+        data.items.every(
+          (item: any) => item.status === 'published' && item.type === 'simple'
+        )
+      ).toBe(true);
     });
 
     it('should return empty results for non-matching filters', async () => {
-      const response = await fetch('http://localhost:3000/api/products?search=NonExistentProduct12345');
+      const response = await fetch(
+        'http://localhost:3000/api/products?search=NonExistentProduct12345'
+      );
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -356,18 +417,26 @@ describe('Products API Integration Tests', () => {
 
   describe('Error Handling', () => {
     it('should handle malformed UUID in filters', async () => {
-      const response = await fetch('http://localhost:3000/api/products?brandIds=invalid-uuid');
+      const response = await fetch(
+        'http://localhost:3000/api/products?brandIds=invalid-uuid'
+      );
       expect(response.status).toBe(400);
     });
 
     it('should handle invalid enum values', async () => {
-      const response1 = await fetch('http://localhost:3000/api/products?status=invalid');
+      const response1 = await fetch(
+        'http://localhost:3000/api/products?status=invalid'
+      );
       expect(response1.status).toBe(400);
 
-      const response2 = await fetch('http://localhost:3000/api/products?type=invalid');
+      const response2 = await fetch(
+        'http://localhost:3000/api/products?type=invalid'
+      );
       expect(response2.status).toBe(400);
 
-      const response3 = await fetch('http://localhost:3000/api/products?sortOrder=invalid');
+      const response3 = await fetch(
+        'http://localhost:3000/api/products?sortOrder=invalid'
+      );
       expect(response3.status).toBe(400);
     });
 
@@ -381,7 +450,9 @@ describe('Products API Integration Tests', () => {
   describe('Performance', () => {
     it('should handle large datasets efficiently', async () => {
       const start = Date.now();
-      const response = await fetch('http://localhost:3000/api/products?limit=50');
+      const response = await fetch(
+        'http://localhost:3000/api/products?limit=50'
+      );
       const duration = Date.now() - start;
 
       expect(response.status).toBe(200);
@@ -391,7 +462,9 @@ describe('Products API Integration Tests', () => {
     it('should use indexes for filtered queries', async () => {
       // Test that filtered queries are still fast
       const start = Date.now();
-      const response = await fetch(`http://localhost:3000/api/products?status=published&brandIds=${testBrand.id}`);
+      const response = await fetch(
+        `http://localhost:3000/api/products?status=published&brandIds=${testBrand.id}`
+      );
       const duration = Date.now() - start;
 
       expect(response.status).toBe(200);

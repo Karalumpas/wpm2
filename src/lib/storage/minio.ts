@@ -24,11 +24,11 @@ export async function initializeMinIO() {
   try {
     // Check if bucket exists, create if it doesn't
     const bucketExists = await minioClient.bucketExists(DEFAULT_BUCKET);
-    
+
     if (!bucketExists) {
       await minioClient.makeBucket(DEFAULT_BUCKET, 'us-east-1');
       console.log(`Created bucket: ${DEFAULT_BUCKET}`);
-      
+
       // Set bucket policy to allow public read access for product images
       const policy = {
         Version: '2012-10-17',
@@ -41,11 +41,11 @@ export async function initializeMinIO() {
           },
         ],
       };
-      
+
       await minioClient.setBucketPolicy(DEFAULT_BUCKET, JSON.stringify(policy));
       console.log(`Set public read policy for bucket: ${DEFAULT_BUCKET}`);
     }
-    
+
     console.log('MinIO initialized successfully');
   } catch (error) {
     console.error('Error initializing MinIO:', error);
@@ -54,14 +54,17 @@ export async function initializeMinIO() {
 }
 
 // Helper function to generate object name
-export function generateObjectName(fileName: string, productId?: string): string {
+export function generateObjectName(
+  fileName: string,
+  productId?: string
+): string {
   const timestamp = Date.now();
   const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, '_');
-  
+
   if (productId) {
     return `products/${productId}/${timestamp}_${sanitizedFileName}`;
   }
-  
+
   return `uploads/${timestamp}_${sanitizedFileName}`;
 }
 
@@ -80,7 +83,7 @@ export async function uploadFile(
     await minioClient.putObject(DEFAULT_BUCKET, objectName, file, file.length, {
       'Content-Type': contentType,
     });
-    
+
     return getFileUrl(objectName);
   } catch (error) {
     console.error('Error uploading file to MinIO:', error);
@@ -103,8 +106,12 @@ export async function listFiles(prefix?: string): Promise<string[]> {
   try {
     const objectsList: string[] = [];
     const effectivePrefix: string = prefix ?? '';
-    const stream = minioClient.listObjects(DEFAULT_BUCKET, effectivePrefix, true);
-    
+    const stream = minioClient.listObjects(
+      DEFAULT_BUCKET,
+      effectivePrefix,
+      true
+    );
+
     return new Promise((resolve, reject) => {
       stream.on('data', (obj) => {
         if (obj?.name) objectsList.push(obj.name);

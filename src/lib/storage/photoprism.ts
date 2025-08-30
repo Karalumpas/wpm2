@@ -91,8 +91,8 @@ class PhotoPrismClient {
       );
 
       this.accessToken = response.data.access_token;
-      this.tokenExpiry = new Date(Date.now() + (response.data.expires_in * 1000));
-      
+      this.tokenExpiry = new Date(Date.now() + response.data.expires_in * 1000);
+
       console.log('Successfully authenticated with PhotoPrism');
     } catch (error) {
       console.error('Failed to authenticate with PhotoPrism:', error);
@@ -102,13 +102,21 @@ class PhotoPrismClient {
 
   // Ensure we have a valid authentication token
   private async ensureAuthenticated(): Promise<void> {
-    if (!this.accessToken || !this.tokenExpiry || this.tokenExpiry <= new Date()) {
+    if (
+      !this.accessToken ||
+      !this.tokenExpiry ||
+      this.tokenExpiry <= new Date()
+    ) {
       await this.authenticate();
     }
   }
 
   // Search photos
-  async searchPhotos(query?: string, count: number = 24, offset: number = 0): Promise<PhotoPrismPhoto[]> {
+  async searchPhotos(
+    query?: string,
+    count: number = 24,
+    offset: number = 0
+  ): Promise<PhotoPrismPhoto[]> {
     try {
       const params = new URLSearchParams({
         count: count.toString(),
@@ -116,7 +124,9 @@ class PhotoPrismClient {
         ...(query && { q: query }),
       });
 
-      const response = await this.apiClient.get<PhotoPrismPhoto[]>(`/photos?${params}`);
+      const response = await this.apiClient.get<PhotoPrismPhoto[]>(
+        `/photos?${params}`
+      );
       return response.data;
     } catch (error) {
       console.error('Error searching photos:', error);
@@ -127,7 +137,9 @@ class PhotoPrismClient {
   // Get photo by UID
   async getPhoto(uid: string): Promise<PhotoPrismPhoto> {
     try {
-      const response = await this.apiClient.get<PhotoPrismPhoto>(`/photos/${uid}`);
+      const response = await this.apiClient.get<PhotoPrismPhoto>(
+        `/photos/${uid}`
+      );
       return response.data;
     } catch (error) {
       console.error(`Error getting photo ${uid}:`, error);
@@ -136,9 +148,15 @@ class PhotoPrismClient {
   }
 
   // Update photo metadata
-  async updatePhoto(uid: string, data: Partial<PhotoPrismPhoto>): Promise<PhotoPrismPhoto> {
+  async updatePhoto(
+    uid: string,
+    data: Partial<PhotoPrismPhoto>
+  ): Promise<PhotoPrismPhoto> {
     try {
-      const response = await this.apiClient.put<PhotoPrismPhoto>(`/photos/${uid}`, data);
+      const response = await this.apiClient.put<PhotoPrismPhoto>(
+        `/photos/${uid}`,
+        data
+      );
       return response.data;
     } catch (error) {
       console.error(`Error updating photo ${uid}:`, error);
@@ -147,7 +165,15 @@ class PhotoPrismClient {
   }
 
   // Get photo thumbnail URL
-  getPhotoThumbnailUrl(uid: string, size: 'tile_224' | 'tile_500' | 'fit_720' | 'fit_1280' | 'fit_1920' = 'tile_224'): string {
+  getPhotoThumbnailUrl(
+    uid: string,
+    size:
+      | 'tile_224'
+      | 'tile_500'
+      | 'fit_720'
+      | 'fit_1280'
+      | 'fit_1920' = 'tile_224'
+  ): string {
     return `${PHOTOPRISM_URL}/api/v1/t/${uid}/${PHOTOPRISM_USER}/${size}`;
   }
 
@@ -157,14 +183,19 @@ class PhotoPrismClient {
   }
 
   // Get all albums
-  async getAlbums(count: number = 100, offset: number = 0): Promise<PhotoPrismAlbum[]> {
+  async getAlbums(
+    count: number = 100,
+    offset: number = 0
+  ): Promise<PhotoPrismAlbum[]> {
     try {
       const params = new URLSearchParams({
         count: count.toString(),
         offset: offset.toString(),
       });
 
-      const response = await this.apiClient.get<PhotoPrismAlbum[]>(`/albums?${params}`);
+      const response = await this.apiClient.get<PhotoPrismAlbum[]>(
+        `/albums?${params}`
+      );
       return response.data;
     } catch (error) {
       console.error('Error getting albums:', error);
@@ -173,7 +204,10 @@ class PhotoPrismClient {
   }
 
   // Create album
-  async createAlbum(title: string, description?: string): Promise<PhotoPrismAlbum> {
+  async createAlbum(
+    title: string,
+    description?: string
+  ): Promise<PhotoPrismAlbum> {
     try {
       const response = await this.apiClient.post<PhotoPrismAlbum>('/albums', {
         Title: title,
@@ -211,7 +245,10 @@ class PhotoPrismClient {
   }
 
   // Get indexing status
-  async getIndexingStatus(): Promise<{ indexing: boolean; importing: boolean }> {
+  async getIndexingStatus(): Promise<{
+    indexing: boolean;
+    importing: boolean;
+  }> {
     try {
       const response = await this.apiClient.get('/status');
       return {

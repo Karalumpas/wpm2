@@ -30,15 +30,13 @@ export async function GET(request: NextRequest) {
       .returning();
 
     if (result.length === 0) {
-      return NextResponse.json(
-        { error: 'Shop not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Shop not found' }, { status: 404 });
     }
 
     return NextResponse.json({
       success: true,
-      message: 'mgwp shop credentials updated successfully with new encryption method',
+      message:
+        'mgwp shop credentials updated successfully with new encryption method',
       shop: {
         id: result[0].id,
         name: result[0].name,
@@ -48,15 +46,14 @@ export async function GET(request: NextRequest) {
         keyLength: encryptedKey.length,
         secretLength: encryptedSecret.length,
         hasIV: encryptedKey.includes(':') && encryptedSecret.includes(':'),
-      }
+      },
     });
-
   } catch (error) {
     console.error('Fix mgwp API error:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to fix mgwp credentials',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

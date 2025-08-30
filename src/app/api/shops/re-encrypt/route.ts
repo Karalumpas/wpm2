@@ -31,10 +31,7 @@ export async function POST(request: NextRequest) {
       .returning();
 
     if (result.length === 0) {
-      return NextResponse.json(
-        { error: 'Shop not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Shop not found' }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -44,15 +41,14 @@ export async function POST(request: NextRequest) {
         id: result[0].id,
         name: result[0].name,
         url: result[0].url,
-      }
+      },
     });
-
   } catch (error) {
     console.error('Re-encrypt API error:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to update credentials',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

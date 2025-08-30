@@ -9,7 +9,9 @@ import { z } from 'zod';
 const updateSettingsSchema = z.object({
   currency: z.string().min(3).max(3).optional(), // ISO currency codes (DKK, EUR, USD)
   currencySymbol: z.string().min(1).max(3).optional(),
-  currencyPosition: z.enum(['left', 'right', 'left_space', 'right_space']).optional(),
+  currencyPosition: z
+    .enum(['left', 'right', 'left_space', 'right_space'])
+    .optional(),
   productsPerPage: z.number().min(1).max(100).optional(),
   defaultViewMode: z.enum(['grid', 'list']).optional(),
 });
@@ -25,7 +27,7 @@ export async function GET() {
     // if (!session?.user?.email) {
     //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     // }
-    
+
     // Use temporary settings for testing
     const defaultSettings = {
       currency: 'DKK',
@@ -40,9 +42,9 @@ export async function GET() {
     console.error('Failed to get user settings:', error);
     console.error('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
+      stack: error instanceof Error ? error.stack : undefined,
     });
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

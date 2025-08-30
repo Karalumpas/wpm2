@@ -36,31 +36,33 @@ interface UseProductsResult {
 async function fetcher(url: string): Promise<ProductsResponse> {
   try {
     const response = await fetch(url);
-    
+
     if (!response.ok) {
       throw new Error(`Failed to fetch products: ${response.statusText}`);
     }
-    
+
     const apiData = await response.json();
-    
+
     // Transform API response to expected format
     // API returns: { items, hasMore, nextCursor, total?, pagination? }
     // Component expects: { products, pagination }
-    
+
     const transformedData = {
       products: apiData.items || [],
       pagination: apiData.pagination || {
         page: 1,
         limit: apiData.items?.length || 0,
         total: apiData.total || apiData.items?.length || 0,
-        totalPages: apiData.total ? Math.ceil(apiData.total / (apiData.items?.length || 1)) : 1,
+        totalPages: apiData.total
+          ? Math.ceil(apiData.total / (apiData.items?.length || 1))
+          : 1,
         hasNext: apiData.hasMore || false,
         hasPrev: false,
         cursor: undefined,
         nextCursor: apiData.nextCursor,
       },
     };
-    
+
     return transformedData;
   } catch (error) {
     throw error;
@@ -78,11 +80,11 @@ export function buildApiUrl(params: ProcessedSearchParams): string {
   if (params.status) searchParams.set('status', params.status);
   if (params.type) searchParams.set('type', params.type);
   if (params.brandIds.length > 0)
-    params.brandIds.forEach(id => searchParams.append('brandIds', id));
+    params.brandIds.forEach((id) => searchParams.append('brandIds', id));
   if (params.categoryIds.length > 0)
-    params.categoryIds.forEach(id => searchParams.append('categoryIds', id));
+    params.categoryIds.forEach((id) => searchParams.append('categoryIds', id));
   if (params.shopIds.length > 0)
-    params.shopIds.forEach(id => searchParams.append('shopIds', id));
+    params.shopIds.forEach((id) => searchParams.append('shopIds', id));
 
   searchParams.set('sortBy', params.sortBy);
   searchParams.set('sortOrder', params.sortOrder);
@@ -119,21 +121,18 @@ export function useProducts(params: ProcessedSearchParams): UseProductsResult {
     params.sortOrder,
     params.limit,
     params.page,
-    params.cursor
+    params.cursor,
   ]);
-  
-  const { data, error, isLoading, isValidating, mutate } = useSWR<ProductsResponse>(
-    cacheKey,
-    fetcher,
-    {
+
+  const { data, error, isLoading, isValidating, mutate } =
+    useSWR<ProductsResponse>(cacheKey, fetcher, {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       revalidateIfStale: false,
       dedupingInterval: 30000, // Increased from 10s to 30s
       errorRetryCount: 1, // Reduced from 2 to 1
       errorRetryInterval: 5000, // Increased from 2s to 5s
-    }
-  );
+    });
 
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
@@ -153,14 +152,17 @@ export function useProducts(params: ProcessedSearchParams): UseProductsResult {
       const nextData = await fetcher(nextUrl);
 
       // Merge with existing data
-      mutate({
-        ...nextData,
-        products: [...data.products, ...nextData.products],
-        pagination: {
-          ...nextData.pagination,
-          total: data.pagination.total, // Keep original total
+      mutate(
+        {
+          ...nextData,
+          products: [...data.products, ...nextData.products],
+          pagination: {
+            ...nextData.pagination,
+            total: data.pagination.total, // Keep original total
+          },
         },
-      }, false);
+        false
+      );
     } catch (err) {
       console.error('Failed to load more products:', err);
     } finally {
@@ -170,7 +172,7 @@ export function useProducts(params: ProcessedSearchParams): UseProductsResult {
 
   const hasMore = useMemo(() => {
     if (!data?.pagination) return false;
-    
+
     if (params.paginationMode === 'loadMore') {
       return !!data.pagination.nextCursor;
     } else {

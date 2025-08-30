@@ -36,9 +36,7 @@
         "brands_name_unique": {
           "name": "brands_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       },
       "policies": {},
@@ -193,12 +191,8 @@
           "name": "categories_shop_id_shops_id_fk",
           "tableFrom": "categories",
           "tableTo": "shops",
-          "columnsFrom": [
-            "shop_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["shop_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -208,10 +202,7 @@
         "categories_name_parent_unique": {
           "name": "categories_name_parent_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name",
-            "parent_id"
-          ]
+          "columns": ["name", "parent_id"]
         }
       },
       "policies": {},
@@ -457,12 +448,8 @@
           "name": "media_files_product_id_products_id_fk",
           "tableFrom": "media_files",
           "tableTo": "products",
-          "columnsFrom": [
-            "product_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -470,12 +457,8 @@
           "name": "media_files_user_id_users_id_fk",
           "tableFrom": "media_files",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -485,9 +468,7 @@
         "media_files_object_name_unique": {
           "name": "media_files_object_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "object_name"
-          ]
+          "columns": ["object_name"]
         }
       },
       "policies": {},
@@ -533,12 +514,8 @@
           "name": "product_brands_product_id_products_id_fk",
           "tableFrom": "product_brands",
           "tableTo": "products",
-          "columnsFrom": [
-            "product_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -546,12 +523,8 @@
           "name": "product_brands_brand_id_brands_id_fk",
           "tableFrom": "product_brands",
           "tableTo": "brands",
-          "columnsFrom": [
-            "brand_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["brand_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -561,10 +534,7 @@
         "product_brands_pk": {
           "name": "product_brands_pk",
           "nullsNotDistinct": false,
-          "columns": [
-            "product_id",
-            "brand_id"
-          ]
+          "columns": ["product_id", "brand_id"]
         }
       },
       "policies": {},
@@ -610,12 +580,8 @@
           "name": "product_categories_product_id_products_id_fk",
           "tableFrom": "product_categories",
           "tableTo": "products",
-          "columnsFrom": [
-            "product_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -623,12 +589,8 @@
           "name": "product_categories_category_id_categories_id_fk",
           "tableFrom": "product_categories",
           "tableTo": "categories",
-          "columnsFrom": [
-            "category_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["category_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -638,10 +600,7 @@
         "product_categories_pk": {
           "name": "product_categories_pk",
           "nullsNotDistinct": false,
-          "columns": [
-            "product_id",
-            "category_id"
-          ]
+          "columns": ["product_id", "category_id"]
         }
       },
       "policies": {},
@@ -844,12 +803,8 @@
           "name": "product_variants_product_id_products_id_fk",
           "tableFrom": "product_variants",
           "tableTo": "products",
-          "columnsFrom": [
-            "product_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -859,9 +814,7 @@
         "product_variants_sku_unique": {
           "name": "product_variants_sku_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "sku"
-          ]
+          "columns": ["sku"]
         }
       },
       "policies": {},
@@ -1189,12 +1142,8 @@
           "name": "products_shop_id_shops_id_fk",
           "tableFrom": "products",
           "tableTo": "shops",
-          "columnsFrom": [
-            "shop_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["shop_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1204,9 +1153,7 @@
         "products_sku_unique": {
           "name": "products_sku_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "sku"
-          ]
+          "columns": ["sku"]
         }
       },
       "policies": {},
@@ -1302,12 +1249,8 @@
           "name": "settings_user_id_users_id_fk",
           "tableFrom": "settings",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1317,9 +1260,7 @@
         "settings_user_unique": {
           "name": "settings_user_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id"
-          ]
+          "columns": ["user_id"]
         }
       },
       "policies": {},
@@ -1424,12 +1365,8 @@
           "name": "shops_user_id_users_id_fk",
           "tableFrom": "shops",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1439,9 +1376,7 @@
         "shops_url_unique": {
           "name": "shops_url_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "url"
-          ]
+          "columns": ["url"]
         }
       },
       "policies": {},
@@ -1486,9 +1421,7 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -1500,29 +1433,17 @@
     "public.product_status": {
       "name": "product_status",
       "schema": "public",
-      "values": [
-        "published",
-        "draft",
-        "private"
-      ]
+      "values": ["published", "draft", "private"]
     },
     "public.product_type": {
       "name": "product_type",
       "schema": "public",
-      "values": [
-        "simple",
-        "variable",
-        "grouped"
-      ]
+      "values": ["simple", "variable", "grouped"]
     },
     "public.shop_status": {
       "name": "shop_status",
       "schema": "public",
-      "values": [
-        "active",
-        "inactive",
-        "error"
-      ]
+      "values": ["active", "inactive", "error"]
     }
   },
   "schemas": {},

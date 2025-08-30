@@ -28,17 +28,17 @@ export function SimpleProductsList() {
       try {
         console.log('🚀 SimpleProductsList: Starting fetch...');
         setLoading(true);
-        
+
         const response = await fetch('/api/products?limit=5');
         console.log('🌐 SimpleProductsList: Response status:', response.status);
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data: ApiResponse = await response.json();
         console.log('📦 SimpleProductsList: Data received:', data);
-        
+
         setProducts(data.items || []);
         setError(null);
       } catch (err) {
@@ -86,7 +86,10 @@ export function SimpleProductsList() {
       <h3 className="text-lg font-medium">Products ({products.length})</h3>
       <div className="grid grid-cols-1 gap-4">
         {products.map((product) => (
-          <div key={product.id} className="p-4 border border-gray-200 rounded-lg">
+          <div
+            key={product.id}
+            className="p-4 border border-gray-200 rounded-lg"
+          >
             <h4 className="font-medium">{product.name}</h4>
             <div className="text-sm text-gray-600 space-y-1">
               <p>SKU: {product.sku}</p>

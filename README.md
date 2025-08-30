@@ -43,6 +43,7 @@ docker compose ps
 ```
 
 **Services tilgængelige:**
+
 - PostgreSQL: localhost:5432
 - MinIO: localhost:9000 (admin: localhost:9001)
 - PhotoPrism: localhost:2342
@@ -94,16 +95,19 @@ npm run dev
 ## 🔍 Service Adresser
 
 **Applikation:**
+
 - http://localhost:3000 - Hovedapplikation
 - http://localhost:3000/api/health - API healthcheck
 - http://localhost:3000/api/health/services - Services status
 
 **Object Storage (MinIO):**
+
 - http://localhost:9000 - MinIO API
 - http://localhost:9001 - MinIO Admin Console
 - Credentials: minioadmin / minioadmin123
 
 **Photo Management (PhotoPrism):**
+
 - http://localhost:2342 - PhotoPrism Interface
 - Credentials: admin / insecure
 
@@ -253,22 +257,26 @@ Dette projekt har følgende kvalitetssikring:
 **Etape 2 - Media Management er komplet!**
 
 ### 🗂️ Media Library
+
 - Upload billeder til MinIO object storage
 - Administrer produkt billeder
 - Automatisk file validering og sikkerhed
 
 ### 📸 Photo Management
+
 - AI-powered foto organisering med PhotoPrism
 - Automatisk indeksering og tagging
 - Avanceret søgning og filtrering
 - Album administration
 
 ### 🔗 Integration
+
 - Produkter kan have featured images
 - Media files koblet til brugere
 - RESTful API til alle media operationer
 
 **Næste etape vil indeholde:**
+
 - UI komponenter til login/registrering forbedringer
 - Avanceret produktbillede management
 - Bulk upload funktionalitet

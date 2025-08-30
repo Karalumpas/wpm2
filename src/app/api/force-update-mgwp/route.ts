@@ -4,7 +4,8 @@ import { shops } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import crypto from 'crypto';
 
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'default-32-char-key-for-development';
+const ENCRYPTION_KEY =
+  process.env.ENCRYPTION_KEY || 'default-32-char-key-for-development';
 const ALGORITHM = 'aes-256-cbc';
 
 // Ensure key is exactly 32 bytes
@@ -31,11 +32,11 @@ export async function POST(request: NextRequest) {
     // Hard-coded credentials for mgwp shop
     const consumerKey = 'ck_fe3f97b0d1bb93c0fd95dec8a0d5d5b94893ddf6';
     const consumerSecret = 'cs_e0ba8b32ad14976fb482ce6e07c4bb8b38de2f24';
-    
+
     // Encrypt with new method
     const encryptedKey = encryptNew(consumerKey);
     const encryptedSecret = encryptNew(consumerSecret);
-    
+
     console.log('Encrypting credentials for mgwp shop...');
     console.log('Consumer Key:', consumerKey);
     console.log('Encrypted Key:', encryptedKey);
@@ -66,15 +67,14 @@ export async function POST(request: NextRequest) {
         secretLength: encryptedSecret.length,
         keyHasIV: encryptedKey.includes(':'),
         secretHasIV: encryptedSecret.includes(':'),
-      }
+      },
     });
-
   } catch (error) {
     console.error('Force update error:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to update credentials',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

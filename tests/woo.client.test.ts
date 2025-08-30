@@ -59,7 +59,9 @@ describe('WooCommerceClient', () => {
 
     it('should handle rate limiting with retries', async () => {
       // Mock sleep to avoid waiting in tests
-      const sleepSpy = vi.spyOn(client as any, 'sleep').mockResolvedValue(undefined);
+      const sleepSpy = vi
+        .spyOn(client as any, 'sleep')
+        .mockResolvedValue(undefined);
 
       // Mock two 429 responses followed by success for all endpoints
       mockFetch
@@ -190,18 +192,19 @@ describe('WooCommerceClient', () => {
 
     it('should measure elapsed time', async () => {
       // Add some delay to mock fetch to make test more realistic
-      mockFetch.mockImplementation(() =>
-        new Promise((resolve) =>
-          setTimeout(
-            () =>
-              resolve({
-                ok: true,
-                status: 200,
-                json: () => Promise.resolve({}),
-              }),
-            1
+      mockFetch.mockImplementation(
+        () =>
+          new Promise((resolve) =>
+            setTimeout(
+              () =>
+                resolve({
+                  ok: true,
+                  status: 200,
+                  json: () => Promise.resolve({}),
+                }),
+              1
+            )
           )
-        )
       );
 
       const result = await client.testConnection();

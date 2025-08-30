@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { initializeMinIO, uploadFile, generateObjectName } from '@/lib/storage/minio';
+import {
+  initializeMinIO,
+  uploadFile,
+  generateObjectName,
+} from '@/lib/storage/minio';
 import { db } from '@/db';
 import { mediaFiles } from '@/db/schema';
 import { auth } from '@/lib/auth-config';
@@ -38,12 +42,18 @@ export async function POST(request: NextRequest) {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      return NextResponse.json({ error: 'Only image files are allowed' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Only image files are allowed' },
+        { status: 400 }
+      );
     }
 
     // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
-      return NextResponse.json({ error: 'File size must be less than 10MB' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'File size must be less than 10MB' },
+        { status: 400 }
+      );
     }
 
     // Convert file to buffer
@@ -64,19 +74,22 @@ export async function POST(request: NextRequest) {
     // In a production app, you might use a library like 'sharp' to get image dimensions
 
     // Save file metadata to database
-    const [mediaFile] = await db.insert(mediaFiles).values({
-      fileName: file.name,
-      originalFileName: file.name,
-      objectName,
-      fileSize: file.size.toString(),
-      mimeType: file.type,
-      width: width?.toString(),
-      height: height?.toString(),
-      minioUrl: fileUrl,
-      productId: productId || null,
-      userId: userId,
-      isFeatured,
-    }).returning();
+    const [mediaFile] = await db
+      .insert(mediaFiles)
+      .values({
+        fileName: file.name,
+        originalFileName: file.name,
+        objectName,
+        fileSize: file.size.toString(),
+        mimeType: file.type,
+        width: width?.toString(),
+        height: height?.toString(),
+        minioUrl: fileUrl,
+        productId: productId || null,
+        userId: userId,
+        isFeatured,
+      })
+      .returning();
 
     return NextResponse.json({
       success: true,
@@ -91,7 +104,6 @@ export async function POST(request: NextRequest) {
         productId: productId || null,
       },
     });
-
   } catch (error) {
     console.error('Error uploading file:', error);
     return NextResponse.json(

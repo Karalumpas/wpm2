@@ -28,7 +28,6 @@ export async function GET() {
       success: true,
       categories: categoriesWithCounts,
     });
-
   } catch (error) {
     console.error('❌ Categories API error:', error);
     return NextResponse.json(

@@ -38,7 +38,10 @@ const urlSchema = z
   .transform(normalizeUrl);
 
 export const createShopSchema = z.object({
-  name: z.string().min(1, 'Shop name is required').max(255, 'Shop name too long'),
+  name: z
+    .string()
+    .min(1, 'Shop name is required')
+    .max(255, 'Shop name too long'),
   url: urlSchema,
   consumerKey: z
     .string()
@@ -51,7 +54,11 @@ export const createShopSchema = z.object({
 });
 
 export const updateShopSchema = z.object({
-  name: z.string().min(1, 'Shop name is required').max(255, 'Shop name too long').optional(),
+  name: z
+    .string()
+    .min(1, 'Shop name is required')
+    .max(255, 'Shop name too long')
+    .optional(),
   url: urlSchema.optional(),
   status: z.enum(['active', 'inactive', 'error']).optional(),
   consumerKey: z
@@ -93,4 +100,6 @@ export const connectionTestResponseSchema = z.object({
 export type CreateShopInput = z.infer<typeof createShopSchema>;
 export type UpdateShopInput = z.infer<typeof updateShopSchema>;
 export type ShopResponse = z.infer<typeof shopResponseSchema>;
-export type ConnectionTestResponse = z.infer<typeof connectionTestResponseSchema>;
+export type ConnectionTestResponse = z.infer<
+  typeof connectionTestResponseSchema
+>;

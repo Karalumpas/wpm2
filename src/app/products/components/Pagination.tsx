@@ -49,7 +49,10 @@ export function Pagination({ pagination, onPageChange }: PaginationProps) {
   const pageNumbers = getPageNumbers();
 
   return (
-    <nav className="flex items-center justify-center space-x-1" aria-label="Pagination">
+    <nav
+      className="flex items-center justify-center space-x-1"
+      aria-label="Pagination"
+    >
       {/* Previous button */}
       <button
         onClick={() => onPageChange(page - 1)}

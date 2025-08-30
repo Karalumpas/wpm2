@@ -15,18 +15,20 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(null);
-  
+  const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(
+    null
+  );
+
   // Prepare image gallery
-  const allImages = [
-    product.featuredImage,
-    ...(product.images || [])
-  ].filter(Boolean) as string[];
-  
+  const allImages = [product.featuredImage, ...(product.images || [])].filter(
+    Boolean
+  ) as string[];
+
   // Use hovered image if hovering, otherwise use selected image
-  const currentImage = hoveredImageIndex !== null 
-    ? allImages[hoveredImageIndex] 
-    : allImages[currentImageIndex] || null;
+  const currentImage =
+    hoveredImageIndex !== null
+      ? allImages[hoveredImageIndex]
+      : allImages[currentImageIndex] || null;
   const hasMultipleImages = allImages.length > 1;
 
   const handleThumbnailClick = (index: number) => {
@@ -60,7 +62,7 @@ export function ProductCard({ product }: ProductCardProps) {
               <Package className="w-16 h-16" />
             </div>
           )}
-          
+
           {/* Status Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1">
             {product.isFeatured && (
@@ -122,7 +124,7 @@ export function ProductCard({ product }: ProductCardProps) {
               </span>
             )}
           </div>
-          
+
           <div className="flex items-center gap-2">
             <p className="text-sm text-gray-500 font-mono bg-gray-50 px-2 py-1 rounded">
               SKU: {product.sku}
@@ -135,11 +137,13 @@ export function ProductCard({ product }: ProductCardProps) {
           <span className="font-bold text-xl text-blue-600">
             {formatPrice(product.basePrice)}
           </span>
-          {product.type === 'variable' && product.variantCount && product.variantCount > 0 && (
-            <span className="text-sm text-gray-500 bg-blue-50 px-2 py-1 rounded">
-              from
-            </span>
-          )}
+          {product.type === 'variable' &&
+            product.variantCount &&
+            product.variantCount > 0 && (
+              <span className="text-sm text-gray-500 bg-blue-50 px-2 py-1 rounded">
+                from
+              </span>
+            )}
         </div>
 
         {/* Description */}
@@ -162,7 +166,7 @@ export function ProductCard({ product }: ProductCardProps) {
               <Eye className="w-4 h-4" />
               View Details
             </Link>
-            
+
             <ShopLinksButton product={product} />
           </div>
 
@@ -184,8 +188,10 @@ export function ProductCard({ product }: ProductCardProps) {
 
 function ProductStatusBadge({ status }: { status: ProductListItem['status'] }) {
   const variants = {
-    published: 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg',
-    draft: 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg',
+    published:
+      'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg',
+    draft:
+      'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg',
     private: 'bg-gradient-to-r from-gray-500 to-slate-600 text-white shadow-lg',
   };
 
@@ -205,7 +211,8 @@ function ProductStatusBadge({ status }: { status: ProductListItem['status'] }) {
 function ProductTypeBadge({ type }: { type: ProductListItem['type'] }) {
   const variants = {
     simple: 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white shadow-lg',
-    variable: 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg',
+    variable:
+      'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg',
     grouped: 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg',
   };
 

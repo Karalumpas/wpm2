@@ -20,7 +20,9 @@ export async function POST(request: NextRequest) {
     const progressHistory: SyncProgress[] = [];
     syncService.setProgressCallback((progress) => {
       progressHistory.push(progress);
-      console.log(`Sync Progress: ${progress.stage} - ${progress.current}/${progress.total} - ${progress.message}`);
+      console.log(
+        `Sync Progress: ${progress.stage} - ${progress.current}/${progress.total} - ${progress.message}`
+      );
     });
 
     // Start synchronization
@@ -32,13 +34,12 @@ export async function POST(request: NextRequest) {
       details: result.details,
       progress: progressHistory,
     });
-
   } catch (error) {
     console.error('Sync API error:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Synchronization failed',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

@@ -28,11 +28,11 @@ export default function MediaPage() {
     try {
       setIsLoading(true);
       const response = await fetch('/api/media');
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch media files');
       }
-      
+
       const data = await response.json();
       setFiles(data.files || []);
     } catch (err) {
@@ -42,7 +42,9 @@ export default function MediaPage() {
     }
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -63,7 +65,7 @@ export default function MediaPage() {
       }
 
       await fetchFiles();
-      
+
       if (event.target) {
         event.target.value = '';
       }
@@ -114,7 +116,8 @@ export default function MediaPage() {
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
             <Upload className="w-8 h-8 mb-4 text-gray-500" />
             <p className="mb-2 text-sm text-gray-500">
-              <span className="font-semibold">Click to upload</span> or drag and drop
+              <span className="font-semibold">Click to upload</span> or drag and
+              drop
             </p>
             <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
           </div>
@@ -148,13 +151,18 @@ export default function MediaPage() {
       ) : files.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">📁</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No files uploaded</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            No files uploaded
+          </h3>
           <p className="text-gray-600">Upload your first file to get started</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {files.map((file) => (
-            <div key={file.id} className="bg-white rounded-lg shadow-sm border overflow-hidden">
+            <div
+              key={file.id}
+              className="bg-white rounded-lg shadow-sm border overflow-hidden"
+            >
               <div className="aspect-square bg-gray-100 relative">
                 {file.mimeType.startsWith('image/') ? (
                   <img
@@ -167,7 +175,7 @@ export default function MediaPage() {
                     <div className="text-4xl text-gray-400">📄</div>
                   </div>
                 )}
-                
+
                 <div className="absolute top-2 right-2 flex space-x-1">
                   {file.isIndexed && (
                     <span className="bg-green-500 text-white text-xs px-2 py-1 rounded">
@@ -181,14 +189,17 @@ export default function MediaPage() {
                   )}
                 </div>
               </div>
-              
+
               <div className="p-4">
-                <h3 className="font-medium text-gray-900 text-sm truncate" title={file.originalFileName}>
+                <h3
+                  className="font-medium text-gray-900 text-sm truncate"
+                  title={file.originalFileName}
+                >
                   {file.originalFileName}
                 </h3>
                 <p className="text-xs text-gray-500 mt-1">{file.fileSize}</p>
                 <p className="text-xs text-gray-400 mt-1">{file.mimeType}</p>
-                
+
                 <div className="flex items-center justify-between mt-4">
                   <div className="flex space-x-2">
                     <a

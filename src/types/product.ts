@@ -1,6 +1,6 @@
 /**
  * Product Types for Frontend
- * 
+ *
  * Shared type definitions for product-related data structures
  */
 
@@ -54,16 +54,16 @@ export interface Product {
   sku: string;
   type: 'simple' | 'variable' | 'grouped';
   status: 'published' | 'draft' | 'private';
-  
+
   // Pricing (for simple products or base price for variable)
   basePrice: string; // Decimal as string
   compareAtPrice?: string; // Decimal as string
-  
+
   // Stock (for simple products)
   stockQuantity?: number;
   lowStockThreshold?: number;
   trackStock: boolean;
-  
+
   // Physical properties
   weight?: string; // Decimal as string
   dimensions?: {
@@ -71,31 +71,31 @@ export interface Product {
     width?: string;
     height?: string;
   };
-  
+
   // Relationships
   brandId?: string;
   brand?: Brand;
   categoryIds: string[];
   categories?: Category[];
-  
+
   // Media
   images: string[];
   featuredImage?: string;
-  
+
   // SEO
   metaTitle?: string;
   metaDescription?: string;
-  
+
   // Variants (for variable products)
   variants?: ProductVariant[];
-  
+
   // Custom attributes
   attributes?: Record<string, unknown>;
-  
+
   // Status
   isActive: boolean;
   isFeatured: boolean;
-  
+
   // Timestamps
   createdAt: string;
   updatedAt: string;
@@ -113,7 +113,7 @@ export interface ProductListItem {
   type: 'simple' | 'variable' | 'grouped';
   updatedAt: string;
   variantCount?: number;
-  
+
   // Optional fields that may or may not be present
   slug?: string;
   description?: string;

@@ -64,7 +64,7 @@ export function ProductsList({
             <div className="col-span-2">Status</div>
             <div className="col-span-2">Actions</div>
           </div>
-          
+
           {/* List items */}
           <div className="divide-y">
             {products.map((product) => (
@@ -89,10 +89,7 @@ export function ProductsList({
         </div>
       ) : (
         pagination && (
-          <Pagination
-            pagination={pagination}
-            onPageChange={onPageChange}
-          />
+          <Pagination pagination={pagination} onPageChange={onPageChange} />
         )
       )}
     </div>
@@ -124,7 +121,7 @@ function ProductsListSkeleton({ viewMode }: { viewMode: 'grid' | 'list' }) {
         <div className="col-span-2">Status</div>
         <div className="col-span-2">Actions</div>
       </div>
-      
+
       <div className="divide-y">
         {Array.from({ length: 8 }).map((_, i) => (
           <ProductRowSkeleton key={i} />

@@ -26,7 +26,7 @@ const SettingsContext = createContext<SettingsContextType | null>(null);
 async function settingsFetcher(): Promise<UserSettings> {
   try {
     const response = await fetch('/api/settings/user');
-    
+
     if (!response.ok) {
       if (response.status === 401 || response.status === 404) {
         // User not authenticated or not found - use defaults silently
@@ -36,7 +36,7 @@ async function settingsFetcher(): Promise<UserSettings> {
       console.warn(`Settings API returned ${response.status}, using defaults`);
       return DEFAULT_SETTINGS;
     }
-    
+
     const data = await response.json();
     return data;
   } catch (err) {
@@ -47,45 +47,49 @@ async function settingsFetcher(): Promise<UserSettings> {
 }
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-  const { data: settings, error, isLoading, mutate } = useSWR<UserSettings>(
-    '/api/settings/user',
-    settingsFetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-      revalidateIfStale: false,
-      dedupingInterval: 30000, // Cache for 30 seconds
-      errorRetryCount: 1,
-      fallbackData: DEFAULT_SETTINGS,
-    }
-  );
+  const {
+    data: settings,
+    error,
+    isLoading,
+    mutate,
+  } = useSWR<UserSettings>('/api/settings/user', settingsFetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateIfStale: false,
+    dedupingInterval: 30000, // Cache for 30 seconds
+    errorRetryCount: 1,
+    fallbackData: DEFAULT_SETTINGS,
+  });
 
-  const updateSettings = useCallback(async (newSettings: Partial<UserSettings>) => {
-    try {
-      const response = await fetch('/api/settings/user', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newSettings),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update settings');
+  const updateSettings = useCallback(
+    async (newSettings: Partial<UserSettings>) => {
+      try {
+        const response = await fetch('/api/settings/user', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newSettings),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to update settings');
+        }
+
+        const updatedSettings = await response.json();
+
+        // Update SWR cache
+        mutate(updatedSettings, false);
+
+        return updatedSettings;
+      } catch (err) {
+        console.error('Failed to update settings:', err);
+        throw err;
       }
-      
-      const updatedSettings = await response.json();
-      
-      // Update SWR cache
-      mutate(updatedSettings, false);
-      
-      return updatedSettings;
-    } catch (err) {
-      console.error('Failed to update settings:', err);
-      throw err;
-    }
-  }, [mutate]);
+    },
+    [mutate]
+  );
 
   const refetch = useCallback(() => {
     mutate();
@@ -94,7 +98,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const contextValue: SettingsContextType = {
     settings: settings || DEFAULT_SETTINGS,
     isLoading,
-    error: error ? (error instanceof Error ? error.message : 'Failed to load settings') : null,
+    error: error
+      ? error instanceof Error
+        ? error.message
+        : 'Failed to load settings'
+      : null,
     updateSettings,
     refetch,
   };

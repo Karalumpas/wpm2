@@ -29,11 +29,11 @@ export default function NewShopPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
@@ -85,12 +85,12 @@ export default function NewShopPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     try {
       setLoading(true);
-      
+
       const response = await fetch('/api/shops', {
         method: 'POST',
         headers: {
@@ -107,7 +107,8 @@ export default function NewShopPage() {
       router.push('/connections');
     } catch (error) {
       setErrors({
-        submit: error instanceof Error ? error.message : 'Failed to create shop',
+        submit:
+          error instanceof Error ? error.message : 'Failed to create shop',
       });
     } finally {
       setLoading(false);
@@ -143,12 +144,22 @@ export default function NewShopPage() {
                 <div className="rounded-md bg-red-50 p-4">
                   <div className="flex">
                     <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      <svg
+                        className="h-5 w-5 text-red-400"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     </div>
                     <div className="ml-3">
-                      <h3 className="text-sm font-medium text-red-800">Error</h3>
+                      <h3 className="text-sm font-medium text-red-800">
+                        Error
+                      </h3>
                       <div className="mt-2 text-sm text-red-700">
                         <p>{errors.submit}</p>
                       </div>
@@ -158,7 +169,10 @@ export default function NewShopPage() {
               )}
 
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Shop Name *
                 </label>
                 <div className="mt-1">
@@ -180,7 +194,10 @@ export default function NewShopPage() {
               </div>
 
               <div>
-                <label htmlFor="url" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="url"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Shop URL *
                 </label>
                 <div className="mt-1">
@@ -200,12 +217,16 @@ export default function NewShopPage() {
                   )}
                 </div>
                 <p className="mt-2 text-sm text-gray-500">
-                  The base URL of your WooCommerce website (will be automatically converted to HTTPS)
+                  The base URL of your WooCommerce website (will be
+                  automatically converted to HTTPS)
                 </p>
               </div>
 
               <div>
-                <label htmlFor="consumerKey" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="consumerKey"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Consumer Key *
                 </label>
                 <div className="mt-1">
@@ -222,13 +243,18 @@ export default function NewShopPage() {
                     placeholder="ck_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                   />
                   {errors.consumerKey && (
-                    <p className="mt-2 text-sm text-red-600">{errors.consumerKey}</p>
+                    <p className="mt-2 text-sm text-red-600">
+                      {errors.consumerKey}
+                    </p>
                   )}
                 </div>
               </div>
 
               <div>
-                <label htmlFor="consumerSecret" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="consumerSecret"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Consumer Secret *
                 </label>
                 <div className="mt-1">
@@ -245,7 +271,9 @@ export default function NewShopPage() {
                     placeholder="cs_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                   />
                   {errors.consumerSecret && (
-                    <p className="mt-2 text-sm text-red-600">{errors.consumerSecret}</p>
+                    <p className="mt-2 text-sm text-red-600">
+                      {errors.consumerSecret}
+                    </p>
                   )}
                 </div>
               </div>
@@ -253,19 +281,33 @@ export default function NewShopPage() {
               <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    <svg
+                      className="h-5 w-5 text-blue-400"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <h3 className="text-sm font-medium text-blue-800">API Credentials Required</h3>
+                    <h3 className="text-sm font-medium text-blue-800">
+                      API Credentials Required
+                    </h3>
                     <div className="mt-2 text-sm text-blue-700">
                       <p>
-                        You need to create WooCommerce REST API keys in your shop admin:
+                        You need to create WooCommerce REST API keys in your
+                        shop admin:
                         <br />
-                        <strong>WooCommerce → Settings → Advanced → REST API</strong>
+                        <strong>
+                          WooCommerce → Settings → Advanced → REST API
+                        </strong>
                         <br />
-                        Set permissions to &quot;Read/Write&quot; for full product management.
+                        Set permissions to &quot;Read/Write&quot; for full
+                        product management.
                       </p>
                     </div>
                   </div>
@@ -273,39 +315,67 @@ export default function NewShopPage() {
               </div>
 
               {testResult && (
-                <div className={`rounded-md p-4 ${
-                  testResult.success 
-                    ? 'bg-green-50 border border-green-200'
-                    : 'bg-red-50 border border-red-200'
-                }`}>
+                <div
+                  className={`rounded-md p-4 ${
+                    testResult.success
+                      ? 'bg-green-50 border border-green-200'
+                      : 'bg-red-50 border border-red-200'
+                  }`}
+                >
                   <div className="flex">
                     <div className="flex-shrink-0">
-                      <svg 
+                      <svg
                         className={`h-5 w-5 ${testResult.success ? 'text-green-400' : 'text-red-400'}`}
-                        viewBox="0 0 20 20" 
+                        viewBox="0 0 20 20"
                         fill="currentColor"
                       >
                         {testResult.success ? (
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
                         ) : (
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            clipRule="evenodd"
+                          />
                         )}
                       </svg>
                     </div>
                     <div className="ml-3">
-                      <h3 className={`text-sm font-medium ${testResult.success ? 'text-green-800' : 'text-red-800'}`}>
-                        {testResult.success ? 'Connection Successful' : 'Connection Failed'}
+                      <h3
+                        className={`text-sm font-medium ${testResult.success ? 'text-green-800' : 'text-red-800'}`}
+                      >
+                        {testResult.success
+                          ? 'Connection Successful'
+                          : 'Connection Failed'}
                       </h3>
-                      <div className={`mt-2 text-sm ${testResult.success ? 'text-green-700' : 'text-red-700'}`}>
+                      <div
+                        className={`mt-2 text-sm ${testResult.success ? 'text-green-700' : 'text-red-700'}`}
+                      >
                         {testResult.success ? (
                           <div>
                             <p>All endpoints are working correctly!</p>
                             {testResult.details && (
                               <ul className="mt-1 space-y-1">
-                                <li>WordPress: {testResult.details.reachable ? '✓' : '✗'}</li>
-                                <li>WooCommerce API: {testResult.details.auth ? '✓' : '✗'}</li>
-                                <li>Products endpoint: {testResult.details.productsOk ? '✓' : '✗'}</li>
-                                <li>Response time: {testResult.details.elapsedMs}ms</li>
+                                <li>
+                                  WordPress:{' '}
+                                  {testResult.details.reachable ? '✓' : '✗'}
+                                </li>
+                                <li>
+                                  WooCommerce API:{' '}
+                                  {testResult.details.auth ? '✓' : '✗'}
+                                </li>
+                                <li>
+                                  Products endpoint:{' '}
+                                  {testResult.details.productsOk ? '✓' : '✗'}
+                                </li>
+                                <li>
+                                  Response time: {testResult.details.elapsedMs}
+                                  ms
+                                </li>
                               </ul>
                             )}
                           </div>
@@ -327,7 +397,7 @@ export default function NewShopPage() {
                 >
                   {testing ? 'Testing...' : 'Test Connection'}
                 </button>
-                
+
                 <button
                   type="submit"
                   disabled={loading || !testResult?.success}

@@ -11,9 +11,12 @@ export async function GET(request: NextRequest) {
     const photos = await photoPrismClient.searchPhotos(query, count, offset);
 
     // Transform photos to include thumbnail URLs
-    const photosWithUrls = photos.map(photo => ({
+    const photosWithUrls = photos.map((photo) => ({
       ...photo,
-      thumbnailUrl: photoPrismClient.getPhotoThumbnailUrl(photo.UID, 'tile_224'),
+      thumbnailUrl: photoPrismClient.getPhotoThumbnailUrl(
+        photo.UID,
+        'tile_224'
+      ),
       previewUrl: photoPrismClient.getPhotoThumbnailUrl(photo.UID, 'fit_720'),
       downloadUrl: photoPrismClient.getPhotoDownloadUrl(photo.UID),
     }));
@@ -24,7 +27,6 @@ export async function GET(request: NextRequest) {
       offset,
       hasMore: photos.length === count,
     });
-
   } catch (error) {
     console.error('Error fetching photos:', error);
     return NextResponse.json(
@@ -49,12 +51,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(status);
 
       default:
-        return NextResponse.json(
-          { error: 'Invalid action' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
-
   } catch (error) {
     console.error('Error handling photo action:', error);
     return NextResponse.json(

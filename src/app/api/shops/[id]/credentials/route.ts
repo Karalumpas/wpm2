@@ -13,7 +13,7 @@ interface RouteParams {
 // GET /api/shops/[id]/credentials - Get decrypted credentials for editing
 export async function GET(request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
-  
+
   try {
     const [shop] = await db
       .select({

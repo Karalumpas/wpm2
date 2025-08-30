@@ -20,7 +20,7 @@ export const shopStatusEnum = pgEnum('shop_status', [
 
 export const productStatusEnum = pgEnum('product_status', [
   'published',
-  'draft', 
+  'draft',
   'private',
 ]);
 
@@ -60,10 +60,10 @@ export const shops = pgTable(
 
 // Product master catalog tables
 export const products = pgTable(
-  'products', 
+  'products',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    // WooCommerce specific fields  
+    // WooCommerce specific fields
     wooCommerceId: text('woocommerce_id'), // Original WooCommerce product ID
     shopId: uuid('shop_id').references(() => shops.id),
     // Core product fields
@@ -101,18 +101,23 @@ export const products = pgTable(
   },
   (table) => ({
     // Keyset pagination index (primary sort)
-    updatedAtIdIdx: index('products_updated_at_id_idx').on(table.updatedAt.desc(), table.id.desc()),
+    updatedAtIdIdx: index('products_updated_at_id_idx').on(
+      table.updatedAt.desc(),
+      table.id.desc()
+    ),
     statusIdx: index('products_status_idx').on(table.status),
     typeIdx: index('products_type_idx').on(table.type),
     skuIdx: index('products_sku_idx').on(table.sku),
     nameIdx: index('products_name_idx').on(table.name),
-    wooCommerceIdIdx: index('products_woocommerce_id_idx').on(table.wooCommerceId),
+    wooCommerceIdIdx: index('products_woocommerce_id_idx').on(
+      table.wooCommerceId
+    ),
     shopIdIdx: index('products_shop_id_idx').on(table.shopId),
     stockStatusIdx: index('products_stock_status_idx').on(table.stockStatus),
     lastSyncedIdx: index('products_last_synced_idx').on(table.lastSyncedAt),
     shopWooIdUnique: unique('products_shop_id_woocommerce_id_unique').on(
       table.shopId,
-      table.wooCommerceId,
+      table.wooCommerceId
     ),
   })
 );
@@ -121,7 +126,9 @@ export const productVariants = pgTable(
   'product_variants',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    productId: uuid('product_id').references(() => products.id, { onDelete: 'cascade' }).notNull(),
+    productId: uuid('product_id')
+      .references(() => products.id, { onDelete: 'cascade' })
+      .notNull(),
     shopId: uuid('shop_id').references(() => shops.id),
     // WooCommerce specific
     wooCommerceId: text('woocommerce_id'), // Original WooCommerce variation ID
@@ -149,14 +156,20 @@ export const productVariants = pgTable(
   (table) => ({
     productIdIdx: index('product_variants_product_id_idx').on(table.productId),
     skuIdx: index('product_variants_sku_idx').on(table.sku),
-    attributesIdx: index('product_variants_attributes_idx').using('gin', table.attributes),
-    wooCommerceIdIdx: index('product_variants_woocommerce_id_idx').on(table.wooCommerceId),
-    stockStatusIdx: index('product_variants_stock_status_idx').on(table.stockStatus),
-    shopIdIdx: index('product_variants_shop_id_idx').on(table.shopId),
-    shopWooIdUnique: unique('product_variants_shop_id_woocommerce_id_unique').on(
-      table.shopId,
-      table.wooCommerceId,
+    attributesIdx: index('product_variants_attributes_idx').using(
+      'gin',
+      table.attributes
     ),
+    wooCommerceIdIdx: index('product_variants_woocommerce_id_idx').on(
+      table.wooCommerceId
+    ),
+    stockStatusIdx: index('product_variants_stock_status_idx').on(
+      table.stockStatus
+    ),
+    shopIdIdx: index('product_variants_shop_id_idx').on(table.shopId),
+    shopWooIdUnique: unique(
+      'product_variants_shop_id_woocommerce_id_unique'
+    ).on(table.shopId, table.wooCommerceId),
   })
 );
 
@@ -169,8 +182,12 @@ export const brands = pgTable('brands', {
 export const productBrands = pgTable(
   'product_brands',
   {
-    productId: uuid('product_id').references(() => products.id, { onDelete: 'cascade' }).notNull(),
-    brandId: uuid('brand_id').references(() => brands.id, { onDelete: 'cascade' }).notNull(),
+    productId: uuid('product_id')
+      .references(() => products.id, { onDelete: 'cascade' })
+      .notNull(),
+    brandId: uuid('brand_id')
+      .references(() => brands.id, { onDelete: 'cascade' })
+      .notNull(),
   },
   (table) => ({
     pk: unique('product_brands_pk').on(table.productId, table.brandId),
@@ -179,7 +196,7 @@ export const productBrands = pgTable(
 );
 
 export const categories = pgTable(
-  'categories', 
+  'categories',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     // WooCommerce specific
@@ -200,8 +217,13 @@ export const categories = pgTable(
   },
   (table) => ({
     parentIdIdx: index('categories_parent_id_idx').on(table.parentId),
-    nameParentUniqueIdx: unique('categories_name_parent_unique').on(table.name, table.parentId),
-    wooCommerceIdIdx: index('categories_woocommerce_id_idx').on(table.wooCommerceId),
+    nameParentUniqueIdx: unique('categories_name_parent_unique').on(
+      table.name,
+      table.parentId
+    ),
+    wooCommerceIdIdx: index('categories_woocommerce_id_idx').on(
+      table.wooCommerceId
+    ),
     shopIdIdx: index('categories_shop_id_idx').on(table.shopId),
     slugIdx: index('categories_slug_idx').on(table.slug),
   })
@@ -210,12 +232,18 @@ export const categories = pgTable(
 export const productCategories = pgTable(
   'product_categories',
   {
-    productId: uuid('product_id').references(() => products.id, { onDelete: 'cascade' }).notNull(),
-    categoryId: uuid('category_id').references(() => categories.id, { onDelete: 'cascade' }).notNull(),
+    productId: uuid('product_id')
+      .references(() => products.id, { onDelete: 'cascade' })
+      .notNull(),
+    categoryId: uuid('category_id')
+      .references(() => categories.id, { onDelete: 'cascade' })
+      .notNull(),
   },
   (table) => ({
     pk: unique('product_categories_pk').on(table.productId, table.categoryId),
-    categoryIdIdx: index('product_categories_category_id_idx').on(table.categoryId),
+    categoryIdIdx: index('product_categories_category_id_idx').on(
+      table.categoryId
+    ),
   })
 );
 
@@ -223,27 +251,35 @@ export const productCategories = pgTable(
 export const categoriesRelations = foreignKey({
   columns: [categories.parentId],
   foreignColumns: [categories.id],
-  name: 'categories_parent_id_fkey'
+  name: 'categories_parent_id_fkey',
 });
 
 // App Settings table
-export const settings = pgTable('settings', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').references(() => users.id).notNull(),
-  // Currency settings
-  currency: text('currency').default('DKK').notNull(),
-  currencySymbol: text('currency_symbol').default('kr').notNull(),
-  currencyPosition: text('currency_position').default('right').notNull(), // 'left', 'right', 'left_space', 'right_space'
-  // Display settings
-  productsPerPage: numeric('products_per_page', { precision: 3, scale: 0 }).default('24').notNull(),
-  defaultViewMode: text('default_view_mode').default('grid').notNull(), // 'grid', 'list'
-  // Timestamps
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-}, (table) => ({
-  userIdIdx: index('settings_user_id_idx').on(table.userId),
-  userUniqueIdx: unique('settings_user_unique').on(table.userId), // One setting per user
-}));
+export const settings = pgTable(
+  'settings',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .references(() => users.id)
+      .notNull(),
+    // Currency settings
+    currency: text('currency').default('DKK').notNull(),
+    currencySymbol: text('currency_symbol').default('kr').notNull(),
+    currencyPosition: text('currency_position').default('right').notNull(), // 'left', 'right', 'left_space', 'right_space'
+    // Display settings
+    productsPerPage: numeric('products_per_page', { precision: 3, scale: 0 })
+      .default('24')
+      .notNull(),
+    defaultViewMode: text('default_view_mode').default('grid').notNull(), // 'grid', 'list'
+    // Timestamps
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userIdIdx: index('settings_user_id_idx').on(table.userId),
+    userUniqueIdx: unique('settings_user_unique').on(table.userId), // One setting per user
+  })
+);
 
 // Media files table for MinIO and PhotoPrism integration
 export const mediaFiles = pgTable(
@@ -263,8 +299,12 @@ export const mediaFiles = pgTable(
     minioUrl: text('minio_url').notNull(), // URL from MinIO
     photoPrismUID: text('photoprism_uid'), // PhotoPrism photo UID if indexed
     // Relationships
-    productId: uuid('product_id').references(() => products.id, { onDelete: 'set null' }),
-    userId: uuid('user_id').references(() => users.id).notNull(),
+    productId: uuid('product_id').references(() => products.id, {
+      onDelete: 'set null',
+    }),
+    userId: uuid('user_id')
+      .references(() => users.id)
+      .notNull(),
     // Flags
     isIndexed: boolean('is_indexed').default(false).notNull(), // Whether indexed in PhotoPrism
     isFeatured: boolean('is_featured').default(false).notNull(), // Featured image for product
@@ -277,10 +317,14 @@ export const mediaFiles = pgTable(
     objectNameIdx: index('media_files_object_name_idx').on(table.objectName),
     productIdIdx: index('media_files_product_id_idx').on(table.productId),
     userIdIdx: index('media_files_user_id_idx').on(table.userId),
-    photoPrismUIDIdx: index('media_files_photoprism_uid_idx').on(table.photoPrismUID),
+    photoPrismUIDIdx: index('media_files_photoprism_uid_idx').on(
+      table.photoPrismUID
+    ),
     mimeTypeIdx: index('media_files_mime_type_idx').on(table.mimeType),
     isIndexedIdx: index('media_files_is_indexed_idx').on(table.isIndexed),
     isFeaturedIdx: index('media_files_is_featured_idx').on(table.isFeatured),
-    createdAtIdx: index('media_files_created_at_idx').on(table.createdAt.desc()),
+    createdAtIdx: index('media_files_created_at_idx').on(
+      table.createdAt.desc()
+    ),
   })
 );

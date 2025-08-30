@@ -40,7 +40,7 @@ export function ProductsToolbar({
   onPageChange,
 }: ProductsToolbarProps) {
   const [searchValue, setSearchValue] = useState(params.search || '');
-  
+
   // Filter options state
   const [brands, setBrands] = useState<FilterOption[]>([]);
   const [categories, setCategories] = useState<FilterOption[]>([]);
@@ -55,7 +55,7 @@ export function ProductsToolbar({
         const [brandsRes, categoriesRes, shopsRes] = await Promise.all([
           fetch('/api/brands'),
           fetch('/api/categories'),
-          fetch('/api/shops')
+          fetch('/api/shops'),
         ]);
 
         if (brandsRes.ok) {
@@ -101,16 +101,29 @@ export function ProductsToolbar({
   };
 
   const toggleViewMode = () => {
-    onParamsUpdate({ 
-      viewMode: params.viewMode === 'grid' ? 'list' : 'grid' 
+    onParamsUpdate({
+      viewMode: params.viewMode === 'grid' ? 'list' : 'grid',
     });
   };
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const [sortBy, sortOrder] = e.target.value.split('-') as [string, 'asc' | 'desc'];
-    onParamsUpdate({ 
-      sortBy: sortBy as 'updatedAt' | 'createdAt' | 'name' | 'basePrice' | 'sku' | 'status' | 'type' | 'stockQuantity' | 'weight' | 'variantCount',
-      sortOrder 
+    const [sortBy, sortOrder] = e.target.value.split('-') as [
+      string,
+      'asc' | 'desc',
+    ];
+    onParamsUpdate({
+      sortBy: sortBy as
+        | 'updatedAt'
+        | 'createdAt'
+        | 'name'
+        | 'basePrice'
+        | 'sku'
+        | 'status'
+        | 'type'
+        | 'stockQuantity'
+        | 'weight'
+        | 'variantCount',
+      sortOrder,
     });
   };
 
@@ -128,14 +141,13 @@ export function ProductsToolbar({
   };
 
   // Check if any filters are active
-  const hasActiveFilters = (
+  const hasActiveFilters =
     params.brandIds.length > 0 ||
     params.categoryIds.length > 0 ||
     params.shopIds.length > 0 ||
     params.status ||
     params.type ||
-    params.search
-  );
+    params.search;
 
   // Pagination handlers
   const handlePreviousPage = () => {
@@ -151,7 +163,12 @@ export function ProductsToolbar({
   };
 
   const handlePageJump = (page: number) => {
-    if (onPageChange && page >= 1 && pagination && page <= pagination.totalPages) {
+    if (
+      onPageChange &&
+      page >= 1 &&
+      pagination &&
+      page <= pagination.totalPages
+    ) {
       onPageChange(page);
     }
   };
@@ -170,7 +187,7 @@ export function ProductsToolbar({
                 {totalCount.toLocaleString()} total products
               </span>
             </div>
-            
+
             <div className="flex items-center gap-2">
               {/* Previous button */}
               <button
@@ -183,26 +200,29 @@ export function ProductsToolbar({
 
               {/* Page numbers - show current and nearby pages */}
               <div className="flex items-center gap-1">
-                {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                  const startPage = Math.max(1, pagination.page - 2);
-                  const page = startPage + i;
-                  if (page > pagination.totalPages) return null;
-                  
-                  return (
-                    <button
-                      key={page}
-                      onClick={() => handlePageJump(page)}
-                      disabled={isLoading}
-                      className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                        page === pagination.page
-                          ? 'bg-blue-600 text-white shadow-sm'
-                          : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  );
-                })}
+                {Array.from(
+                  { length: Math.min(5, pagination.totalPages) },
+                  (_, i) => {
+                    const startPage = Math.max(1, pagination.page - 2);
+                    const page = startPage + i;
+                    if (page > pagination.totalPages) return null;
+
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => handlePageJump(page)}
+                        disabled={isLoading}
+                        className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                          page === pagination.page
+                            ? 'bg-blue-600 text-white shadow-sm'
+                            : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  }
+                )}
               </div>
 
               {/* Next button */}
@@ -219,7 +239,9 @@ export function ProductsToolbar({
                 <span className="text-sm text-gray-600">Show:</span>
                 <select
                   value={params.limit}
-                  onChange={(e) => onParamsUpdate({ limit: parseInt(e.target.value), page: 1 })}
+                  onChange={(e) =>
+                    onParamsUpdate({ limit: parseInt(e.target.value), page: 1 })
+                  }
                   className="px-2 py-1 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={isLoading}
                 >
@@ -262,7 +284,11 @@ export function ProductsToolbar({
               disabled={isLoading}
               title={`Switch to ${params.viewMode === 'grid' ? 'list' : 'grid'} view`}
             >
-              {params.viewMode === 'grid' ? <List className="h-5 w-5" /> : <Grid className="h-5 w-5" />}
+              {params.viewMode === 'grid' ? (
+                <List className="h-5 w-5" />
+              ) : (
+                <Grid className="h-5 w-5" />
+              )}
             </button>
 
             {/* Reset button */}
@@ -285,7 +311,14 @@ export function ProductsToolbar({
             <label className="text-sm font-medium text-gray-700">Status</label>
             <select
               value={params.status || ''}
-              onChange={(e) => onParamsUpdate({ status: (e.target.value as 'published' | 'draft' | 'private') || undefined, page: 1 })}
+              onChange={(e) =>
+                onParamsUpdate({
+                  status:
+                    (e.target.value as 'published' | 'draft' | 'private') ||
+                    undefined,
+                  page: 1,
+                })
+              }
               className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               disabled={isLoading}
             >
@@ -301,7 +334,14 @@ export function ProductsToolbar({
             <label className="text-sm font-medium text-gray-700">Type</label>
             <select
               value={params.type || ''}
-              onChange={(e) => onParamsUpdate({ type: (e.target.value as 'simple' | 'variable' | 'grouped') || undefined, page: 1 })}
+              onChange={(e) =>
+                onParamsUpdate({
+                  type:
+                    (e.target.value as 'simple' | 'variable' | 'grouped') ||
+                    undefined,
+                  page: 1,
+                })
+              }
               className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               disabled={isLoading}
             >
@@ -327,7 +367,9 @@ export function ProductsToolbar({
 
           {/* Category Filter */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Categories</label>
+            <label className="text-sm font-medium text-gray-700">
+              Categories
+            </label>
             <MultiSelectFilter
               options={categories}
               selectedIds={params.categoryIds || []}
@@ -356,7 +398,9 @@ export function ProductsToolbar({
         <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between pt-4 border-t border-blue-100">
           {/* Sort */}
           <div className="flex items-center gap-3">
-            <label className="text-sm font-medium text-gray-700">Sort by:</label>
+            <label className="text-sm font-medium text-gray-700">
+              Sort by:
+            </label>
             <select
               value={`${params.sortBy}-${params.sortOrder}`}
               onChange={handleSortChange}
@@ -378,13 +422,24 @@ export function ProductsToolbar({
           {/* Results info */}
           <div className="text-sm text-gray-600">
             {isLoading ? (
-              <span className="text-blue-600 font-medium">Loading products...</span>
+              <span className="text-blue-600 font-medium">
+                Loading products...
+              </span>
             ) : (
               <span>
-                Showing <span className="font-semibold text-gray-900">{totalCount.toLocaleString()}</span> product{totalCount !== 1 ? 's' : ''}
+                Showing{' '}
+                <span className="font-semibold text-gray-900">
+                  {totalCount.toLocaleString()}
+                </span>{' '}
+                product{totalCount !== 1 ? 's' : ''}
                 {params.search && (
                   <>
-                    {' '}for &ldquo;<span className="font-semibold text-blue-600">{params.search}</span>&rdquo;
+                    {' '}
+                    for &ldquo;
+                    <span className="font-semibold text-blue-600">
+                      {params.search}
+                    </span>
+                    &rdquo;
                   </>
                 )}
                 {hasActiveFilters && (

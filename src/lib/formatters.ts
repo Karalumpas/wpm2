@@ -7,7 +7,7 @@
  */
 export function formatPrice(price: string | number): string {
   const numPrice = typeof price === 'string' ? parseFloat(price) : price;
-  
+
   if (isNaN(numPrice)) {
     return '$0.00';
   }
@@ -25,7 +25,7 @@ export function formatPrice(price: string | number): string {
  */
 export function formatDate(date: string | Date): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
+
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'short',
@@ -38,7 +38,7 @@ export function formatDate(date: string | Date): string {
  */
 export function formatDateTime(date: string | Date): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
+
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'short',
@@ -53,11 +53,11 @@ export function formatDateTime(date: string | Date): string {
  */
 export function formatFileSize(bytes: number): string {
   if (bytes === 0) return '0 B';
-  
+
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
 
@@ -79,9 +79,12 @@ export function truncateText(text: string, maxLength: number): string {
 /**
  * Format weight for display
  */
-export function formatWeight(weight: string | number, unit: string = 'kg'): string {
+export function formatWeight(
+  weight: string | number,
+  unit: string = 'kg'
+): string {
   const numWeight = typeof weight === 'string' ? parseFloat(weight) : weight;
-  
+
   if (isNaN(numWeight)) {
     return `0 ${unit}`;
   }

@@ -25,11 +25,11 @@ export function useShop(shopId?: string) {
       try {
         setIsLoading(true);
         const response = await fetch(`/api/shops/${shopId}`);
-        
+
         if (!response.ok) {
           throw new Error(`Failed to fetch shop: ${response.statusText}`);
         }
-        
+
         const shopData = await response.json();
         setShop(shopData);
         setError(null);
@@ -58,11 +58,11 @@ export function useShops() {
       try {
         setIsLoading(true);
         const response = await fetch('/api/shops');
-        
+
         if (!response.ok) {
           throw new Error(`Failed to fetch shops: ${response.statusText}`);
         }
-        
+
         const data = await response.json();
         setShops(data.shops || []);
         setError(null);

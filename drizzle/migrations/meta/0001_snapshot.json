@@ -102,12 +102,8 @@
           "name": "shops_user_id_users_id_fk",
           "tableFrom": "shops",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -117,9 +113,7 @@
         "shops_url_unique": {
           "name": "shops_url_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "url"
-          ]
+          "columns": ["url"]
         }
       },
       "policies": {},
@@ -164,9 +158,7 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -178,11 +170,7 @@
     "public.shop_status": {
       "name": "shop_status",
       "schema": "public",
-      "values": [
-        "active",
-        "inactive",
-        "error"
-      ]
+      "values": ["active", "inactive", "error"]
     }
   },
   "schemas": {},

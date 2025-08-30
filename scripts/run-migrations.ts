@@ -1,6 +1,6 @@
 /**
  * Manual Migration Script
- * 
+ *
  * Dette script kører migrationerne manuelt da drizzle-kit hænger
  */
 
@@ -8,11 +8,12 @@ import postgres from 'postgres';
 import fs from 'fs';
 import path from 'path';
 
-const connectionString = 'postgresql://postgres:postgresPW@192.168.0.180:5432/wpm2';
+const connectionString =
+  'postgresql://postgres:postgresPW@192.168.0.180:5432/wpm2';
 
 async function runMigrations() {
   console.log('🔄 Running database migrations manually...');
-  
+
   const sql = postgres(connectionString, {
     max: 1,
     idle_timeout: 20,
@@ -33,8 +34,9 @@ async function runMigrations() {
 
     // Get migration files
     const migrationsDir = path.join(process.cwd(), 'drizzle', 'migrations');
-    const migrationFiles = fs.readdirSync(migrationsDir)
-      .filter(file => file.endsWith('.sql'))
+    const migrationFiles = fs
+      .readdirSync(migrationsDir)
+      .filter((file) => file.endsWith('.sql'))
       .sort();
 
     console.log(`\n2. Found ${migrationFiles.length} migration files:`);
@@ -49,27 +51,27 @@ async function runMigrations() {
     const appliedHashes = new Set(appliedMigrations.map((m: any) => m.hash));
 
     console.log(`\n3. Running migrations...`);
-    
+
     for (const file of migrationFiles) {
       const filePath = path.join(migrationsDir, file);
       const content = fs.readFileSync(filePath, 'utf8');
-      
+
       // Extract the hash from the filename or content
       const hash = file.replace('.sql', '');
-      
+
       if (appliedHashes.has(hash)) {
         console.log(`   ⏩ Skipping ${file} (already applied)`);
         continue;
       }
 
       console.log(`   🔄 Applying ${file}...`);
-      
+
       try {
         // Split the content by statements and execute each
         const statements = content
           .split(';')
-          .map(stmt => stmt.trim())
-          .filter(stmt => stmt.length > 0);
+          .map((stmt) => stmt.trim())
+          .filter((stmt) => stmt.length > 0);
 
         for (const statement of statements) {
           await sql.unsafe(statement);
@@ -80,9 +82,8 @@ async function runMigrations() {
           INSERT INTO __drizzle_migrations (hash, created_at) 
           VALUES (${hash}, ${Date.now()})
         `;
-        
+
         console.log(`   ✅ Applied ${file}`);
-        
       } catch (error) {
         console.error(`   ❌ Failed to apply ${file}:`);
         console.error(`      ${error}`);
@@ -91,7 +92,7 @@ async function runMigrations() {
     }
 
     console.log('\n🎉 All migrations completed successfully!');
-    
+
     // Verify tables were created
     console.log('\n4. Verifying created tables...');
     const tables = await sql`
@@ -100,14 +101,13 @@ async function runMigrations() {
       WHERE table_schema = 'public' 
       ORDER BY table_name
     `;
-    
+
     console.log(`   Created ${tables.length} tables:`);
     tables.forEach((table: any, index: number) => {
       console.log(`   ${index + 1}. ${table.table_name}`);
     });
 
     await sql.end();
-    
   } catch (error) {
     console.error('\n❌ Migration failed!');
     console.error('Error:', error);

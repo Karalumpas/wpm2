@@ -1,16 +1,17 @@
 /**
  * Clean Database Script
- * 
+ *
  * Dette script rydder op i databasen for at genstarte med friske data
  */
 
 import postgres from 'postgres';
 
-const connectionString = 'postgresql://postgres:postgresPW@192.168.0.180:5432/wpm2';
+const connectionString =
+  'postgresql://postgres:postgresPW@192.168.0.180:5432/wpm2';
 
 async function cleanDatabase() {
   console.log('🧹 Cleaning database...');
-  
+
   const sql = postgres(connectionString, {
     max: 1,
     idle_timeout: 20,
@@ -19,7 +20,7 @@ async function cleanDatabase() {
 
   try {
     console.log('\n1. Deleting product data...');
-    
+
     // Delete in correct order due to foreign key constraints
     await sql`DELETE FROM product_categories`;
     await sql`DELETE FROM product_brands`;
@@ -27,7 +28,7 @@ async function cleanDatabase() {
     await sql`DELETE FROM products`;
     await sql`DELETE FROM categories`;
     await sql`DELETE FROM brands`;
-    
+
     console.log('✅ Product data deleted');
 
     console.log('\n2. Verifying cleanup...');
@@ -40,7 +41,7 @@ async function cleanDatabase() {
         (SELECT COUNT(*) FROM product_brands) as product_brands,
         (SELECT COUNT(*) FROM product_categories) as product_categories
     `;
-    
+
     const count = counts[0] as any;
     console.log(`   Products: ${count.products}`);
     console.log(`   Brands: ${count.brands}`);
@@ -51,7 +52,6 @@ async function cleanDatabase() {
 
     await sql.end();
     console.log('\n🎉 Database cleaned successfully!');
-    
   } catch (error) {
     console.error('\n❌ Failed to clean database!');
     console.error('Error:', error);

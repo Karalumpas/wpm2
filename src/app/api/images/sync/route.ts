@@ -11,7 +11,8 @@ import { eq } from 'drizzle-orm';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { shopId, productId, featuredImage, galleryImages, forceRedownload } = body;
+    const { shopId, productId, featuredImage, galleryImages, forceRedownload } =
+      body;
 
     if (!shopId || !productId) {
       return NextResponse.json(
@@ -20,7 +21,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`🔄 Starting image sync for product ${productId} from shop ${shopId}`);
+    console.log(
+      `🔄 Starting image sync for product ${productId} from shop ${shopId}`
+    );
 
     // Sync images to central storage
     const syncedImages = await imageSyncService.syncProductImages(
@@ -53,7 +56,6 @@ export async function POST(request: NextRequest) {
       syncedImages,
       message: `Synced ${syncedImages.galleryImages.length + (syncedImages.featuredImage ? 1 : 0)} images`,
     });
-
   } catch (error) {
     console.error('❌ Image sync error:', error);
     return NextResponse.json(
@@ -81,7 +83,6 @@ export async function GET(request: NextRequest) {
       shopId,
       productId,
     });
-
   } catch (error) {
     console.error('❌ Sync status error:', error);
     return NextResponse.json(

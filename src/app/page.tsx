@@ -1,7 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { Package, Tags, Building2, ShoppingCart, BarChart3, Database, Wifi } from 'lucide-react';
+import {
+  Package,
+  Tags,
+  Building2,
+  ShoppingCart,
+  BarChart3,
+  Database,
+  Wifi,
+} from 'lucide-react';
 
 const stats = [
   { name: 'Total Products', value: '0', icon: Package, href: '/products' },
@@ -11,21 +19,48 @@ const stats = [
 ];
 
 const quickActions = [
-  { name: 'Manage Shops', href: '/connections', icon: Wifi, description: 'Connect and sync WooCommerce shops' },
-  { name: 'View Products', href: '/products', icon: Package, description: 'Browse synchronized product catalog' },
-  { name: 'Manage Categories', href: '/categories', icon: Tags, description: 'Organize products into categories' },
-  { name: 'View Brands', href: '/brands', icon: Building2, description: 'Manage product brands and manufacturers' },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3, description: 'View sales and product analytics' },
+  {
+    name: 'Manage Shops',
+    href: '/connections',
+    icon: Wifi,
+    description: 'Connect and sync WooCommerce shops',
+  },
+  {
+    name: 'View Products',
+    href: '/products',
+    icon: Package,
+    description: 'Browse synchronized product catalog',
+  },
+  {
+    name: 'Manage Categories',
+    href: '/categories',
+    icon: Tags,
+    description: 'Organize products into categories',
+  },
+  {
+    name: 'View Brands',
+    href: '/brands',
+    icon: Building2,
+    description: 'Manage product brands and manufacturers',
+  },
+  {
+    name: 'Analytics',
+    href: '/analytics',
+    icon: BarChart3,
+    description: 'View sales and product analytics',
+  },
 ];
 
 export default function Home() {
   return (
-    <div className="space-y-6">{/* Page Header */}
+    <div className="space-y-6">
+      {/* Page Header */}
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-gray-600">
-            Welcome to WooCommerce Product Manager v2. Manage your product catalog efficiently.
+            Welcome to WooCommerce Product Manager v2. Manage your product
+            catalog efficiently.
           </p>
         </div>
       </div>
@@ -77,7 +112,9 @@ export default function Home() {
 
       {/* Quick Actions */}
       <div className="px-4 sm:px-6 lg:px-8">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h2>
+        <h2 className="text-lg font-medium text-gray-900 mb-4">
+          Quick Actions
+        </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {quickActions.map((action) => {
             const Icon = action.icon;

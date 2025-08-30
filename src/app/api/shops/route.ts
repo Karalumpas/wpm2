@@ -27,7 +27,7 @@ export async function GET() {
       .orderBy(shops.updatedAt);
 
     // Format for filter dropdown
-    const shopsForFilter = userShops.map(shop => ({
+    const shopsForFilter = userShops.map((shop) => ({
       id: shop.id,
       name: shop.name,
       count: shop.productCount,
@@ -46,7 +46,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     const validatedData = createShopSchema.parse(body);
 
     // Check if URL already exists
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
       });
 
       const testResult = await client.testConnection();
-      
+
       await db
         .update(shops)
         .set({
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(newShop, { status: 201 });
   } catch (error) {
     console.error('Error creating shop - Full details:', error);
-    
+
     if (error instanceof Error && error.name === 'ZodError') {
       console.error('Validation error:', error.message);
       return NextResponse.json({ error: error.message }, { status: 400 });

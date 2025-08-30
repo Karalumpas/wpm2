@@ -15,12 +15,12 @@ export function decodeCursor(cursor: string): CursorData {
   try {
     const json = Buffer.from(cursor, 'base64url').toString('utf-8');
     const data = JSON.parse(json);
-    
+
     // Validate the decoded data structure
     if (!data.updatedAt || !data.id) {
       throw new Error('Invalid cursor format');
     }
-    
+
     return {
       updatedAt: data.updatedAt,
       id: data.id,
@@ -40,7 +40,7 @@ export function buildCursorCondition(
   sortOrder: 'asc' | 'desc'
 ): { condition: string; params: unknown[] } {
   const operator = sortOrder === 'desc' ? '<' : '>';
-  
+
   // For updatedAt sorting (default), use composite keyset
   if (sortBy === 'updatedAt') {
     return {
@@ -48,20 +48,20 @@ export function buildCursorCondition(
       params: [new Date(cursor.updatedAt), cursor.id],
     };
   }
-  
+
   // For other sort fields, use composite with id as secondary
   const fieldMap: Record<string, string> = {
     name: 'name',
-    basePrice: 'base_price', 
+    basePrice: 'base_price',
     sku: 'sku',
     createdAt: 'created_at',
   };
-  
+
   const dbField = fieldMap[sortBy];
   if (!dbField) {
     throw new Error(`Unsupported sort field: ${sortBy}`);
   }
-  
+
   // For non-updatedAt sorts, we need to handle the fact that we only have
   // updatedAt and id in cursor. This is a simplified approach.
   // For production, you'd want to include the sort field in the cursor.
@@ -79,20 +79,20 @@ export function buildOrderClause(
   sortOrder: 'asc' | 'desc'
 ): string {
   const direction = sortOrder.toUpperCase();
-  
+
   const fieldMap: Record<string, string> = {
     name: 'name',
     basePrice: 'base_price',
-    sku: 'sku', 
+    sku: 'sku',
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   };
-  
+
   const dbField = fieldMap[sortBy];
   if (!dbField) {
     throw new Error(`Unsupported sort field: ${sortBy}`);
   }
-  
+
   // Always include id as secondary sort for deterministic results
   return `${dbField} ${direction}, id ${direction}`;
 }
@@ -100,9 +100,10 @@ export function buildOrderClause(
 /**
  * Generate next cursor from the last item in results
  */
-export function generateNextCursor(
-  lastItem: { updatedAt: string; id: string }
-): string {
+export function generateNextCursor(lastItem: {
+  updatedAt: string;
+  id: string;
+}): string {
   return encodeCursor({
     updatedAt: lastItem.updatedAt,
     id: lastItem.id,
@@ -118,6 +119,6 @@ export function checkHasMore<T>(
 ): { items: T[]; hasMore: boolean } {
   const hasMore = results.length > requestedLimit;
   const items = hasMore ? results.slice(0, requestedLimit) : results;
-  
+
   return { items, hasMore };
 }

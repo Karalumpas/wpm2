@@ -3,19 +3,19 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { 
-  Package, 
-  Tags, 
-  Building2, 
-  ShoppingCart, 
-  BarChart3, 
+import {
+  Package,
+  Tags,
+  Building2,
+  ShoppingCart,
+  BarChart3,
   Settings,
   Home,
   Menu,
   X,
   Globe,
   Images,
-  Camera
+  Camera,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -45,7 +45,10 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* Mobile sidebar */}
       <div className={`lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
         <div className="fixed inset-0 z-40 flex">
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
+          <div
+            className="fixed inset-0 bg-gray-600 bg-opacity-75"
+            onClick={() => setSidebarOpen(false)}
+          />
           <div className="relative flex w-full max-w-xs flex-1 flex-col bg-white">
             <div className="absolute top-0 right-0 -mr-12 pt-2">
               <button
@@ -94,9 +97,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         </div>
 
         {/* Page content */}
-        <main className="py-6">
-          {children}
-        </main>
+        <main className="py-6">{children}</main>
       </div>
     </div>
   );
@@ -116,7 +117,7 @@ function Sidebar() {
           {navigation.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
-            
+
             return (
               <Link
                 key={item.name}
@@ -146,7 +147,9 @@ function Sidebar() {
         <div className="flex-shrink-0 px-4 py-4 border-t border-gray-200">
           <div className="flex items-center">
             <div className="h-2 w-2 bg-green-400 rounded-full"></div>
-            <span className="ml-2 text-xs text-gray-500">Database Connected</span>
+            <span className="ml-2 text-xs text-gray-500">
+              Database Connected
+            </span>
           </div>
           <div className="mt-1 text-xs text-gray-400">
             PostgreSQL: 192.168.0.180:5432

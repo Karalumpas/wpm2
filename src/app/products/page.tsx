@@ -7,7 +7,7 @@ import { ProductsPageSkeleton } from './components/ProductsPageSkeleton';
 
 /**
  * Products List Page - Server Component
- * 
+ *
  * This is the main page for browsing products with filtering, sorting,
  * search, and pagination. Uses App Router and URL-based state management.
  */

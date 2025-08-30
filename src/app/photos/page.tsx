@@ -35,16 +35,16 @@ export default function PhotosPage() {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       const params = new URLSearchParams();
       if (query) params.append('q', query);
-      
+
       const response = await fetch(`/api/photos?${params}`);
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch photos');
       }
-      
+
       const data = await response.json();
       setPhotos(data.photos || []);
     } catch (err) {
@@ -151,7 +151,9 @@ export default function PhotosPage() {
             disabled={isIndexing}
             className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <RefreshCw className={`h-4 w-4 ${isIndexing ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`h-4 w-4 ${isIndexing ? 'animate-spin' : ''}`}
+            />
             <span>{isIndexing ? 'Indexing...' : 'Start Indexing'}</span>
           </button>
           <button
@@ -172,7 +174,9 @@ export default function PhotosPage() {
 
       {isIndexing && (
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
-          <p className="text-blue-800">PhotoPrism is indexing your photos. This may take a while...</p>
+          <p className="text-blue-800">
+            PhotoPrism is indexing your photos. This may take a while...
+          </p>
         </div>
       )}
 
@@ -184,9 +188,13 @@ export default function PhotosPage() {
       ) : photos.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">📷</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No photos found</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            No photos found
+          </h3>
           <p className="text-gray-600 mb-4">
-            {searchQuery ? 'Try adjusting your search terms' : 'Upload photos to your PhotoPrism library and start indexing'}
+            {searchQuery
+              ? 'Try adjusting your search terms'
+              : 'Upload photos to your PhotoPrism library and start indexing'}
           </p>
           {!searchQuery && (
             <button
@@ -201,14 +209,17 @@ export default function PhotosPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {photos.map((photo) => (
-            <div key={photo.UID} className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow">
+            <div
+              key={photo.UID}
+              className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow"
+            >
               <div className="aspect-square bg-gray-100 relative">
                 <img
                   src={photo.thumbnailUrl}
                   alt={photo.Title || photo.OriginalName}
                   className="w-full h-full object-cover"
                 />
-                
+
                 {photo.Favorite && (
                   <div className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full">
                     <Heart className="h-3 w-3 fill-current" />
@@ -238,14 +249,19 @@ export default function PhotosPage() {
               </div>
 
               <div className="p-3">
-                <h3 className="font-medium text-gray-900 text-sm truncate" title={photo.Title || photo.OriginalName}>
+                <h3
+                  className="font-medium text-gray-900 text-sm truncate"
+                  title={photo.Title || photo.OriginalName}
+                >
                   {photo.Title || photo.OriginalName}
                 </h3>
                 <p className="text-xs text-gray-500 mt-1">
                   {photo.Width} x {photo.Height}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  {new Date(photo.TakenAt || photo.CreatedAt).toLocaleDateString()}
+                  {new Date(
+                    photo.TakenAt || photo.CreatedAt
+                  ).toLocaleDateString()}
                 </p>
               </div>
             </div>

@@ -13,7 +13,8 @@ vi.mock('@/db', () => ({
     }),
     insert: () => ({
       values: () => ({
-        returning: () => Promise.resolve([{ id: '1', email: 'test@example.com' }]),
+        returning: () =>
+          Promise.resolve([{ id: '1', email: 'test@example.com' }]),
       }),
     }),
   },

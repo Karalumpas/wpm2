@@ -25,7 +25,6 @@ export async function GET() {
       success: true,
       brands: brandsWithCounts,
     });
-
   } catch (error) {
     console.error('❌ Brands API error:', error);
     return NextResponse.json(

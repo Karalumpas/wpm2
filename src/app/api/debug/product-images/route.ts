@@ -21,13 +21,17 @@ export async function GET() {
       .orderBy(desc(products.updatedAt))
       .limit(10);
 
-    const imageAnalysis = latestProducts.map(product => {
-      const featuredImageType = product.featuredImage 
-        ? (product.featuredImage.includes('localhost:9000') ? 'MinIO (Local)' : 'External')
+    const imageAnalysis = latestProducts.map((product) => {
+      const featuredImageType = product.featuredImage
+        ? product.featuredImage.includes('localhost:9000')
+          ? 'MinIO (Local)'
+          : 'External'
         : 'None';
-      
-      const galleryImagesArray = Array.isArray(product.galleryImages) ? product.galleryImages : [];
-      const galleryImageTypes = galleryImagesArray.map((url: string) => 
+
+      const galleryImagesArray = Array.isArray(product.galleryImages)
+        ? product.galleryImages
+        : [];
+      const galleryImageTypes = galleryImagesArray.map((url: string) =>
         url.includes('localhost:9000') ? 'MinIO (Local)' : 'External'
       );
 
@@ -51,13 +55,15 @@ export async function GET() {
 
     // Count image types
     const totalProducts = latestProducts.length;
-    const productsWithMinIOImages = imageAnalysis.filter(p => 
-      p.featuredImage.type === 'MinIO (Local)' || 
-      p.galleryImages.types.some((type: string) => type === 'MinIO (Local)')
+    const productsWithMinIOImages = imageAnalysis.filter(
+      (p) =>
+        p.featuredImage.type === 'MinIO (Local)' ||
+        p.galleryImages.types.some((type: string) => type === 'MinIO (Local)')
     ).length;
-    const productsWithExternalImages = imageAnalysis.filter(p => 
-      p.featuredImage.type === 'External' || 
-      p.galleryImages.types.some((type: string) => type === 'External')
+    const productsWithExternalImages = imageAnalysis.filter(
+      (p) =>
+        p.featuredImage.type === 'External' ||
+        p.galleryImages.types.some((type: string) => type === 'External')
     ).length;
 
     return NextResponse.json({
@@ -65,24 +71,28 @@ export async function GET() {
         totalProducts,
         productsWithMinIOImages,
         productsWithExternalImages,
-        syncedPercentage: Math.round((productsWithMinIOImages / totalProducts) * 100),
+        syncedPercentage: Math.round(
+          (productsWithMinIOImages / totalProducts) * 100
+        ),
       },
       latestProducts: imageAnalysis,
       message: 'Image analysis for latest products',
       minioUrl: 'http://localhost:9001',
       instructions: {
-        'If all images are External': 'Images are still pointing to original webshops. Run image sync to download them to MinIO.',
-        'If some images are MinIO (Local)': 'Image sync is working! Some products have been synced.',
-        'Check MinIO Browser': 'Go to http://localhost:9001 (minioadmin/minioadmin) to see uploaded files in product-images bucket.',
-      }
+        'If all images are External':
+          'Images are still pointing to original webshops. Run image sync to download them to MinIO.',
+        'If some images are MinIO (Local)':
+          'Image sync is working! Some products have been synced.',
+        'Check MinIO Browser':
+          'Go to http://localhost:9001 (minioadmin/minioadmin) to see uploaded files in product-images bucket.',
+      },
     });
-
   } catch (error) {
     console.error('❌ Failed to analyze product images:', error);
-    
+
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }

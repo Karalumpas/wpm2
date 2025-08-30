@@ -15,7 +15,6 @@ export async function GET(request: NextRequest) {
       offset,
       hasMore: albums.length === count,
     });
-
   } catch (error) {
     console.error('Error fetching albums:', error);
     return NextResponse.json(
@@ -31,10 +30,7 @@ export async function POST(request: NextRequest) {
     const { title, description } = body;
 
     if (!title) {
-      return NextResponse.json(
-        { error: 'Title is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Title is required' }, { status: 400 });
     }
 
     const album = await photoPrismClient.createAlbum(title, description);
@@ -43,7 +39,6 @@ export async function POST(request: NextRequest) {
       success: true,
       album,
     });
-
   } catch (error) {
     console.error('Error creating album:', error);
     return NextResponse.json(

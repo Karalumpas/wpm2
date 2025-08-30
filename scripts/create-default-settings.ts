@@ -5,11 +5,11 @@ import { eq } from 'drizzle-orm';
 async function createDefaultSettings() {
   try {
     console.log('Creating default settings for all users...');
-    
+
     // Get all users
     const allUsers = await db.select().from(users);
     console.log(`Found ${allUsers.length} users`);
-    
+
     for (const user of allUsers) {
       // Check if user already has settings
       const [existingSettings] = await db
@@ -17,7 +17,7 @@ async function createDefaultSettings() {
         .from(settings)
         .where(eq(settings.userId, user.id))
         .limit(1);
-        
+
       if (!existingSettings) {
         // Create default settings
         await db.insert(settings).values({
@@ -33,7 +33,7 @@ async function createDefaultSettings() {
         console.log(`⏭️ Settings already exist for user: ${user.email}`);
       }
     }
-    
+
     console.log('✅ Default settings creation completed');
   } catch (error) {
     console.error('❌ Error creating default settings:', error);

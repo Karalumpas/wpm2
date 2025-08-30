@@ -25,7 +25,7 @@ export function ShopLinksButton({ product }: ShopLinksButtonProps) {
     );
   }
 
-  const connectedShops = shops.filter(shop => shop.isConnected);
+  const connectedShops = shops.filter((shop) => shop.isConnected);
 
   if (connectedShops.length === 0) {
     return (
@@ -43,7 +43,7 @@ export function ShopLinksButton({ product }: ShopLinksButtonProps) {
   // Single shop - direct link
   if (connectedShops.length === 1) {
     const shop = connectedShops[0];
-    
+
     const handleShopClick = () => {
       // Generate product URL for the shop
       // This is a placeholder - in real implementation, you'd have proper URL generation
@@ -72,20 +72,20 @@ export function ShopLinksButton({ product }: ShopLinksButtonProps) {
         title="View on shop"
       >
         <Store className="w-4 h-4" />
-        <span className="hidden sm:inline">
-          {connectedShops.length} Shops
-        </span>
-        <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${showDropdown ? 'rotate-180' : ''}`} />
+        <span className="hidden sm:inline">{connectedShops.length} Shops</span>
+        <ChevronDown
+          className={`w-3 h-3 transition-transform duration-200 ${showDropdown ? 'rotate-180' : ''}`}
+        />
       </button>
 
       {showDropdown && (
         <>
           {/* Backdrop */}
-          <div 
+          <div
             className="fixed inset-0 z-10"
             onClick={() => setShowDropdown(false)}
           />
-          
+
           {/* Dropdown */}
           <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl border-2 border-gray-100 shadow-xl z-20 overflow-hidden">
             <div className="py-2">

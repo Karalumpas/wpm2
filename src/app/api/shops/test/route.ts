@@ -5,7 +5,7 @@ import { WooCommerceClient } from '@/lib/woo/client';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     // Validate input
     const shopData = createShopSchema.parse(body);
 

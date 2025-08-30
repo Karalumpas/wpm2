@@ -16,23 +16,29 @@ export async function GET() {
     // Check cache first
     const cacheKey = 'products:filters';
     const cachedFilters = memoryCache.get<GetFiltersResponse>(cacheKey);
-    
+
     if (cachedFilters) {
       return NextResponse.json(cachedFilters);
     }
 
     // Fetch all filter data in parallel
     const [brandsData, categoriesData] = await Promise.all([
-      db.select({
-        id: brands.id,
-        name: brands.name,
-      }).from(brands).orderBy(brands.name),
-      
-      db.select({
-        id: categories.id,
-        name: categories.name,
-        parentId: categories.parentId,
-      }).from(categories).orderBy(categories.name),
+      db
+        .select({
+          id: brands.id,
+          name: brands.name,
+        })
+        .from(brands)
+        .orderBy(brands.name),
+
+      db
+        .select({
+          id: categories.id,
+          name: categories.name,
+          parentId: categories.parentId,
+        })
+        .from(categories)
+        .orderBy(categories.name),
     ]);
 
     // Static filter values
@@ -50,10 +56,9 @@ export async function GET() {
     memoryCache.set(cacheKey, response, CACHE_TTL.FILTERS);
 
     return NextResponse.json(response);
-
   } catch (error) {
     console.error('Products filters API error:', error);
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

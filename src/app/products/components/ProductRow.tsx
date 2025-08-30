@@ -12,8 +12,12 @@ interface ProductRowProps {
 
 export function ProductRow({ product }: ProductRowProps) {
   const { settings } = useSettings();
-  const featuredImage = product.featuredImage || (product.images && product.images[0]) || null;
-  const hasVariants = product.type === 'variable' && (product.variantCount && product.variantCount > 0);
+  const featuredImage =
+    product.featuredImage || (product.images && product.images[0]) || null;
+  const hasVariants =
+    product.type === 'variable' &&
+    product.variantCount &&
+    product.variantCount > 0;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 px-4 py-3 hover:bg-gray-50 transition-colors">
@@ -31,7 +35,11 @@ export function ProductRow({ product }: ProductRowProps) {
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-400">
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                  clipRule="evenodd"
+                />
               </svg>
             </div>
           )}
@@ -41,7 +49,7 @@ export function ProductRow({ product }: ProductRowProps) {
       {/* Product Info */}
       <div className="lg:col-span-4 space-y-1">
         <div>
-          <Link 
+          <Link
             href={`/products/${product.id}`}
             className="font-medium text-gray-900 hover:text-blue-600 line-clamp-1"
           >
@@ -105,9 +113,19 @@ export function ProductRow({ product }: ProductRowProps) {
 
 import type { UserSettings } from '@/types/settings';
 
-function PriceRange({ product, settings }: { product: ProductListItem; settings: UserSettings }) {
+function PriceRange({
+  product,
+  settings,
+}: {
+  product: ProductListItem;
+  settings: UserSettings;
+}) {
   // Since ProductListItem doesn't have variants, we'll just show the base price
-  return <span className="font-medium text-sm">{formatPrice(product.basePrice, settings)}</span>;
+  return (
+    <span className="font-medium text-sm">
+      {formatPrice(product.basePrice, settings)}
+    </span>
+  );
 }
 
 function ProductStatusBadge({ status }: { status: ProductListItem['status'] }) {
@@ -118,7 +136,9 @@ function ProductStatusBadge({ status }: { status: ProductListItem['status'] }) {
   };
 
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${variants[status]}`}>
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${variants[status]}`}
+    >
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   );
@@ -132,7 +152,9 @@ function ProductTypeBadge({ type }: { type: ProductListItem['type'] }) {
   };
 
   return (
-    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${variants[type]}`}>
+    <span
+      className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${variants[type]}`}
+    >
       {type.charAt(0).toUpperCase() + type.slice(1)}
     </span>
   );

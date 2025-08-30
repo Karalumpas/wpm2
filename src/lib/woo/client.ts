@@ -1,12 +1,18 @@
 export class NetworkError extends Error {
-  constructor(message: string, public cause?: Error) {
+  constructor(
+    message: string,
+    public cause?: Error
+  ) {
     super(message);
     this.name = 'NetworkError';
   }
 }
 
 export class AuthError extends Error {
-  constructor(message: string, public status: number) {
+  constructor(
+    message: string,
+    public status: number
+  ) {
     super(message);
     this.name = 'AuthError';
   }
@@ -20,14 +26,21 @@ export class NotFoundError extends Error {
 }
 
 export class RateLimitedError extends Error {
-  constructor(message: string, public retryAfter?: number) {
+  constructor(
+    message: string,
+    public retryAfter?: number
+  ) {
     super(message);
     this.name = 'RateLimitedError';
   }
 }
 
 export class ApiError extends Error {
-  constructor(message: string, public status: number, public body?: unknown) {
+  constructor(
+    message: string,
+    public status: number,
+    public body?: unknown
+  ) {
     super(message);
     this.name = 'ApiError';
   }
@@ -89,7 +102,10 @@ export class WooCommerceClient {
     attempt = 1
   ): Promise<Response> {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.config.timeoutMs);
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      this.config.timeoutMs
+    );
 
     try {
       const response = await fetch(url, {
@@ -115,7 +131,9 @@ export class WooCommerceClient {
       clearTimeout(timeoutId);
 
       if (error instanceof Error && error.name === 'AbortError') {
-        throw new NetworkError(`Request timeout after ${this.config.timeoutMs}ms`);
+        throw new NetworkError(
+          `Request timeout after ${this.config.timeoutMs}ms`
+        );
       }
 
       if (attempt < this.config.retries) {
@@ -170,7 +188,9 @@ export class WooCommerceClient {
     };
 
     try {
-      console.log(`Testing connection to ${this.getMaskedUrl(this.config.baseUrl)}`);
+      console.log(
+        `Testing connection to ${this.getMaskedUrl(this.config.baseUrl)}`
+      );
 
       // Step 1: Test WordPress reachability
       const wpUrl = `${this.config.baseUrl}/wp-json/`;
@@ -229,7 +249,8 @@ export class WooCommerceClient {
 
       return result;
     } catch (error) {
-      result.details.error = error instanceof Error ? error.message : 'Unknown error';
+      result.details.error =
+        error instanceof Error ? error.message : 'Unknown error';
 
       if (error instanceof AuthError) {
         result.reachable = true;

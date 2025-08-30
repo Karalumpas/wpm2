@@ -16,7 +16,7 @@ interface RouteParams {
 // GET /api/shops/[id] - Get single shop
 export async function GET(request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
-  
+
   try {
     const [shop] = await db
       .select({
@@ -111,7 +111,9 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       }
 
       updateData.consumerKeyEnc = encryptToCompact(validatedData.consumerKey);
-      updateData.consumerSecretEnc = encryptToCompact(validatedData.consumerSecret);
+      updateData.consumerSecretEnc = encryptToCompact(
+        validatedData.consumerSecret
+      );
     }
 
     // Update shop
@@ -131,7 +133,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       });
 
     // Test connection if requested or credentials were updated
-    const shouldTest = 
+    const shouldTest =
       request.nextUrl.searchParams.get('test') === 'true' ||
       validatedData.consumerKey ||
       validatedData.consumerSecret ||
@@ -147,7 +149,9 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           .limit(1);
 
         const consumerKey = decryptFromCompact(currentShop[0].consumerKeyEnc);
-        const consumerSecret = decryptFromCompact(currentShop[0].consumerSecretEnc);
+        const consumerSecret = decryptFromCompact(
+          currentShop[0].consumerSecretEnc
+        );
 
         const client = new WooCommerceClient({
           baseUrl: updatedShop.url,
@@ -156,7 +160,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         });
 
         const testResult = await client.testConnection();
-        
+
         await db
           .update(shops)
           .set({

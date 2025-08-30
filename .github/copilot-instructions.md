@@ -29,6 +29,7 @@
 ## WooCommerce Product Manager v2 - Etape 1 Complete ✅
 
 Projektet er nu komplet opsat med:
+
 - Next.js 14 TypeScript strict mode
 - PostgreSQL database med Drizzle ORM
 - NextAuth med credential login

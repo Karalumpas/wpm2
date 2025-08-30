@@ -17,9 +17,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased" suppressHydrationWarning={true}>
         <SettingsProvider>
-          <MainLayout>
-            {children}
-          </MainLayout>
+          <MainLayout>{children}</MainLayout>
         </SettingsProvider>
       </body>
     </html>

@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'default-32-char-key-for-development';
+const ENCRYPTION_KEY =
+  process.env.ENCRYPTION_KEY || 'default-32-char-key-for-development';
 const ALGORITHM = 'aes-256-cbc';
 
 // Ensure key is exactly 32 bytes
@@ -24,17 +25,19 @@ export function encrypt(text: string): string {
 
 export function decrypt(encryptedText: string): string {
   const textParts = encryptedText.split(':');
-  
+
   // Check if this is old format (no IV) or new format (with IV)
   if (textParts.length === 1) {
     // Old format - just return an error since createDecipher is deprecated
-    throw new Error('Old encryption format detected. Please re-encrypt credentials.');
+    throw new Error(
+      'Old encryption format detected. Please re-encrypt credentials.'
+    );
   } else {
     // New format - use IV-based decryption
     const ivString = textParts.shift()!;
     let iv: Buffer;
     let encryptedData: string;
-    
+
     // Check if IV is base64 (new format) or hex (old new format)
     if (ivString.endsWith('==') || ivString.endsWith('=')) {
       // Base64 format

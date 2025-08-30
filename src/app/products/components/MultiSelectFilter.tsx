@@ -24,24 +24,26 @@ export function MultiSelectFilter({
   options,
   selectedIds,
   onSelectionChange,
-  placeholder = "Select...",
+  placeholder = 'Select...',
   isLoading = false,
   compact = false,
 }: MultiSelectFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const selectedOptions = options.filter(option => selectedIds.includes(option.id));
+  const selectedOptions = options.filter((option) =>
+    selectedIds.includes(option.id)
+  );
 
   const handleOptionToggle = (optionId: string) => {
     const newSelection = selectedIds.includes(optionId)
-      ? selectedIds.filter(id => id !== optionId)
+      ? selectedIds.filter((id) => id !== optionId)
       : [...selectedIds, optionId];
-    
+
     onSelectionChange(newSelection);
   };
 
   const handleRemoveSelection = (optionId: string) => {
-    onSelectionChange(selectedIds.filter(id => id !== optionId));
+    onSelectionChange(selectedIds.filter((id) => id !== optionId));
   };
 
   const clearAll = () => {
@@ -53,11 +55,11 @@ export function MultiSelectFilter({
       <label className="block text-sm font-medium text-gray-700 mb-1">
         {label}
       </label>
-      
+
       {/* Selected items display */}
       {selectedOptions.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-2">
-          {selectedOptions.map(option => (
+          {selectedOptions.map((option) => (
             <span
               key={option.id}
               className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
@@ -93,8 +95,7 @@ export function MultiSelectFilter({
         <span className="block truncate text-sm">
           {selectedOptions.length > 0
             ? `${selectedOptions.length} selected`
-            : placeholder
-          }
+            : placeholder}
         </span>
         <span className="absolute inset-y-0 right-0 flex items-center pr-2">
           <ChevronDown
@@ -111,10 +112,12 @@ export function MultiSelectFilter({
           {isLoading ? (
             <div className="px-3 py-2 text-sm text-gray-500">Loading...</div>
           ) : options.length === 0 ? (
-            <div className="px-3 py-2 text-sm text-gray-500">No options available</div>
+            <div className="px-3 py-2 text-sm text-gray-500">
+              No options available
+            </div>
           ) : (
             <div className="py-1">
-              {options.map(option => (
+              {options.map((option) => (
                 <label
                   key={option.id}
                   className="flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer"
@@ -142,10 +145,7 @@ export function MultiSelectFilter({
 
       {/* Click outside to close */}
       {isOpen && (
-        <div
-          className="fixed inset-0 z-0"
-          onClick={() => setIsOpen(false)}
-        />
+        <div className="fixed inset-0 z-0" onClick={() => setIsOpen(false)} />
       )}
     </div>
   );

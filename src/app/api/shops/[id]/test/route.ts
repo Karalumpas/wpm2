@@ -14,10 +14,10 @@ interface RouteParams {
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
-  
+
   try {
     console.log('Starting connection test for shop:', id);
-    
+
     // Skip authentication for now - use direct shop lookup
     // const session = await auth();
     // if (!session?.user) {
@@ -41,15 +41,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Check if credentials exist
     if (!shop.consumerKeyEnc || !shop.consumerSecretEnc) {
       console.log('Missing credentials for shop:', id);
-      return NextResponse.json({ 
+      return NextResponse.json({
         success: false,
-        error: 'Shop credentials not configured. Please edit the shop and add your WooCommerce API credentials.',
+        error:
+          'Shop credentials not configured. Please edit the shop and add your WooCommerce API credentials.',
         details: {
           reachable: false,
           auth: false,
           productsOk: false,
-          elapsedMs: 0
-        }
+          elapsedMs: 0,
+        },
       });
     }
 
@@ -61,15 +62,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       console.log('Credentials decrypted successfully');
     } catch (decryptError) {
       console.error('Failed to decrypt credentials:', decryptError);
-      return NextResponse.json({ 
+      return NextResponse.json({
         success: false,
-        error: 'Failed to decrypt shop credentials. Please re-enter your API credentials.',
+        error:
+          'Failed to decrypt shop credentials. Please re-enter your API credentials.',
         details: {
           reachable: false,
           auth: false,
           productsOk: false,
-          elapsedMs: 0
-        }
+          elapsedMs: 0,
+        },
       });
     }
 
@@ -97,23 +99,25 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Return wrapped result in expected format
     return NextResponse.json({
       success: testResult.auth,
-      error: testResult.details.error || (testResult.auth ? null : 'Connection or authentication failed'),
+      error:
+        testResult.details.error ||
+        (testResult.auth ? null : 'Connection or authentication failed'),
       details: {
         reachable: testResult.reachable,
         auth: testResult.auth,
         productsOk: testResult.details.productsOk || false,
-        elapsedMs: testResult.details.elapsedMs
-      }
+        elapsedMs: testResult.details.elapsedMs,
+      },
     });
   } catch (error) {
     console.error('Error testing connection:', error);
-    
+
     // Create detailed error message
     let errorMessage = 'Connection test failed';
     if (error instanceof Error) {
       errorMessage = error.message;
     }
-    
+
     // Update shop with error status
     try {
       await db
@@ -135,8 +139,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         reachable: false,
         auth: false,
         productsOk: false,
-        elapsedMs: 0
-      }
+        elapsedMs: 0,
+      },
     });
   }
 }

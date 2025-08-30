@@ -1,6 +1,6 @@
 /**
  * Settings Types
- * 
+ *
  * Type definitions for user settings
  */
 

@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Product sort fields whitelist for security
 export const productSortFields = [
   'name',
-  'basePrice', 
+  'basePrice',
   'sku',
   'createdAt',
   'updatedAt',
@@ -11,7 +11,7 @@ export const productSortFields = [
   'type',
   'stockQuantity',
   'weight',
-  'variantCount'
+  'variantCount',
 ] as const;
 
 export const sortOrder = ['asc', 'desc'] as const;
@@ -29,17 +29,17 @@ export const getProductsQuerySchema = z.object({
   // Pagination
   cursor: z.string().optional(),
   limit: z.coerce.number().min(1).max(100).default(25),
-  
+
   // Legacy pagination fallback
   page: z.coerce.number().min(1).optional(),
-  
+
   // Search
   search: z.string().optional(),
-  
+
   // Sorting
   sortBy: z.enum(productSortFields).default('updatedAt'),
   sortOrder: z.enum(sortOrder).default('desc'),
-  
+
   // Filters
   status: z.enum(productStatus).optional(),
   type: z.enum(productType).optional(),
@@ -73,16 +73,18 @@ export const productsListResponseSchema = z.object({
   hasMore: z.boolean(),
   nextCursor: z.string().optional(),
   total: z.number().optional(), // Total count for page-based pagination
-  pagination: z.object({
-    page: z.number(),
-    limit: z.number(),
-    total: z.number(),
-    totalPages: z.number(),
-    hasNext: z.boolean(),
-    hasPrev: z.boolean(),
-    cursor: z.string().optional(),
-    nextCursor: z.string().optional(),
-  }).optional(),
+  pagination: z
+    .object({
+      page: z.number(),
+      limit: z.number(),
+      total: z.number(),
+      totalPages: z.number(),
+      hasNext: z.boolean(),
+      hasPrev: z.boolean(),
+      cursor: z.string().optional(),
+      nextCursor: z.string().optional(),
+    })
+    .optional(),
 });
 
 export type ProductsListResponse = z.infer<typeof productsListResponseSchema>;

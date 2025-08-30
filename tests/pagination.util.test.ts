@@ -36,13 +36,17 @@ describe('Pagination utilities', () => {
     });
 
     it('should throw error for invalid cursor format', () => {
-      expect(() => decodeCursor('invalid-cursor')).toThrow('Invalid cursor format');
+      expect(() => decodeCursor('invalid-cursor')).toThrow(
+        'Invalid cursor format'
+      );
       expect(() => decodeCursor('dGVzdA==')).toThrow('Invalid cursor format'); // base64 but invalid JSON
     });
 
     it('should throw error for cursor missing required fields', () => {
       const invalidCursor = btoa(JSON.stringify({ onlyId: 'test' }));
-      expect(() => decodeCursor(invalidCursor)).toThrow('Invalid cursor format');
+      expect(() => decodeCursor(invalidCursor)).toThrow(
+        'Invalid cursor format'
+      );
     });
   });
 
@@ -54,7 +58,7 @@ describe('Pagination utilities', () => {
 
     it('should build DESC condition for updatedAt sort', () => {
       const result = buildCursorCondition(testCursor, 'updatedAt', 'desc');
-      
+
       expect(result.condition).toBe('(updated_at, id) < ($1, $2)');
       expect(result.params).toHaveLength(2);
       expect(result.params[0]).toBeInstanceOf(Date);
@@ -63,21 +67,21 @@ describe('Pagination utilities', () => {
 
     it('should build ASC condition for updatedAt sort', () => {
       const result = buildCursorCondition(testCursor, 'updatedAt', 'asc');
-      
+
       expect(result.condition).toBe('(updated_at, id) > ($1, $2)');
       expect(result.params).toHaveLength(2);
     });
 
     it('should handle other sort fields', () => {
       const result = buildCursorCondition(testCursor, 'name', 'desc');
-      
+
       // For now, fallback to updatedAt-based cursor
       expect(result.condition).toBe('(updated_at, id) < ($1, $2)');
       expect(result.params).toHaveLength(2);
     });
 
     it('should throw error for unsupported sort fields', () => {
-      expect(() => 
+      expect(() =>
         buildCursorCondition(testCursor, 'unsupported_field', 'desc')
       ).toThrow('Unsupported sort field: unsupported_field');
     });
@@ -100,9 +104,9 @@ describe('Pagination utilities', () => {
     });
 
     it('should throw error for unsupported sort fields', () => {
-      expect(() => 
-        buildOrderClause('unsupported_field', 'desc')
-      ).toThrow('Unsupported sort field: unsupported_field');
+      expect(() => buildOrderClause('unsupported_field', 'desc')).toThrow(
+        'Unsupported sort field: unsupported_field'
+      );
     });
   });
 
@@ -115,7 +119,7 @@ describe('Pagination utilities', () => {
 
       const cursor = generateNextCursor(lastItem);
       expect(cursor).toBeTypeOf('string');
-      
+
       const decoded = decodeCursor(cursor);
       expect(decoded).toEqual(lastItem);
     });
@@ -127,7 +131,7 @@ describe('Pagination utilities', () => {
       const limit = 5;
 
       const { items, hasMore } = checkHasMore(results, limit);
-      
+
       expect(hasMore).toBe(true);
       expect(items).toHaveLength(5);
       expect(items).toEqual([1, 2, 3, 4, 5]);
@@ -138,7 +142,7 @@ describe('Pagination utilities', () => {
       const limit = 5;
 
       const { items, hasMore } = checkHasMore(results, limit);
-      
+
       expect(hasMore).toBe(false);
       expect(items).toHaveLength(5);
       expect(items).toEqual([1, 2, 3, 4, 5]);
@@ -149,7 +153,7 @@ describe('Pagination utilities', () => {
       const limit = 5;
 
       const { items, hasMore } = checkHasMore(results, limit);
-      
+
       expect(hasMore).toBe(false);
       expect(items).toHaveLength(3);
       expect(items).toEqual([1, 2, 3]);
@@ -160,7 +164,7 @@ describe('Pagination utilities', () => {
       const limit = 5;
 
       const { items, hasMore } = checkHasMore(results, limit);
-      
+
       expect(hasMore).toBe(false);
       expect(items).toHaveLength(0);
     });
@@ -176,7 +180,7 @@ describe('Pagination utilities', () => {
         buildOrderClause('sku', 'asc'),
       ];
 
-      orderClauses.forEach(clause => {
+      orderClauses.forEach((clause) => {
         expect(clause).toMatch(/,\s*id\s+(ASC|DESC)$/);
       });
     });
@@ -189,7 +193,7 @@ describe('Pagination utilities', () => {
 
       const cursor1 = generateNextCursor(item);
       const cursor2 = generateNextCursor(item);
-      
+
       expect(cursor1).toBe(cursor2);
     });
   });

@@ -97,8 +97,12 @@ describe('Crypto utilities', () => {
     });
 
     it('should throw error for invalid compact format', () => {
-      expect(() => decryptFromCompact('invalid')).toThrow('Invalid encrypted data format');
-      expect(() => decryptFromCompact('part1:part2')).toThrow('Invalid encrypted data format');
+      expect(() => decryptFromCompact('invalid')).toThrow(
+        'Invalid encrypted data format'
+      );
+      expect(() => decryptFromCompact('part1:part2')).toThrow(
+        'Invalid encrypted data format'
+      );
       expect(() => decryptFromCompact('part1:part2:part3:part4')).toThrow(
         'Invalid encrypted data format'
       );
@@ -110,7 +114,7 @@ describe('Crypto utilities', () => {
       const key = generateEncryptionKey();
 
       expect(key).toMatch(/^base64:/);
-      
+
       const keyData = key.slice(7);
       const buffer = Buffer.from(keyData, 'base64');
       expect(buffer.length).toBe(32);

@@ -13,17 +13,17 @@ export function formatPrice(
   }
 
   const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
-  
+
   if (isNaN(numericPrice)) {
     return 'N/A';
   }
 
   // Format the number to 2 decimal places
   const formattedNumber = numericPrice.toFixed(2);
-  
+
   // Apply currency symbol and position
   const { currencySymbol, currencyPosition } = settings;
-  
+
   switch (currencyPosition) {
     case 'left':
       return `${currencySymbol}${formattedNumber}`;
@@ -52,13 +52,13 @@ export function parsePrice(priceString: string): number {
  */
 export function getCurrencySymbol(currencyCode: string): string {
   const symbolMap: Record<string, string> = {
-    'DKK': 'kr',
-    'EUR': '€',
-    'USD': '$',
-    'GBP': '£',
-    'SEK': 'kr',
-    'NOK': 'kr',
+    DKK: 'kr',
+    EUR: '€',
+    USD: '$',
+    GBP: '£',
+    SEK: 'kr',
+    NOK: 'kr',
   };
-  
+
   return symbolMap[currencyCode] || currencyCode;
 }

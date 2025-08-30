@@ -16,42 +16,45 @@ interface ProductsPageProps {
 export function ProductsPage({ initialParams }: ProductsPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   // Use local state instead of URL state to prevent infinite loops
   const [params, setParams] = useState<ProcessedSearchParams>(initialParams);
-  
+
   // Update local state when URL parameters change (for direct navigation)
   useEffect(() => {
     const currentPage = searchParams.get('page');
     const pageNum = currentPage ? parseInt(currentPage) : 1;
-    
+
     if (pageNum !== params.page) {
       // Use a timeout to debounce URL changes and prevent loops
       const timeoutId = setTimeout(() => {
-        setParams(prev => ({ ...prev, page: pageNum }));
+        setParams((prev) => ({ ...prev, page: pageNum }));
       }, 10);
-      
+
       return () => clearTimeout(timeoutId);
     }
   }, [searchParams]);
-  
+
   // Stabilize params to prevent unnecessary re-renders
-  const stableParams = useMemo(() => params, [
-    params.search,
-    params.sortBy, 
-    params.sortOrder,
-    params.limit,
-    params.page,
-    params.cursor,
-    params.status,
-    params.type,
-    params.brandIds.join(','),
-    params.categoryIds.join(','),
-    params.shopIds.join(','),
-    params.viewMode,
-    params.paginationMode
-  ]);
-  
+  const stableParams = useMemo(
+    () => params,
+    [
+      params.search,
+      params.sortBy,
+      params.sortOrder,
+      params.limit,
+      params.page,
+      params.cursor,
+      params.status,
+      params.type,
+      params.brandIds.join(','),
+      params.categoryIds.join(','),
+      params.shopIds.join(','),
+      params.viewMode,
+      params.paginationMode,
+    ]
+  );
+
   // Fetch products with SWR
   const {
     data,
@@ -61,13 +64,16 @@ export function ProductsPage({ initialParams }: ProductsPageProps) {
     mutate,
     loadMore,
     hasMore,
-    isLoadingMore
+    isLoadingMore,
   } = useProducts(stableParams);
 
   // Handle parameter updates
-  const handleParamsUpdate = useCallback((updates: Partial<ProcessedSearchParams>) => {
-    setParams(prev => ({ ...prev, ...updates }));
-  }, []);
+  const handleParamsUpdate = useCallback(
+    (updates: Partial<ProcessedSearchParams>) => {
+      setParams((prev) => ({ ...prev, ...updates }));
+    },
+    []
+  );
 
   // Handle reset
   const handleReset = useCallback(() => {
@@ -75,14 +81,17 @@ export function ProductsPage({ initialParams }: ProductsPageProps) {
   }, [initialParams]);
 
   // Handle pagination
-  const handlePageChange = useCallback((page: number) => {
-    setParams(prev => ({ ...prev, page, cursor: undefined }));
-    
-    // Update URL to reflect current page
-    const newSearchParams = new URLSearchParams(searchParams.toString());
-    newSearchParams.set('page', page.toString());
-    router.push(`/products?${newSearchParams.toString()}`, { scroll: false });
-  }, [router, searchParams]);
+  const handlePageChange = useCallback(
+    (page: number) => {
+      setParams((prev) => ({ ...prev, page, cursor: undefined }));
+
+      // Update URL to reflect current page
+      const newSearchParams = new URLSearchParams(searchParams.toString());
+      newSearchParams.set('page', page.toString());
+      router.push(`/products?${newSearchParams.toString()}`, { scroll: false });
+    },
+    [router, searchParams]
+  );
 
   const handleLoadMore = useCallback(() => {
     if (hasMore && !isLoadingMore) {

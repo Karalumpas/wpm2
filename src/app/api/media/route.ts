@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     // Build query conditions
     let conditions: SQL = eq(mediaFiles.userId, userId);
-    
+
     if (productId) {
       conditions = and(conditions, eq(mediaFiles.productId, productId)) as SQL;
     }
@@ -41,7 +41,6 @@ export async function GET(request: NextRequest) {
       count: files.length,
       hasMore: files.length === limit,
     });
-
   } catch (error) {
     console.error('Error fetching media files:', error);
     return NextResponse.json(
@@ -64,17 +63,17 @@ export async function DELETE(request: NextRequest) {
     const fileId = searchParams.get('id');
 
     if (!fileId) {
-      return NextResponse.json({ error: 'File ID is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'File ID is required' },
+        { status: 400 }
+      );
     }
 
     // Get the file record
     const [file] = await db
       .select()
       .from(mediaFiles)
-      .where(and(
-        eq(mediaFiles.id, fileId),
-        eq(mediaFiles.userId, userId)
-      ))
+      .where(and(eq(mediaFiles.id, fileId), eq(mediaFiles.userId, userId)))
       .limit(1);
 
     if (!file) {
@@ -90,15 +89,12 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete from database
-    await db
-      .delete(mediaFiles)
-      .where(eq(mediaFiles.id, fileId));
+    await db.delete(mediaFiles).where(eq(mediaFiles.id, fileId));
 
     return NextResponse.json({
       success: true,
       message: 'File deleted successfully',
     });
-
   } catch (error) {
     console.error('Error deleting media file:', error);
     return NextResponse.json(

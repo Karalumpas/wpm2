@@ -19,7 +19,9 @@ function getEncryptionKey(): Buffer {
     }
     return buffer;
   } catch {
-    throw new Error('Invalid ENCRYPTION_KEY format. Must be base64 encoded 32 bytes');
+    throw new Error(
+      'Invalid ENCRYPTION_KEY format. Must be base64 encoded 32 bytes'
+    );
   }
 }
 

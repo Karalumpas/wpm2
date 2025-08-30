@@ -7,6 +7,7 @@ This implementation adds PhotoPrism (AI-powered photo management) and MinIO (S3-
 ## Services Added
 
 ### MinIO Object Storage
+
 - **Endpoint**: http://localhost:9000
 - **Admin Console**: http://localhost:9001
 - **Credentials**: minioadmin / minioadmin123
@@ -18,6 +19,7 @@ This implementation adds PhotoPrism (AI-powered photo management) and MinIO (S3-
   - Automatic bucket creation
 
 ### PhotoPrism Photo Management
+
 - **Endpoint**: http://localhost:2342
 - **Credentials**: admin / insecure
 - **Features**:
@@ -30,6 +32,7 @@ This implementation adds PhotoPrism (AI-powered photo management) and MinIO (S3-
 ## Database Schema
 
 ### New Table: `media_files`
+
 ```sql
 CREATE TABLE media_files (
     id UUID PRIMARY KEY,
@@ -55,36 +58,43 @@ CREATE TABLE media_files (
 ## API Endpoints
 
 ### File Upload
+
 - **POST** `/api/uploads`
 - **Form Data**: `file`, `productId` (optional), `isFeatured` (optional)
 - **Response**: File metadata and URL
 
 ### Media Management
+
 - **GET** `/api/media` - List media files
 - **DELETE** `/api/media?id={fileId}` - Delete media file
 
 ### PhotoPrism Integration
+
 - **GET** `/api/photos` - Search photos
 - **POST** `/api/photos` - Control indexing
 - **GET** `/api/photos/{uid}` - Get photo details
 - **PUT** `/api/photos/{uid}` - Update photo metadata
 
 ### Albums
+
 - **GET** `/api/albums` - List albums
 - **POST** `/api/albums` - Create album
 
 ### Health Check
+
 - **GET** `/api/health/services` - Check MinIO and PhotoPrism status
 
 ## New Pages
 
 ### Media Library (`/media`)
+
 - File upload interface
 - Media file browser
 - File management (view, download, delete)
 - Integration with MinIO storage
 
 ### Photo Management (`/photos`)
+
 - PhotoPrism photo browser
 - Search functionality
 - Indexing controls
@@ -109,6 +119,7 @@ PHOTOPRISM_PASSWORD=insecure
 ## Docker Services
 
 ### Updated docker-compose.yml
+
 - Added MinIO service with admin console
 - Added PhotoPrism service with PostgreSQL backend
 - Configured volumes for persistent storage
@@ -117,6 +128,7 @@ PHOTOPRISM_PASSWORD=insecure
 ## Usage
 
 ### Starting Services
+
 ```bash
 # Start all services
 npm run docker:up
@@ -128,6 +140,7 @@ npm run docker:services  # MinIO + PhotoPrism only
 ```
 
 ### File Upload Workflow
+
 1. User uploads file via `/media` page
 2. File is stored in MinIO bucket
 3. Metadata saved to `media_files` table
@@ -135,6 +148,7 @@ npm run docker:services  # MinIO + PhotoPrism only
 5. Optional: Mark as featured image
 
 ### Photo Management Workflow
+
 1. Upload photos to PhotoPrism originals folder
 2. Start indexing via `/photos` page
 3. Browse and search indexed photos
@@ -144,16 +158,19 @@ npm run docker:services  # MinIO + PhotoPrism only
 ## Integration Points
 
 ### Product Images
+
 - Product featured images can be stored in MinIO
 - Gallery images supported through media files
 - Direct integration with existing product schema
 
 ### User Management
+
 - Media files are user-specific
 - Authentication required for uploads
 - File ownership and permissions
 
 ### Search and Organization
+
 - PhotoPrism AI-powered search
 - Automatic tagging and categorization
 - Face recognition for team photos
@@ -162,18 +179,21 @@ npm run docker:services  # MinIO + PhotoPrism only
 ## Development Notes
 
 ### MinIO Client
+
 - Uses official MinIO JavaScript SDK
 - Automatic bucket initialization
 - Public read policy for product images
 - File naming conventions with timestamps
 
 ### PhotoPrism Client
+
 - Custom API client with authentication
 - Session management with token refresh
 - Image URL generation for different sizes
 - Indexing status monitoring
 
 ### Security
+
 - File type validation (images only)
 - File size limits (10MB max)
 - User authentication required

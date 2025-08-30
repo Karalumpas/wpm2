@@ -43,6 +43,13 @@
       "when": 1756540150892,
       "tag": "0005_easy_dorian_gray",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1756562137516,
+      "tag": "0006_bright_purifiers",
+      "breakpoints": true
     }
   ]
 }

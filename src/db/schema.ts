@@ -110,6 +110,10 @@ export const products = pgTable(
     shopIdIdx: index('products_shop_id_idx').on(table.shopId),
     stockStatusIdx: index('products_stock_status_idx').on(table.stockStatus),
     lastSyncedIdx: index('products_last_synced_idx').on(table.lastSyncedAt),
+    shopWooIdUnique: unique('products_shop_id_woocommerce_id_unique').on(
+      table.shopId,
+      table.wooCommerceId,
+    ),
   })
 );
 
@@ -118,6 +122,7 @@ export const productVariants = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     productId: uuid('product_id').references(() => products.id, { onDelete: 'cascade' }).notNull(),
+    shopId: uuid('shop_id').references(() => shops.id),
     // WooCommerce specific
     wooCommerceId: text('woocommerce_id'), // Original WooCommerce variation ID
     // Core variant fields
@@ -147,6 +152,11 @@ export const productVariants = pgTable(
     attributesIdx: index('product_variants_attributes_idx').using('gin', table.attributes),
     wooCommerceIdIdx: index('product_variants_woocommerce_id_idx').on(table.wooCommerceId),
     stockStatusIdx: index('product_variants_stock_status_idx').on(table.stockStatus),
+    shopIdIdx: index('product_variants_shop_id_idx').on(table.shopId),
+    shopWooIdUnique: unique('product_variants_shop_id_woocommerce_id_unique').on(
+      table.shopId,
+      table.wooCommerceId,
+    ),
   })
 );
 

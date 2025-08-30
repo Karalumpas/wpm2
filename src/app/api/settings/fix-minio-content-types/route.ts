@@ -26,4 +26,3 @@ export async function GET() {
       'POST to this endpoint to scan MinIO and fix missing/invalid content-types for image objects. Optional body: { "prefix": "shops/<shopId>/" }',
   });
 }
-

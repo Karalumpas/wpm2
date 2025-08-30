@@ -161,7 +161,8 @@ export async function fixObjectContentType(
 ): Promise<{ updated: boolean; contentType?: string }> {
   try {
     const stat = await minioClient.statObject(DEFAULT_BUCKET, objectName);
-    const current = (stat.metaData && (stat.metaData['content-type'] as string)) || '';
+    const current =
+      (stat.metaData && (stat.metaData['content-type'] as string)) || '';
     const desired = guessMimeType(objectName);
 
     if (current && current.startsWith('image/')) {

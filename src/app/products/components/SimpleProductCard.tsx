@@ -17,26 +17,27 @@ export function SimpleProductCard({ product }: SimpleProductCardProps) {
   const displayImage =
     product.featuredImage ||
     (product.images && product.images.length > 0 ? product.images[0] : null);
+  const variantImages = product.variantImages || [];
 
   const [imageError, setImageError] = useState(false);
 
   return (
     <div className="bg-white rounded-lg border hover:shadow-md transition-shadow duration-200 p-4">
       <Link href={`/products/${product.id}`} className="block">
-        {/* Product Image */}
-        <div className="w-full h-48 bg-gray-100 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+        {/* Product Image (square) */}
+        <div className="relative aspect-square bg-gray-100 rounded-lg mb-3 overflow-hidden">
           {displayImage && !imageError ? (
             <Image
               src={displayImage}
               alt={product.name}
-              width={200}
-              height={200}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
               onError={() => setImageError(true)}
               onLoad={() => setImageError(false)}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center text-gray-400">
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
               <svg
                 className="w-12 h-12 mb-2"
                 fill="none"
@@ -54,6 +55,29 @@ export function SimpleProductCard({ product }: SimpleProductCardProps) {
             </div>
           )}
         </div>
+
+        {/* Variant thumbnails (for variable products) */}
+        {product.type === 'variable' && variantImages.length > 0 && (
+          <div className="mb-4">
+            <div className="flex gap-2 overflow-x-auto">
+              {variantImages.map((img, i) => (
+                <div
+                  key={i}
+                  className="w-12 h-12 rounded-md overflow-hidden border border-gray-200 flex-shrink-0"
+                  title={`Variant ${i + 1}`}
+                >
+                  <Image
+                    src={img}
+                    alt={`${product.name} variant ${i + 1}`}
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Product Info */}
         <div className="space-y-2">

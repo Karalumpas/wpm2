@@ -113,6 +113,7 @@ export interface ProductListItem {
   type: 'simple' | 'variable' | 'grouped';
   updatedAt: string;
   variantCount?: number;
+  variantImages?: string[];
 
   // Optional fields that may or may not be present
   slug?: string;

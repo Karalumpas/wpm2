@@ -217,6 +217,28 @@ export async function GET(request: NextRequest) {
       variantCountMap.set(row.product_id, Number(row.count));
     });
 
+    // Fetch variant images for these products
+    const variantImagesMap = new Map<string, string[]>();
+    if (productIds.length > 0) {
+      const imagesRows = await db
+        .select({
+          productId: productVariants.productId,
+          image: productVariants.image,
+        })
+        .from(productVariants)
+        .where(inArray(productVariants.productId, productIds));
+
+      for (const row of imagesRows) {
+        if (!row.image) continue;
+        const list = variantImagesMap.get(row.productId) || [];
+        // Avoid duplicates and cap to a reasonable number
+        if (!list.includes(row.image) && list.length < 8) {
+          list.push(row.image);
+          variantImagesMap.set(row.productId, list);
+        }
+      }
+    }
+
     // Check if there are more results (only for cursor-based pagination)
     let hasMore = false;
     let nextCursor: string | undefined;
@@ -249,6 +271,7 @@ export async function GET(request: NextRequest) {
       type: product.type,
       featuredImage: product.featuredImage,
       images: (product.galleryImages as string[]) || [],
+      variantImages: variantImagesMap.get(product.id) || [],
       updatedAt: product.updatedAt.toISOString(),
       variantCount: variantCountMap.get(product.id) || 0,
     }));

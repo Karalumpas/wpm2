@@ -730,7 +730,12 @@ export class WooCommerceProductSyncService {
       const bySku = await db
         .select()
         .from(productVariants)
-        .where(and(eq(productVariants.productId, productId), eq(productVariants.sku, sku)))
+        .where(
+          and(
+            eq(productVariants.productId, productId),
+            eq(productVariants.sku, sku)
+          )
+        )
         .limit(1);
       return bySku[0] || null;
     }

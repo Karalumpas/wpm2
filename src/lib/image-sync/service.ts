@@ -8,7 +8,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { minioClient, DEFAULT_BUCKET, getFileUrl } from '@/lib/storage/minio';
 import { db } from '@/db';
-import { mediaFiles } from '@/db/schema';
+import { mediaFiles, users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 interface ImageSyncOptions {
@@ -165,7 +165,15 @@ export class ImageSyncService {
     featuredImage?: string,
     galleryImages?: string[]
   ): Promise<void> {
-    if (!userId) return; // Cannot register without a user owner
+    // Resolve a user id: prefer provided, else pick first user as fallback
+    let ownerId = userId || null;
+    if (!ownerId) {
+      try {
+        const anyUser = await db.select({ id: users.id }).from(users).limit(1);
+        if (anyUser.length) ownerId = anyUser[0].id;
+      } catch {}
+    }
+    if (!ownerId) return; // Skip if we truly have no users
     const urls: Array<{ url: string; isFeatured: boolean }> = [];
     if (featuredImage) urls.push({ url: featuredImage, isFeatured: true });
     for (const u of galleryImages || [])
@@ -198,7 +206,7 @@ export class ImageSyncService {
               mimeType,
               minioUrl: url,
               productId,
-              userId,
+              userId: ownerId,
               isFeatured,
               updatedAt: new Date(),
             })
@@ -212,7 +220,7 @@ export class ImageSyncService {
             mimeType,
             minioUrl: url,
             productId,
-            userId,
+            userId: ownerId,
             isIndexed: false,
             isFeatured,
           });

@@ -93,9 +93,15 @@ export class ImageSyncService {
       const buffer = Buffer.from(imageBuffer);
 
       // Upload to MinIO with content-type so Next/Image optimizer accepts it
-      await minioClient.putObject(this.bucketName, minioPath, buffer, buffer.length, {
-        'Content-Type': this.guessMimeType(fileName),
-      } as Record<string, string>);
+      await minioClient.putObject(
+        this.bucketName,
+        minioPath,
+        buffer,
+        buffer.length,
+        {
+          'Content-Type': this.guessMimeType(fileName),
+        } as Record<string, string>
+      );
       console.log(`✅ Uploaded to MinIO: ${minioPath}`);
 
       const syncedImage: SyncedImage = {
@@ -349,4 +355,3 @@ export class ImageSyncService {
 }
 
 export const imageSyncService = new ImageSyncService();
-

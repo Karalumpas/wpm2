@@ -1,4 +1,7 @@
 import * as Minio from 'minio';
+import { db } from '@/db';
+import { mediaFiles } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 
 // MinIO configuration
 const MINIO_ENDPOINT = process.env.MINIO_ENDPOINT || 'localhost';
@@ -123,4 +126,97 @@ export async function listFiles(prefix?: string): Promise<string[]> {
     console.error('Error listing files from MinIO:', error);
     throw error;
   }
+}
+
+// Guess basic image content-type from file extension
+function guessMimeType(fileName: string): string {
+  const lower = fileName.toLowerCase();
+  if (lower.endsWith('.png')) return 'image/png';
+  if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg';
+  if (lower.endsWith('.gif')) return 'image/gif';
+  if (lower.endsWith('.webp')) return 'image/webp';
+  if (lower.endsWith('.svg')) return 'image/svg+xml';
+  return 'application/octet-stream';
+}
+
+// Get object as Buffer
+async function getObjectBuffer(objectName: string): Promise<Buffer> {
+  const stream: NodeJS.ReadableStream = await minioClient.getObject(
+    DEFAULT_BUCKET,
+    objectName
+  );
+  return await new Promise<Buffer>((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    stream.on('data', (chunk) => {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    });
+    stream.on('error', reject);
+    stream.on('end', () => resolve(Buffer.concat(chunks)));
+  });
+}
+
+// Fix content-type metadata for a single object if missing/invalid.
+export async function fixObjectContentType(
+  objectName: string
+): Promise<{ updated: boolean; contentType?: string }> {
+  try {
+    const stat = await minioClient.statObject(DEFAULT_BUCKET, objectName);
+    const current = (stat.metaData && (stat.metaData['content-type'] as string)) || '';
+    const desired = guessMimeType(objectName);
+
+    if (current && current.startsWith('image/')) {
+      return { updated: false, contentType: current };
+    }
+
+    // Read and re-upload to set metadata
+    const buffer = await getObjectBuffer(objectName);
+    await minioClient.putObject(
+      DEFAULT_BUCKET,
+      objectName,
+      buffer,
+      buffer.length,
+      { 'Content-Type': desired }
+    );
+    return { updated: true, contentType: desired };
+  } catch (error) {
+    console.error('Error fixing content-type for', objectName, error);
+    throw error;
+  }
+}
+
+// Scan bucket and fix content-type for image objects, optionally under a prefix.
+export async function fixMissingContentTypes(prefix?: string): Promise<{
+  checked: number;
+  updated: number;
+  errors: number;
+  updatedItems: Array<{ objectName: string; contentType: string }>;
+}> {
+  const files = await listFiles(prefix);
+  let checked = 0;
+  let updated = 0;
+  let errors = 0;
+  const updatedItems: Array<{ objectName: string; contentType: string }> = [];
+
+  for (const objectName of files) {
+    // Only consider likely images
+    const ct = guessMimeType(objectName);
+    if (!ct.startsWith('image/')) continue;
+    checked++;
+    try {
+      const result = await fixObjectContentType(objectName);
+      if (result.updated && result.contentType) {
+        updated++;
+        updatedItems.push({ objectName, contentType: result.contentType });
+        // Also update DB mime type if present
+        await db
+          .update(mediaFiles)
+          .set({ mimeType: result.contentType, updatedAt: new Date() })
+          .where(eq(mediaFiles.objectName, objectName));
+      }
+    } catch {
+      errors++;
+    }
+  }
+
+  return { checked, updated, errors, updatedItems };
 }

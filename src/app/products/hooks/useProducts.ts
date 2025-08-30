@@ -1,7 +1,7 @@
 'use client';
 
 import useSWR from 'swr';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import { ProcessedSearchParams } from '../params';
 import { ProductListItem } from '@/types/product';
 
@@ -135,19 +135,23 @@ export function useProducts(params: ProcessedSearchParams): UseProductsResult {
     }
   );
 
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
   // Load more for infinite scroll
   const loadMore = useCallback(async () => {
-    if (!data?.pagination.nextCursor) return;
-    
+    if (!data?.pagination.nextCursor || isLoadingMore) return;
+
+    setIsLoadingMore(true);
+
     const nextUrl = buildApiUrl({
       ...params,
       cursor: data.pagination.nextCursor,
       page: undefined, // Remove page when using cursor
     });
-    
+
     try {
       const nextData = await fetcher(nextUrl);
-      
+
       // Merge with existing data
       mutate({
         ...nextData,
@@ -159,8 +163,10 @@ export function useProducts(params: ProcessedSearchParams): UseProductsResult {
       }, false);
     } catch (err) {
       console.error('Failed to load more products:', err);
+    } finally {
+      setIsLoadingMore(false);
     }
-  }, [data, params, mutate]);
+  }, [data, params, mutate, isLoadingMore]);
 
   const hasMore = useMemo(() => {
     if (!data?.pagination) return false;
@@ -180,6 +186,6 @@ export function useProducts(params: ProcessedSearchParams): UseProductsResult {
     mutate,
     loadMore,
     hasMore,
-    isLoadingMore: false, // TODO: Implement proper loading state for loadMore
+    isLoadingMore,
   };
 }

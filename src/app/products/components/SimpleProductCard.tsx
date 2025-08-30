@@ -20,15 +20,17 @@ export function SimpleProductCard({ product }: SimpleProductCardProps) {
   const variantImages = product.variantImages || [];
 
   const [imageError, setImageError] = useState(false);
+  const [hoveredVariant, setHoveredVariant] = useState<string | null>(null);
+  const mainImage = hoveredVariant || displayImage;
 
   return (
     <div className="bg-white rounded-lg border hover:shadow-md transition-shadow duration-200 p-4">
       <Link href={`/products/${product.id}`} className="block">
         {/* Product Image (square) */}
         <div className="relative aspect-square bg-gray-100 rounded-lg mb-3 overflow-hidden">
-          {displayImage && !imageError ? (
+          {mainImage && !imageError ? (
             <Image
-              src={displayImage}
+              src={mainImage}
               alt={product.name}
               fill
               className="object-cover"
@@ -65,6 +67,8 @@ export function SimpleProductCard({ product }: SimpleProductCardProps) {
                   key={i}
                   className="w-12 h-12 rounded-md overflow-hidden border border-gray-200 flex-shrink-0"
                   title={`Variant ${i + 1}`}
+                  onMouseEnter={() => setHoveredVariant(img)}
+                  onMouseLeave={() => setHoveredVariant(null)}
                 >
                   <Image
                     src={img}

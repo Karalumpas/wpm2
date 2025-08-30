@@ -17,7 +17,7 @@ export function SimpleProductCard({ product }: SimpleProductCardProps) {
   const displayImage =
     product.featuredImage ||
     (product.images && product.images.length > 0 ? product.images[0] : null);
-  const variantImages = product.variantImages || [];
+  const variantImages = Array.from(new Set(product.variantImages || []));
 
   const [imageError, setImageError] = useState(false);
   const [hoveredVariant, setHoveredVariant] = useState<string | null>(null);

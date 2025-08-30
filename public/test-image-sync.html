@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Sync Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; }
+        .loading { background-color: #d1ecf1; border: 1px solid #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #6c757d; cursor: not-allowed; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        input { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🖼️ Image Sync Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Single Image Sync</h2>
+        <input type="text" id="imageUrl" placeholder="Image URL" value="https://mgwp.medeland.dk/wp-content/uploads/B011F_LS00_2025.jpg">
+        <input type="text" id="shopId" placeholder="Shop ID" value="mgwp-shop">
+        <br>
+        <button onclick="testImageSync()" id="testSingleBtn">Test Single Image Sync</button>
+        <div id="singleResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Product Images Sync</h2>
+        <input type="text" id="featuredUrl" placeholder="Featured Image URL" value="https://mgwp.medeland.dk/wp-content/uploads/B011F_LS00_2025.jpg">
+        <input type="text" id="galleryUrls" placeholder="Gallery URLs (comma separated)" value="https://mgwp.medeland.dk/wp-content/uploads/B011F_BB00_2025.jpg,https://mgwp.medeland.dk/wp-content/uploads/B011F_RS00_2025.jpg">
+        <input type="text" id="productShopId" placeholder="Shop ID" value="mgwp-shop">
+        <br>
+        <button onclick="testProductImagesSync()" id="testProductBtn">Test Product Images Sync</button>
+        <div id="productResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Full Product Sync with Images</h2>
+        <p>This will sync real products from WooCommerce including their images to MinIO</p>
+        <input type="text" id="syncShopId" placeholder="Shop ID" value="">
+        <input type="number" id="productLimit" placeholder="Product Limit" value="3" min="1" max="10">
+        <br>
+        <button onclick="loadShops()" id="loadShopsBtn">Load Available Shops</button>
+        <button onclick="testFullProductSync()" id="testFullSyncBtn">Test Full Product Sync</button>
+        <div id="shopsInfo"></div>
+        <div id="fullSyncResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>MinIO Browser</h2>
+        <p>Access MinIO directly: <a href="http://localhost:9001" target="_blank">http://localhost:9001</a></p>
+        <p>Username: <code>minioadmin</code> | Password: <code>minioadmin</code></p>
+    </div>
+
+    <script>
+        async function testImageSync() {
+            const btn = document.getElementById('testSingleBtn');
+            const result = document.getElementById('singleResult');
+            
+            btn.disabled = true;
+            result.innerHTML = '<div class="loading">🔄 Testing image sync...</div>';
+            
+            try {
+                const response = await fetch('/api/test-image-sync', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        imageUrl: document.getElementById('imageUrl').value,
+                        shopId: document.getElementById('shopId').value
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Success!</h3>
+                            <p><strong>Original URL:</strong> ${data.originalUrl}</p>
+                            <p><strong>MinIO URL:</strong> <a href="${data.syncedImage.centralUrl}" target="_blank">${data.syncedImage.centralUrl}</a></p>
+                            <p><strong>MinIO Path:</strong> ${data.syncedImage.minioPath}</p>
+                            <p><strong>File Name:</strong> ${data.syncedImage.fileName}</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="error">
+                            <h3>❌ Error</h3>
+                            <p>${data.error}</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Network Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+            
+            btn.disabled = false;
+        }
+
+        async function testProductImagesSync() {
+            const btn = document.getElementById('testProductBtn');
+            const result = document.getElementById('productResult');
+            
+            btn.disabled = true;
+            result.innerHTML = '<div class="loading">🔄 Testing product images sync...</div>';
+            
+            try {
+                const galleryUrls = document.getElementById('galleryUrls').value
+                    .split(',')
+                    .map(url => url.trim())
+                    .filter(url => url.length > 0);
+
+                const response = await fetch('/api/test-product-images', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        featuredImageUrl: document.getElementById('featuredUrl').value,
+                        galleryImageUrls: galleryUrls,
+                        shopId: document.getElementById('productShopId').value
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Success!</h3>
+                            <p><strong>Featured Image:</strong> <a href="${data.syncedImages.featuredImage}" target="_blank">${data.syncedImages.featuredImage}</a></p>
+                            <p><strong>Gallery Images:</strong> ${data.syncedImages.galleryImages.length} synced</p>
+                            <h4>Gallery URLs:</h4>
+                            <ul>
+                                ${data.syncedImages.galleryImages.map(url => `<li><a href="${url}" target="_blank">${url}</a></li>`).join('')}
+                            </ul>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="error">
+                            <h3>❌ Error</h3>
+                            <p>${data.error}</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Network Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+            
+            btn.disabled = false;
+        }
+
+        async function loadShops() {
+            const btn = document.getElementById('loadShopsBtn');
+            const result = document.getElementById('shopsInfo');
+            
+            btn.disabled = true;
+            result.innerHTML = '<div class="loading">🔄 Loading shops...</div>';
+            
+            try {
+                const response = await fetch('/api/test-product-sync');
+                const data = await response.json();
+                
+                if (data.availableShops && data.availableShops.length > 0) {
+                    const shopSelect = `
+                        <div class="success">
+                            <h3>Available Shops:</h3>
+                            <select id="shopSelect" onchange="document.getElementById('syncShopId').value = this.value;">
+                                <option value="">Select a shop...</option>
+                                ${data.availableShops.map(shop => 
+                                    `<option value="${shop.id}">${shop.name} (${shop.url}) - ${shop.status}</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+                    `;
+                    result.innerHTML = shopSelect;
+                } else {
+                    result.innerHTML = '<div class="error">❌ No shops found</div>';
+                }
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Error loading shops</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+            
+            btn.disabled = false;
+        }
+
+        async function testFullProductSync() {
+            const btn = document.getElementById('testFullSyncBtn');
+            const result = document.getElementById('fullSyncResult');
+            
+            const shopId = document.getElementById('syncShopId').value;
+            const productLimit = parseInt(document.getElementById('productLimit').value) || 3;
+            
+            if (!shopId) {
+                result.innerHTML = '<div class="error">❌ Please select a shop first</div>';
+                return;
+            }
+            
+            btn.disabled = true;
+            result.innerHTML = '<div class="loading">🔄 Running full product sync with images... This may take a while...</div>';
+            
+            try {
+                const response = await fetch('/api/test-product-sync', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        shopId: shopId,
+                        productLimit: productLimit
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Full Product Sync Success!</h3>
+                            <p><strong>Message:</strong> ${data.message}</p>
+                            <p><strong>Products Found:</strong> ${data.productsFound}</p>
+                            
+                            <h4>Sync Details:</h4>
+                            <ul>
+                                <li>Products Created: ${data.syncDetails.productsCreated}</li>
+                                <li>Products Updated: ${data.syncDetails.productsUpdated}</li>
+                                <li>Categories Created: ${data.syncDetails.categoriesCreated}</li>
+                                <li>Categories Updated: ${data.syncDetails.categoriesUpdated}</li>
+                                <li>Variations Created: ${data.syncDetails.variationsCreated}</li>
+                                <li>Variations Updated: ${data.syncDetails.variationsUpdated}</li>
+                                <li>Errors: ${data.syncDetails.errors.length}</li>
+                            </ul>
+                            
+                            <h4>Test Products (first 3):</h4>
+                            <ul>
+                                ${data.testProducts.map(p => 
+                                    `<li><strong>${p.name}</strong> (ID: ${p.id}) - ${p.images} images</li>`
+                                ).join('')}
+                            </ul>
+                            
+                            <h4>Progress Log (last 20 entries):</h4>
+                            <pre style="max-height: 200px; overflow-y: auto;">${data.progressLog.join('\\n')}</pre>
+                            
+                            <p><strong>Now check:</strong> 
+                                <a href="/products" target="_blank">Products page</a> | 
+                                <a href="http://localhost:9001" target="_blank">MinIO Browser</a>
+                            </p>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="error">
+                            <h3>❌ Sync Failed</h3>
+                            <p>${data.error}</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Network Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+            
+            btn.disabled = false;
+        }
+    </script>
+</body>
+</html>

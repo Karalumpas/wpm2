@@ -1,4 +1,5 @@
-import NextAuth from 'next-auth';
+import NextAuth, { type NextAuthOptions } from 'next-auth';
+import { getServerSession } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { db } from '@/db';
 import { users } from '@/db/schema';
@@ -6,7 +7,8 @@ import { verifyPassword } from '@/lib/auth';
 import { loginSchema } from '@/lib/validations';
 import { eq } from 'drizzle-orm';
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+// NextAuth v4-compatible configuration and helpers
+export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
   },
@@ -40,7 +42,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return {
             id: user[0].id,
             email: user[0].email,
-          };
+          } as any;
         } catch {
           return null;
         }
@@ -50,13 +52,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        token.id = (user as any).id as string;
       }
       return token;
     },
     session({ session, token }) {
-      if (session.user && token.id) {
-        session.user.id = token.id as string;
+      if (session.user && (token as any).id) {
+        session.user.id = (token as any).id as string;
       }
       return session;
     },
@@ -64,4 +66,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
     signIn: '/login',
   },
-});
+};
+
+// Route handlers for App Router (GET/POST)
+const handler = NextAuth(authOptions);
+export const GET = handler;
+export const POST = handler;
+
+// Maintain the previous import style used by route.ts
+export const handlers = { GET, POST } as const;
+
+// Server-side session helper used across RSC and Route Handlers
+export function auth() {
+  return getServerSession(authOptions);
+}

@@ -9,11 +9,8 @@ import {
   categories,
 } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import {
-  formatDateTime,
-  formatDimensions,
-  formatPrice,
-} from '@/lib/formatters';
+import { formatDateTime, formatDimensions, formatPrice } from '@/lib/formatters';
+import ThumbsSlider from './components/ThumbsSlider';
 import VariantsTable from './variants/VariantsTable';
 
 type PageProps = {
@@ -111,23 +108,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
               {allThumbs.length > 0 && (
                 <div className="p-4 border-t">
-                  <div className="flex gap-3 overflow-x-auto">
-                    {allThumbs.map((thumb, i) => (
-                      <div
-                        key={`${thumb}-${i}`}
-                        className="w-16 h-16 rounded-lg overflow-hidden border hover:scale-105 transition-transform duration-150 flex-shrink-0"
-                        title={`Image ${i + 1}`}
-                      >
-                        <Image
-                          src={thumb}
-                          alt={`${product.name} ${i + 1}`}
-                          width={64}
-                          height={64}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
+                  <ThumbsSlider images={allThumbs} altBase={product.name} />
                 </div>
               )}
             </div>

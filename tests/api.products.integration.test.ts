@@ -10,6 +10,19 @@ import {
 } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
+// Unauthorized access tests
+describe('Products API Authentication', () => {
+  it('should reject unauthorized product requests', async () => {
+    const response = await fetch('http://localhost:3000/api/products');
+    expect(response.status).toBe(401);
+  });
+
+  it('should reject unauthorized filter requests', async () => {
+    const response = await fetch('http://localhost:3000/api/products/filters');
+    expect(response.status).toBe(401);
+  });
+});
+
 // Mock data for testing
 const testBrand = {
   id: 'test-brand-id',

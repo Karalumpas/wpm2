@@ -1,6 +1,8 @@
-'use client';
+'use server';
 
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { auth } from '@/lib/auth-utils';
 import {
   Package,
   Tags,
@@ -51,7 +53,11 @@ const quickActions = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+  if (!session?.user) {
+    redirect('/login');
+  }
   return (
     <div className="space-y-6">
       {/* Page Header */}

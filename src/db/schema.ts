@@ -37,6 +37,24 @@ export const users = pgTable('users', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Password reset tokens for account recovery
+export const passwordResetTokens = pgTable(
+  'password_reset_tokens',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id).notNull(),
+    token: text('token').notNull().unique(),
+    expiresAt: timestamp('expires_at').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userIdIdx: index('password_reset_tokens_user_id_idx').on(table.userId),
+    expiresAtIdx: index('password_reset_tokens_expires_at_idx').on(
+      table.expiresAt
+    ),
+  })
+);
+
 export const shops = pgTable(
   'shops',
   {

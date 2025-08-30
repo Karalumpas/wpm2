@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Search, RefreshCw, Eye, Download, Heart } from 'lucide-react';
+import { ProtectedClient } from '@/components/auth/ProtectedClient';
 
 interface PhotoPrismPhoto {
   UID: string;
@@ -115,7 +116,8 @@ export default function PhotosPage() {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <ProtectedClient>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Photo Management</h1>
         <p className="mt-2 text-gray-600">
@@ -279,6 +281,7 @@ export default function PhotosPage() {
           </button>
         </div>
       )}
-    </div>
+      </div>
+    </ProtectedClient>
   );
 }

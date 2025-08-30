@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Alert } from '@/components/ui/alert';
 import { useSettings } from '@/hooks/useSettings';
+import { ProtectedClient } from '@/components/auth/ProtectedClient';
 import {
   SUPPORTED_CURRENCIES,
   CURRENCY_POSITION_OPTIONS,
@@ -211,7 +212,8 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <ProtectedClient>
+      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="px-4 py-6 sm:px-0">
         <div className="border-b border-gray-200 pb-4">
@@ -657,6 +659,7 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </ProtectedClient>
   );
 }

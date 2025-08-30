@@ -8,6 +8,7 @@ import {
   type ShopResponse,
 } from '@/lib/validation/shops';
 import { z } from 'zod';
+import { ProtectedClient } from '@/components/auth/ProtectedClient';
 
 export default function EditShopPage() {
   const router = useRouter();
@@ -295,8 +296,9 @@ export default function EditShopPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
+    <ProtectedClient>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="border-b border-gray-200 pb-4 mb-8">
             <div className="flex justify-between items-center">

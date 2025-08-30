@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ShopResponse } from '@/lib/validation/shops';
+import { ProtectedClient } from '@/components/auth/ProtectedClient';
 
 export default function ConnectionsPage() {
   const router = useRouter();
@@ -46,7 +47,8 @@ export default function ConnectionsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <ProtectedClient>
+      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="px-4 py-6 sm:px-0">
         <div className="border-b border-gray-200 pb-4">
@@ -137,6 +139,7 @@ export default function ConnectionsPage() {
         )}
       </div>
     </div>
+    </ProtectedClient>
   );
 }
 

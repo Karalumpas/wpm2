@@ -9,7 +9,11 @@ import {
   categories,
 } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { formatDateTime, formatDimensions, formatPrice } from '@/lib/formatters';
+import {
+  formatDateTime,
+  formatDimensions,
+  formatPrice,
+} from '@/lib/formatters';
 
 type PageProps = {
   params: { id: string };
@@ -159,12 +163,27 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   <dt className="text-gray-500">Vægt &amp; mål</dt>
                   <dd className="text-gray-900">
                     {formatDimensions(
-                      (product.dimensions as unknown as { length?: string; width?: string; height?: string })
-                        ?.length,
-                      (product.dimensions as unknown as { length?: string; width?: string; height?: string })
-                        ?.width,
-                      (product.dimensions as unknown as { length?: string; width?: string; height?: string })
-                        ?.height
+                      (
+                        product.dimensions as unknown as {
+                          length?: string;
+                          width?: string;
+                          height?: string;
+                        }
+                      )?.length,
+                      (
+                        product.dimensions as unknown as {
+                          length?: string;
+                          width?: string;
+                          height?: string;
+                        }
+                      )?.width,
+                      (
+                        product.dimensions as unknown as {
+                          length?: string;
+                          width?: string;
+                          height?: string;
+                        }
+                      )?.height
                     )}
                   </dd>
                 </div>
@@ -261,7 +280,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
                           </span>
                         </div>
                         <p className="text-sm text-gray-500 mt-1">
-                          {v.price ? formatPrice(v.price as unknown as string) : '-'}
+                          {v.price
+                            ? formatPrice(v.price as unknown as string)
+                            : '-'}
                         </p>
                       </div>
                     </div>

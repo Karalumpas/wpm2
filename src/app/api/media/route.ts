@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { mediaFiles } from '@/db/schema';
 import { auth } from '@/lib/auth-config';
 import { eq, and, desc } from 'drizzle-orm';
+import type { SQL } from 'drizzle-orm';
 import { deleteFile } from '@/lib/storage/minio';
 
 export async function GET(request: NextRequest) {
@@ -20,10 +21,10 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0');
 
     // Build query conditions
-    let conditions = eq(mediaFiles.userId, userId);
+    let conditions: SQL = eq(mediaFiles.userId, userId);
     
     if (productId) {
-      conditions = and(conditions, eq(mediaFiles.productId, productId));
+      conditions = and(conditions, eq(mediaFiles.productId, productId)) as SQL;
     }
 
     // Get media files

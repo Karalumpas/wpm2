@@ -102,10 +102,13 @@ export async function deleteFile(objectName: string): Promise<void> {
 export async function listFiles(prefix?: string): Promise<string[]> {
   try {
     const objectsList: string[] = [];
-    const stream = minioClient.listObjects(DEFAULT_BUCKET, prefix, true);
+    const effectivePrefix: string = prefix ?? '';
+    const stream = minioClient.listObjects(DEFAULT_BUCKET, effectivePrefix, true);
     
     return new Promise((resolve, reject) => {
-      stream.on('data', (obj) => objectsList.push(obj.name));
+      stream.on('data', (obj) => {
+        if (obj?.name) objectsList.push(obj.name);
+      });
       stream.on('error', reject);
       stream.on('end', () => resolve(objectsList));
     });

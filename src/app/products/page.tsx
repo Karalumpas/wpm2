@@ -1,4 +1,6 @@
 import { Suspense } from 'react';
+import { auth } from '@/lib/auth-utils';
+import { redirect } from 'next/navigation';
 import { parseSearchParams, normalizeParams } from './params';
 import { ProductsPage } from './components/ProductsPage';
 import { ProductsPageSkeleton } from './components/ProductsPageSkeleton';
@@ -15,6 +17,12 @@ interface ProductsPageProps {
 }
 
 export default async function Page({ searchParams }: ProductsPageProps) {
+  // Require authentication; redirect to login if not signed in
+  const session = await auth();
+  if (!session?.user) {
+    redirect('/login');
+  }
+
   // Parse and normalize search parameters
   const resolvedSearchParams = await searchParams;
   const params = normalizeParams(parseSearchParams(resolvedSearchParams));

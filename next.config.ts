@@ -3,12 +3,7 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'mgwp.medeland.dk',
-        port: '',
-        pathname: '/wp-content/uploads/**',
-      },
+      // Central MinIO storage - primary image source
       {
         protocol: 'http',
         hostname: 'localhost',
@@ -20,6 +15,28 @@ const nextConfig: NextConfig = {
         hostname: '127.0.0.1',
         port: '9000',
         pathname: '/**',
+      },
+      // Generic patterns for any WooCommerce site during sync
+      {
+        protocol: 'https',
+        hostname: '**',
+        pathname: '/wp-content/uploads/**',
+      },
+      {
+        protocol: 'http',
+        hostname: '**',
+        pathname: '/wp-content/uploads/**',
+      },
+      // Additional patterns for various WordPress hosting configurations
+      {
+        protocol: 'https',
+        hostname: '**',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**',
+        pathname: '/content/uploads/**',
       },
     ],
   },

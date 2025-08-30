@@ -2,6 +2,7 @@ import { db } from '@/db';
 import { shops, products, categories, productCategories, productVariants } from '@/db/schema';
 import { WooCommerceClient } from './client';
 import { decryptFromCompact } from '@/lib/security/crypto';
+import { imageSyncService } from '@/lib/image-sync/service';
 import { eq, and, sql } from 'drizzle-orm';
 import type {
   WooCommerceProduct,
@@ -224,7 +225,7 @@ export class WooCommerceProductSyncService {
         this.updateProgress('products', index + 1, allProducts.length, `Processing product: ${product.name}`);
         
         try {
-          const syncData = this.mapProductToSyncData(product);
+          const syncData = await this.mapProductToSyncData(product);
           let existing = await this.findExistingProduct(product.id.toString());
           this.log(`After findExistingProduct(${product.id}): ${existing ? JSON.stringify({id: existing.id, wooCommerceId: existing.wooCommerceId}) : 'null'}`);
           
@@ -331,12 +332,35 @@ export class WooCommerceProductSyncService {
     };
   }
 
-  private mapProductToSyncData(product: WooCommerceProduct): ProductSyncData {
+  private async mapProductToSyncData(product: WooCommerceProduct): Promise<ProductSyncData> {
     // Helper function to convert empty strings to undefined for numeric fields
     const parseNumeric = (value: string | number | null | undefined): string | undefined => {
       if (value === '' || value === null || value === undefined) return undefined;
       return value.toString();
     };
+
+    // Extract original image URLs
+    const originalFeaturedImage = product.images[0]?.src;
+    const originalGalleryImages = product.images.slice(1).map(img => img.src);
+
+    // Sync images to central storage
+    let syncedImages = {
+      featuredImage: originalFeaturedImage || null,
+      galleryImages: originalGalleryImages,
+    };
+
+    try {
+      console.log(`🖼️ Syncing images for product: ${product.name}`);
+      syncedImages = await imageSyncService.syncProductImages(
+        originalFeaturedImage || null,
+        originalGalleryImages,
+        this.shopId
+      );
+      console.log(`✅ Images synced: ${syncedImages.galleryImages.length + (syncedImages.featuredImage ? 1 : 0)} total`);
+    } catch (error) {
+      console.warn(`⚠️ Failed to sync images for product ${product.name}:`, error);
+      // Fall back to original URLs if sync fails
+    }
 
     return {
       wooCommerceId: product.id.toString(),
@@ -361,8 +385,8 @@ export class WooCommerceProductSyncService {
         height: product.dimensions.height || '',
       },
       wooCommerceData: product as unknown as Record<string, unknown>,
-      featuredImage: product.images[0]?.src,
-      galleryImages: product.images.slice(1).map(img => img.src),
+      featuredImage: syncedImages.featuredImage || undefined,
+      galleryImages: syncedImages.galleryImages,
     };
   }
 

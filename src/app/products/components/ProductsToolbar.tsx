@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Search, Filter, Grid, List, RotateCcw } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Grid, List, RotateCcw } from 'lucide-react';
 import { ProcessedSearchParams } from '../params';
 
 interface ProductsToolbarProps {
@@ -48,7 +48,7 @@ export function ProductsToolbar({
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const [sortBy, sortOrder] = e.target.value.split('-') as [string, 'asc' | 'desc'];
     onParamsUpdate({ 
-      sortBy: sortBy as any,
+      sortBy: sortBy as 'updatedAt' | 'createdAt' | 'name' | 'basePrice' | 'sku',
       sortOrder 
     });
   };
@@ -74,7 +74,7 @@ export function ProductsToolbar({
           {/* Quick filters */}
           <select
             value={params.status || ''}
-            onChange={(e) => onParamsUpdate({ status: e.target.value as any || undefined })}
+            onChange={(e) => onParamsUpdate({ status: (e.target.value as 'published' | 'draft' | 'private') || undefined })}
             className="px-4 py-3 border-2 border-gray-300 rounded-lg text-sm font-medium text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors min-w-[120px]"
             disabled={isLoading}
           >
@@ -86,7 +86,7 @@ export function ProductsToolbar({
 
           <select
             value={params.type || ''}
-            onChange={(e) => onParamsUpdate({ type: e.target.value as any || undefined })}
+            onChange={(e) => onParamsUpdate({ type: (e.target.value as 'simple' | 'variable' | 'grouped') || undefined })}
             className="px-4 py-3 border-2 border-gray-300 rounded-lg text-sm font-medium text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors min-w-[120px]"
             disabled={isLoading}
           >
@@ -148,7 +148,7 @@ export function ProductsToolbar({
               Showing <span className="font-semibold text-gray-900">{totalCount}</span> product{totalCount !== 1 ? 's' : ''}
               {params.search && (
                 <>
-                  {' '}for "<span className="font-semibold text-blue-600">{params.search}</span>"
+                  {' '}for &ldquo;<span className="font-semibold text-blue-600">{params.search}</span>&rdquo;
                 </>
               )}
             </span>

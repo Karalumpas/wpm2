@@ -109,6 +109,8 @@ export async function GET(request: NextRequest) {
         basePrice: products.basePrice,
         status: products.status,
         type: products.type,
+        featuredImage: products.featuredImage,
+        galleryImages: products.galleryImages,
         updatedAt: products.updatedAt,
       })
       .from(products)
@@ -159,6 +161,8 @@ export async function GET(request: NextRequest) {
       basePrice: product.basePrice,
       status: product.status,
       type: product.type,
+      featuredImage: product.featuredImage,
+      images: product.galleryImages as string[] || [],
       updatedAt: product.updatedAt.toISOString(),
       variantCount: variantCountMap.get(product.id) || 0,
     }));

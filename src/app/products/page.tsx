@@ -20,23 +20,10 @@ export default async function Page({ searchParams }: ProductsPageProps) {
   const params = normalizeParams(parseSearchParams(resolvedSearchParams));
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold tracking-tight">Products</h1>
-          <p className="text-muted-foreground">
-            Manage your product catalog with advanced filtering and search capabilities.
-          </p>
-        </div>
-      </div>
-
-      {/* Products Content */}
-      <div className="px-4 sm:px-6 lg:px-8">
-        <Suspense fallback={<ProductsPageSkeleton />}>
-          <ProductsPage initialParams={params} />
-        </Suspense>
-      </div>
+    <div className="px-4 sm:px-6 lg:px-8 py-6">
+      <Suspense fallback={<ProductsPageSkeleton />}>
+        <ProductsPage initialParams={params} />
+      </Suspense>
     </div>
   );
 }

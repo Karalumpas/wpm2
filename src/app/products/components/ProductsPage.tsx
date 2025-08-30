@@ -67,7 +67,7 @@ export function ProductsPage({ initialParams }: ProductsPageProps) {
   // Error state
   if (error) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-8">
         <ProductsToolbar
           params={params}
           onParamsUpdate={handleParamsUpdate}
@@ -86,7 +86,7 @@ export function ProductsPage({ initialParams }: ProductsPageProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Toolbar */}
       <ProductsToolbar
         params={params}

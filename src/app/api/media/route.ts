@@ -8,33 +8,28 @@ import { deleteFile } from '@/lib/storage/minio';
 
 export async function GET(request: NextRequest) {
   try {
-    // Check authentication - temporarily disabled for testing
-    // const session = await auth();
-    // if (!session?.user?.id) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
-    const userId = '00000000-0000-0000-0000-000000000000'; // Temporary UUID for testing
-
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get('productId');
     const limit = parseInt(searchParams.get('limit') || '24');
     const offset = parseInt(searchParams.get('offset') || '0');
-
-    // Build query conditions
-    let conditions: SQL = eq(mediaFiles.userId, userId);
-
+    // Get media files (optionally filtered by product)
+    let files;
     if (productId) {
-      conditions = and(conditions, eq(mediaFiles.productId, productId)) as SQL;
+      files = await db
+        .select()
+        .from(mediaFiles)
+        .where(eq(mediaFiles.productId, productId))
+        .orderBy(desc(mediaFiles.createdAt))
+        .limit(limit)
+        .offset(offset);
+    } else {
+      files = await db
+        .select()
+        .from(mediaFiles)
+        .orderBy(desc(mediaFiles.createdAt))
+        .limit(limit)
+        .offset(offset);
     }
-
-    // Get media files
-    const files = await db
-      .select()
-      .from(mediaFiles)
-      .where(conditions)
-      .orderBy(desc(mediaFiles.createdAt))
-      .limit(limit)
-      .offset(offset);
 
     return NextResponse.json({
       files,

@@ -5,8 +5,11 @@
  * and distributing them to other shops when products are pushed.
  */
 
-import { Client } from 'minio';
 import { v4 as uuidv4 } from 'uuid';
+import { minioClient, DEFAULT_BUCKET, getFileUrl } from '@/lib/storage/minio';
+import { db } from '@/db';
+import { mediaFiles } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 
 interface ImageSyncOptions {
   shopId: string;
@@ -24,27 +27,16 @@ interface SyncedImage {
 }
 
 export class ImageSyncService {
-  private minioClient: Client;
-  private bucketName = 'product-images';
-
-  constructor() {
-    this.minioClient = new Client({
-      endPoint: 'localhost',
-      port: 9000,
-      useSSL: false,
-      accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-      secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
-    });
-  }
+  private bucketName = DEFAULT_BUCKET;
 
   /**
    * Initialize MinIO bucket if it doesn't exist
    */
   async initializeBucket(): Promise<void> {
     try {
-      const bucketExists = await this.minioClient.bucketExists(this.bucketName);
+      const bucketExists = await minioClient.bucketExists(this.bucketName);
       if (!bucketExists) {
-        await this.minioClient.makeBucket(this.bucketName);
+        await minioClient.makeBucket(this.bucketName, 'us-east-1');
         console.log(`✅ Created MinIO bucket: ${this.bucketName}`);
       }
     } catch (error) {
@@ -73,12 +65,12 @@ export class ImageSyncService {
 
       // Check if image already exists
       try {
-        await this.minioClient.statObject(this.bucketName, minioPath);
+        await minioClient.statObject(this.bucketName, minioPath);
         console.log(`📷 Image already exists in MinIO: ${minioPath}`);
 
         return {
           originalUrl: imageUrl,
-          centralUrl: `http://localhost:9000/${this.bucketName}/${minioPath}`,
+          centralUrl: getFileUrl(minioPath),
           minioPath,
           shopId,
           fileName,
@@ -101,12 +93,12 @@ export class ImageSyncService {
       const buffer = Buffer.from(imageBuffer);
 
       // Upload to MinIO
-      await this.minioClient.putObject(this.bucketName, minioPath, buffer);
+      await minioClient.putObject(this.bucketName, minioPath, buffer);
       console.log(`✅ Uploaded to MinIO: ${minioPath}`);
 
       const syncedImage: SyncedImage = {
         originalUrl: imageUrl,
-        centralUrl: `http://localhost:9000/${this.bucketName}/${minioPath}`,
+        centralUrl: getFileUrl(minioPath),
         minioPath,
         shopId,
         fileName,
@@ -161,7 +153,91 @@ export class ImageSyncService {
    * Get central URL for distributing to other shops
    */
   getCentralImageUrl(minioPath: string): string {
-    return `http://localhost:9000/${this.bucketName}/${minioPath}`;
+    return getFileUrl(minioPath);
+  }
+
+  /**
+   * Register central images in media_files table and associate with product/user
+   */
+  async registerCentralImagesForProduct(
+    productId: string,
+    userId: string | null | undefined,
+    featuredImage?: string,
+    galleryImages?: string[]
+  ): Promise<void> {
+    if (!userId) return; // Cannot register without a user owner
+    const urls: Array<{ url: string; isFeatured: boolean }> = [];
+    if (featuredImage) urls.push({ url: featuredImage, isFeatured: true });
+    for (const u of galleryImages || []) urls.push({ url: u, isFeatured: false });
+
+    for (const { url, isFeatured } of urls) {
+      try {
+        const { objectName, fileName } = this.parseCentralUrl(url);
+        // Get object stat for size and mime
+        const stat = await minioClient.statObject(this.bucketName, objectName);
+        const size = (stat.size ?? 0).toString();
+        const mimeType = (stat.metaData && (stat.metaData['content-type'] as string)) || this.guessMimeType(fileName);
+
+        // Upsert by object_name
+        const existing = await db
+          .select({ id: mediaFiles.id })
+          .from(mediaFiles)
+          .where(eq(mediaFiles.objectName, objectName))
+          .limit(1);
+
+        if (existing.length) {
+          await db
+            .update(mediaFiles)
+            .set({
+              fileName,
+              originalFileName: fileName,
+              fileSize: size,
+              mimeType,
+              minioUrl: url,
+              productId,
+              userId,
+              isFeatured,
+              updatedAt: new Date(),
+            })
+            .where(eq(mediaFiles.id, existing[0].id));
+        } else {
+          await db.insert(mediaFiles).values({
+            fileName,
+            originalFileName: fileName,
+            objectName,
+            fileSize: size,
+            mimeType,
+            minioUrl: url,
+            productId,
+            userId,
+            isIndexed: false,
+            isFeatured,
+          });
+        }
+      } catch (err) {
+        console.warn('Failed to register media file', url, err);
+      }
+    }
+  }
+
+  private parseCentralUrl(url: string): { objectName: string; fileName: string } {
+    const u = new URL(url);
+    // Pathname like /<bucket>/<object>
+    const parts = u.pathname.split('/').filter(Boolean);
+    // Remove bucket name
+    const objectName = parts.slice(1).join('/');
+    const fileName = objectName.split('/').pop() || 'image.jpg';
+    return { objectName, fileName };
+  }
+
+  private guessMimeType(fileName: string): string {
+    const lower = fileName.toLowerCase();
+    if (lower.endsWith('.png')) return 'image/png';
+    if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg';
+    if (lower.endsWith('.gif')) return 'image/gif';
+    if (lower.endsWith('.webp')) return 'image/webp';
+    if (lower.endsWith('.svg')) return 'image/svg+xml';
+    return 'application/octet-stream';
   }
 
   /**
@@ -173,7 +249,7 @@ export class ImageSyncService {
   ): Promise<string | null> {
     try {
       // Get image from MinIO
-      const imageStream = await this.minioClient.getObject(
+      const imageStream = await minioClient.getObject(
         this.bucketName,
         centralImagePath
       );

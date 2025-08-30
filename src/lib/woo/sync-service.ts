@@ -24,13 +24,15 @@ import type {
 export class WooCommerceProductSyncService {
   private client: WooCommerceClient;
   private shopId: string;
+  private userId?: string | null;
   private progressCallback?: (progress: SyncProgress) => void;
   private debugMode: boolean = false; // Set to false to disable debug in production
   private debugLogs: string[] = []; // Separate debug logs from errors
 
-  constructor(shopId: string, client: WooCommerceClient) {
+  constructor(shopId: string, client: WooCommerceClient, userId?: string | null) {
     this.shopId = shopId;
     this.client = client;
+    this.userId = userId;
   }
 
   setProgressCallback(callback: (progress: SyncProgress) => void) {
@@ -376,6 +378,18 @@ export class WooCommerceProductSyncService {
             productId = await this.createProduct(syncData);
             result.created++;
             console.log(`Created product with database ID: ${productId}`);
+          }
+
+          // Register synced images in media library
+          try {
+            await imageSyncService.registerCentralImagesForProduct(
+              productId,
+              this.userId,
+              syncData.featuredImage,
+              syncData.galleryImages
+            );
+          } catch (e) {
+            console.warn('Failed to register product media files', e);
           }
 
           // Sync product categories
@@ -1004,5 +1018,5 @@ export async function createSyncServiceForShop(
     consumerSecret,
   });
 
-  return new WooCommerceProductSyncService(shopId, client);
+  return new WooCommerceProductSyncService(shopId, client, shop[0].userId);
 }

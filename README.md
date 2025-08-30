@@ -23,7 +23,7 @@ Production-ready Next.js application for managing WooCommerce products with cent
 
 ## Quick Start
 
-1) Install dependencies
+1. Install dependencies
 
 ```bash
 git clone <repository-url>
@@ -31,19 +31,19 @@ cd wpm2
 npm install
 ```
 
-2) Start required services (PostgreSQL, MinIO, PhotoPrism)
+2. Start required services (PostgreSQL, MinIO, PhotoPrism)
 
 ```bash
 npm run docker:up
 ```
 
-3) Apply database migrations
+3. Apply database migrations
 
 ```bash
 npm run db:migrate
 ```
 
-4) Configure environment
+4. Configure environment
 
 Create `.env.local` with at least:
 
@@ -71,7 +71,7 @@ PHOTOPRISM_USER=admin
 PHOTOPRISM_PASSWORD=insecure
 ```
 
-5) Start the app
+5. Start the app
 
 ```bash
 npm run dev
@@ -172,4 +172,3 @@ npm run type-check
 - RESTful API endpoints for media operations
 
 More details: see `PHOTOPRISM_MINIO_INTEGRATION.md`.
-

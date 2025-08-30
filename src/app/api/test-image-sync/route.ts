@@ -20,7 +20,10 @@ export async function POST(request: NextRequest) {
     console.log('✅ MinIO bucket initialized');
 
     // Download image to MinIO
-    const syncedImage = await imageSyncService.downloadImageToMinIO(imageUrl, shopId);
+    const syncedImage = await imageSyncService.downloadImageToMinIO(
+      imageUrl,
+      shopId
+    );
 
     if (!syncedImage) {
       return NextResponse.json(
@@ -41,17 +44,16 @@ export async function POST(request: NextRequest) {
         shopId: syncedImage.shopId,
         syncedAt: syncedImage.syncedAt,
       },
-      message: 'Image synced successfully to MinIO'
+      message: 'Image synced successfully to MinIO',
     });
-
   } catch (error) {
     console.error('❌ Image sync test failed:', error);
-    
+
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
-        details: error instanceof Error ? error.stack : undefined
+        details: error instanceof Error ? error.stack : undefined,
       },
       { status: 500 }
     );
@@ -61,6 +63,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json({
     message: 'Image sync test endpoint',
-    usage: 'POST with { "imageUrl": "https://example.com/image.jpg", "shopId": "optional-shop-id" }'
+    usage:
+      'POST with { "imageUrl": "https://example.com/image.jpg", "shopId": "optional-shop-id" }',
   });
 }

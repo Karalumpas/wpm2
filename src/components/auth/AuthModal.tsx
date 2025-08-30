@@ -35,11 +35,12 @@ export default function AuthModal() {
   const [forgotStep, setForgotStep] = useState<1 | 2>(1);
 
   const tabs = useMemo(
-    () => [
-      { key: 'signin', label: 'Sign In' },
-      { key: 'signup', label: 'Sign Up' },
-      { key: 'forgot', label: 'Forgot Password' },
-    ] as { key: TabKey; label: string }[],
+    () =>
+      [
+        { key: 'signin', label: 'Sign In' },
+        { key: 'signup', label: 'Sign Up' },
+        { key: 'forgot', label: 'Forgot Password' },
+      ] as { key: TabKey; label: string }[],
     []
   );
 
@@ -355,4 +356,3 @@ export default function AuthModal() {
     </div>
   );
 }
-

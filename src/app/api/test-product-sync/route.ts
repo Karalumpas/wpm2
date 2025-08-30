@@ -70,7 +70,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`✅ Found ${products.length} products, starting sync with images...`);
+    console.log(
+      `✅ Found ${products.length} products, starting sync with images...`
+    );
 
     // Create sync service
     const syncService = new WooCommerceProductSyncService(shopId, client);
@@ -94,22 +96,21 @@ export async function POST(request: NextRequest) {
       syncDetails: syncResult.details,
       productsFound: products.length,
       progressLog: progressLog.slice(-20), // Last 20 progress messages
-      testProducts: products.slice(0, 3).map(p => ({
+      testProducts: products.slice(0, 3).map((p) => ({
         id: p.id,
         name: p.name,
         images: p.images?.length || 0,
         featuredImage: p.images?.[0]?.src || null,
       })),
     });
-
   } catch (error) {
     console.error('❌ Product sync test failed:', error);
-    
+
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
-        details: error instanceof Error ? error.stack : undefined
+        details: error instanceof Error ? error.stack : undefined,
       },
       { status: 500 }
     );

@@ -10,25 +10,25 @@ This project uses a Dockerized PostgreSQL database by default.
 
 ## Setup
 
-1) Start Docker services
+1. Start Docker services
 
 ```bash
 npm run docker:up
 ```
 
-2) Run database migrations
+2. Run database migrations
 
 ```bash
 npm run db:migrate
 ```
 
-3) Seed database (optional but recommended)
+3. Seed database (optional but recommended)
 
 ```bash
 npm run db:seed
 ```
 
-4) Start development server
+4. Start development server
 
 ```bash
 npm run dev
@@ -101,8 +101,7 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/wpm2
 
 ## Verify
 
-1) Visit `http://localhost:3000/api/health` – should return `{ "status": "ok" }`
-2) Log in with the test credentials
-3) Open `/settings` to configure currency
-4) Open `/products` to verify product listing and formatting
-
+1. Visit `http://localhost:3000/api/health` – should return `{ "status": "ok" }`
+2. Log in with the test credentials
+3. Open `/settings` to configure currency
+4. Open `/products` to verify product listing and formatting

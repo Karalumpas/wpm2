@@ -23,4 +23,3 @@ export function ProtectedClient({ children }: { children: React.ReactNode }) {
 
   return <>{children}</>;
 }
-

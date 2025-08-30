@@ -4,11 +4,21 @@ import { imageSyncService } from '@/lib/image-sync/service';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { featuredImageUrl, galleryImageUrls = [], shopId = 'test-shop' } = body;
+    const {
+      featuredImageUrl,
+      galleryImageUrls = [],
+      shopId = 'test-shop',
+    } = body;
 
-    if (!featuredImageUrl && (!galleryImageUrls || galleryImageUrls.length === 0)) {
+    if (
+      !featuredImageUrl &&
+      (!galleryImageUrls || galleryImageUrls.length === 0)
+    ) {
       return NextResponse.json(
-        { success: false, error: 'At least featuredImageUrl or galleryImageUrls is required' },
+        {
+          success: false,
+          error: 'At least featuredImageUrl or galleryImageUrls is required',
+        },
         { status: 400 }
       );
     }
@@ -43,17 +53,16 @@ export async function POST(request: NextRequest) {
         galleryImages: syncedImages.galleryImages,
       },
       shopId,
-      message: `Successfully synced ${(syncedImages.featuredImage ? 1 : 0) + syncedImages.galleryImages.length} images`
+      message: `Successfully synced ${(syncedImages.featuredImage ? 1 : 0) + syncedImages.galleryImages.length} images`,
     });
-
   } catch (error) {
     console.error('❌ Product image sync test failed:', error);
-    
+
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
-        details: error instanceof Error ? error.stack : undefined
+        details: error instanceof Error ? error.stack : undefined,
       },
       { status: 500 }
     );
@@ -63,6 +72,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json({
     message: 'Product image sync test endpoint',
-    usage: 'POST with { "featuredImageUrl": "https://example.com/featured.jpg", "galleryImageUrls": ["https://example.com/img1.jpg"], "shopId": "optional-shop-id" }'
+    usage:
+      'POST with { "featuredImageUrl": "https://example.com/featured.jpg", "galleryImageUrls": ["https://example.com/img1.jpg"], "shopId": "optional-shop-id" }',
   });
 }

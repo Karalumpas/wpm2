@@ -214,451 +214,458 @@ export default function SettingsPage() {
   return (
     <ProtectedClient>
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="px-4 py-6 sm:px-0">
-        <div className="border-b border-gray-200 pb-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold leading-tight text-gray-900">
-                Settings
-              </h1>
-              <p className="mt-1 text-sm text-gray-600">
-                Manage database and system settings
-              </p>
-            </div>
-            <div className="flex space-x-2">
-              <button
-                onClick={fetchStats}
-                disabled={statsLoading}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-              >
-                {statsLoading ? '🔄' : '📊'} Refresh Stats
-              </button>
-              <button
-                onClick={() => setShowLogs(!showLogs)}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                {showLogs ? 'Hide' : 'Show'} Logs
-              </button>
+        {/* Header */}
+        <div className="px-4 py-6 sm:px-0">
+          <div className="border-b border-gray-200 pb-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-3xl font-bold leading-tight text-gray-900">
+                  Settings
+                </h1>
+                <p className="mt-1 text-sm text-gray-600">
+                  Manage database and system settings
+                </p>
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  onClick={fetchStats}
+                  disabled={statsLoading}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                >
+                  {statsLoading ? '🔄' : '📊'} Refresh Stats
+                </button>
+                <button
+                  onClick={() => setShowLogs(!showLogs)}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  {showLogs ? 'Hide' : 'Show'} Logs
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Main content */}
-      <div className="px-4 py-6 sm:px-0">
-        <div className="space-y-6">
-          {/* User Settings */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">
-                User Settings
-              </h3>
-              <p className="mt-1 text-sm text-gray-600">
-                Configure your display preferences and currency settings
-              </p>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {/* Currency Settings */}
-              <div>
-                <h4 className="text-base font-medium text-gray-900 mb-4">
-                  Currency Settings
-                </h4>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Currency Selection */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Currency
-                    </label>
-                    <select
-                      value={settings.currency}
-                      onChange={(e) => {
-                        const selectedCurrency = SUPPORTED_CURRENCIES.find(
-                          (c) => c.code === e.target.value
-                        );
-                        if (selectedCurrency) {
-                          handleSettingsUpdate(
-                            'currency',
-                            selectedCurrency.code
-                          );
-                          handleSettingsUpdate(
-                            'currencySymbol',
-                            selectedCurrency.symbol
-                          );
-                        }
-                      }}
-                      disabled={settingsLoading || settingsUpdateLoading}
-                      className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50"
-                    >
-                      {SUPPORTED_CURRENCIES.map((currency) => (
-                        <option key={currency.code} value={currency.code}>
-                          {currency.name} ({currency.symbol})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Currency Position */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Currency Position
-                    </label>
-                    <select
-                      value={settings.currencyPosition}
-                      onChange={(e) =>
-                        handleSettingsUpdate('currencyPosition', e.target.value)
-                      }
-                      disabled={settingsLoading || settingsUpdateLoading}
-                      className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50"
-                    >
-                      {CURRENCY_POSITION_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* Display Settings */}
-              <div>
-                <h4 className="text-base font-medium text-gray-900 mb-4">
-                  Display Settings
-                </h4>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Products per page */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Products per page
-                    </label>
-                    <select
-                      value={settings.productsPerPage}
-                      onChange={(e) =>
-                        handleSettingsUpdate(
-                          'productsPerPage',
-                          parseInt(e.target.value)
-                        )
-                      }
-                      disabled={settingsLoading || settingsUpdateLoading}
-                      className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50"
-                    >
-                      <option value={12}>12</option>
-                      <option value={24}>24</option>
-                      <option value={48}>48</option>
-                      <option value={96}>96</option>
-                    </select>
-                  </div>
-
-                  {/* Default view mode */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Default view mode
-                    </label>
-                    <select
-                      value={settings.defaultViewMode}
-                      onChange={(e) =>
-                        handleSettingsUpdate('defaultViewMode', e.target.value)
-                      }
-                      disabled={settingsLoading || settingsUpdateLoading}
-                      className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50"
-                    >
-                      <option value="grid">Grid</option>
-                      <option value="list">List</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* Settings Update Result */}
-              {settingsUpdateResult && (
-                <Alert>
-                  <div
-                    className={
-                      settingsUpdateResult.includes('successfully')
-                        ? 'text-green-700'
-                        : 'text-red-700'
-                    }
-                  >
-                    <p className="font-medium">
-                      {settingsUpdateResult.includes('successfully')
-                        ? '✅'
-                        : '❌'}{' '}
-                      {settingsUpdateResult}
-                    </p>
-                  </div>
-                </Alert>
-              )}
-
-              {settingsError && (
-                <Alert>
-                  <div className="text-red-700">
-                    <p className="font-medium">❌ {settingsError}</p>
-                  </div>
-                </Alert>
-              )}
-            </div>
-          </div>
-
-          {/* Database Management */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Database Statistics */}
-            <div className="lg:col-span-1">
-              <div className="bg-white shadow rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
-                  Database Statistics
+        {/* Main content */}
+        <div className="px-4 py-6 sm:px-0">
+          <div className="space-y-6">
+            {/* User Settings */}
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-lg font-medium text-gray-900">
+                  User Settings
                 </h3>
+                <p className="mt-1 text-sm text-gray-600">
+                  Configure your display preferences and currency settings
+                </p>
+              </div>
 
-                {stats ? (
-                  <dl className="space-y-3">
-                    <div className="flex justify-between">
-                      <dt className="text-sm text-gray-600">Products</dt>
-                      <dd>
-                        <Badge variant="secondary">
-                          {stats.products.toLocaleString()}
-                        </Badge>
-                      </dd>
+              <div className="p-6 space-y-6">
+                {/* Currency Settings */}
+                <div>
+                  <h4 className="text-base font-medium text-gray-900 mb-4">
+                    Currency Settings
+                  </h4>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Currency Selection */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Currency
+                      </label>
+                      <select
+                        value={settings.currency}
+                        onChange={(e) => {
+                          const selectedCurrency = SUPPORTED_CURRENCIES.find(
+                            (c) => c.code === e.target.value
+                          );
+                          if (selectedCurrency) {
+                            handleSettingsUpdate(
+                              'currency',
+                              selectedCurrency.code
+                            );
+                            handleSettingsUpdate(
+                              'currencySymbol',
+                              selectedCurrency.symbol
+                            );
+                          }
+                        }}
+                        disabled={settingsLoading || settingsUpdateLoading}
+                        className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50"
+                      >
+                        {SUPPORTED_CURRENCIES.map((currency) => (
+                          <option key={currency.code} value={currency.code}>
+                            {currency.name} ({currency.symbol})
+                          </option>
+                        ))}
+                      </select>
                     </div>
-                    <div className="flex justify-between">
-                      <dt className="text-sm text-gray-600">
-                        Product Variants
-                      </dt>
-                      <dd>
-                        <Badge variant="secondary">
-                          {stats.variants.toLocaleString()}
-                        </Badge>
-                      </dd>
+
+                    {/* Currency Position */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Currency Position
+                      </label>
+                      <select
+                        value={settings.currencyPosition}
+                        onChange={(e) =>
+                          handleSettingsUpdate(
+                            'currencyPosition',
+                            e.target.value
+                          )
+                        }
+                        disabled={settingsLoading || settingsUpdateLoading}
+                        className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50"
+                      >
+                        {CURRENCY_POSITION_OPTIONS.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
-                    <div className="flex justify-between">
-                      <dt className="text-sm text-gray-600">Categories</dt>
-                      <dd>
-                        <Badge variant="secondary">
-                          {stats.categories.toLocaleString()}
-                        </Badge>
-                      </dd>
-                    </div>
-                    <div className="flex justify-between">
-                      <dt className="text-sm text-gray-600">Brands</dt>
-                      <dd>
-                        <Badge variant="secondary">
-                          {stats.brands.toLocaleString()}
-                        </Badge>
-                      </dd>
-                    </div>
-                    <div className="flex justify-between">
-                      <dt className="text-sm text-gray-600">
-                        Shop Connections
-                      </dt>
-                      <dd>
-                        <Badge variant="secondary">
-                          {stats.shops.toLocaleString()}
-                        </Badge>
-                      </dd>
-                    </div>
-                  </dl>
-                ) : (
-                  <div className="text-center py-4">
-                    <p className="text-sm text-gray-500">
-                      Click &quot;Refresh Stats&quot; to load data
-                    </p>
                   </div>
+                </div>
+
+                {/* Display Settings */}
+                <div>
+                  <h4 className="text-base font-medium text-gray-900 mb-4">
+                    Display Settings
+                  </h4>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Products per page */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Products per page
+                      </label>
+                      <select
+                        value={settings.productsPerPage}
+                        onChange={(e) =>
+                          handleSettingsUpdate(
+                            'productsPerPage',
+                            parseInt(e.target.value)
+                          )
+                        }
+                        disabled={settingsLoading || settingsUpdateLoading}
+                        className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50"
+                      >
+                        <option value={12}>12</option>
+                        <option value={24}>24</option>
+                        <option value={48}>48</option>
+                        <option value={96}>96</option>
+                      </select>
+                    </div>
+
+                    {/* Default view mode */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Default view mode
+                      </label>
+                      <select
+                        value={settings.defaultViewMode}
+                        onChange={(e) =>
+                          handleSettingsUpdate(
+                            'defaultViewMode',
+                            e.target.value
+                          )
+                        }
+                        disabled={settingsLoading || settingsUpdateLoading}
+                        className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50"
+                      >
+                        <option value="grid">Grid</option>
+                        <option value="list">List</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Settings Update Result */}
+                {settingsUpdateResult && (
+                  <Alert>
+                    <div
+                      className={
+                        settingsUpdateResult.includes('successfully')
+                          ? 'text-green-700'
+                          : 'text-red-700'
+                      }
+                    >
+                      <p className="font-medium">
+                        {settingsUpdateResult.includes('successfully')
+                          ? '✅'
+                          : '❌'}{' '}
+                        {settingsUpdateResult}
+                      </p>
+                    </div>
+                  </Alert>
+                )}
+
+                {settingsError && (
+                  <Alert>
+                    <div className="text-red-700">
+                      <p className="font-medium">❌ {settingsError}</p>
+                    </div>
+                  </Alert>
                 )}
               </div>
             </div>
 
-            {/* Operations */}
-            <div className="lg:col-span-2">
-              <div className="bg-white shadow rounded-lg">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    Database Operations
+            {/* Database Management */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Database Statistics */}
+              <div className="lg:col-span-1">
+                <div className="bg-white shadow rounded-lg p-6">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Database Statistics
                   </h3>
-                  <p className="mt-1 text-sm text-gray-600">
-                    Perform maintenance and cleanup operations on your database
-                  </p>
-                </div>
 
-                <div className="divide-y divide-gray-200">
-                  {operations.map((operation) => (
-                    <div key={operation.id} className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center">
-                            <span className="text-2xl mr-3">
-                              {operation.icon}
-                            </span>
-                            <h4 className="text-base font-medium text-gray-900">
-                              {operation.title}
-                            </h4>
-                          </div>
-                          <p className="mt-2 text-sm text-gray-600">
-                            {operation.description}
-                          </p>
-                        </div>
-                        <div className="ml-4">
-                          {confirmOperation === operation.id ? (
-                            <div className="flex items-center space-x-2">
-                              <span className="text-xs text-red-600 font-medium">
-                                Type &quot;{operation.confirmText}&quot; to
-                                confirm:
+                  {stats ? (
+                    <dl className="space-y-3">
+                      <div className="flex justify-between">
+                        <dt className="text-sm text-gray-600">Products</dt>
+                        <dd>
+                          <Badge variant="secondary">
+                            {stats.products.toLocaleString()}
+                          </Badge>
+                        </dd>
+                      </div>
+                      <div className="flex justify-between">
+                        <dt className="text-sm text-gray-600">
+                          Product Variants
+                        </dt>
+                        <dd>
+                          <Badge variant="secondary">
+                            {stats.variants.toLocaleString()}
+                          </Badge>
+                        </dd>
+                      </div>
+                      <div className="flex justify-between">
+                        <dt className="text-sm text-gray-600">Categories</dt>
+                        <dd>
+                          <Badge variant="secondary">
+                            {stats.categories.toLocaleString()}
+                          </Badge>
+                        </dd>
+                      </div>
+                      <div className="flex justify-between">
+                        <dt className="text-sm text-gray-600">Brands</dt>
+                        <dd>
+                          <Badge variant="secondary">
+                            {stats.brands.toLocaleString()}
+                          </Badge>
+                        </dd>
+                      </div>
+                      <div className="flex justify-between">
+                        <dt className="text-sm text-gray-600">
+                          Shop Connections
+                        </dt>
+                        <dd>
+                          <Badge variant="secondary">
+                            {stats.shops.toLocaleString()}
+                          </Badge>
+                        </dd>
+                      </div>
+                    </dl>
+                  ) : (
+                    <div className="text-center py-4">
+                      <p className="text-sm text-gray-500">
+                        Click &quot;Refresh Stats&quot; to load data
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Operations */}
+              <div className="lg:col-span-2">
+                <div className="bg-white shadow rounded-lg">
+                  <div className="px-6 py-4 border-b border-gray-200">
+                    <h3 className="text-lg font-medium text-gray-900">
+                      Database Operations
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-600">
+                      Perform maintenance and cleanup operations on your
+                      database
+                    </p>
+                  </div>
+
+                  <div className="divide-y divide-gray-200">
+                    {operations.map((operation) => (
+                      <div key={operation.id} className="p-6">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center">
+                              <span className="text-2xl mr-3">
+                                {operation.icon}
                               </span>
-                              <input
-                                type="text"
-                                placeholder={operation.confirmText}
-                                className="text-xs border border-red-300 rounded px-2 py-1 w-32"
-                                onKeyPress={(e) => {
-                                  if (
-                                    e.key === 'Enter' &&
-                                    e.currentTarget.value ===
-                                      operation.confirmText
-                                  ) {
-                                    performOperation(
-                                      operation.id,
-                                      operation.endpoint,
-                                      operation.confirmText
-                                    );
-                                  }
-                                }}
-                              />
-                              <button
-                                onClick={() => setConfirmOperation(null)}
-                                className="text-xs text-gray-500 hover:text-gray-700"
-                              >
-                                Cancel
-                              </button>
+                              <h4 className="text-base font-medium text-gray-900">
+                                {operation.title}
+                              </h4>
                             </div>
-                          ) : (
-                            <button
-                              onClick={() =>
-                                performOperation(
-                                  operation.id,
-                                  operation.endpoint,
-                                  operation.confirmText
-                                )
-                              }
-                              disabled={loading}
-                              className={`inline-flex items-center px-3 py-2 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${
-                                operation.danger
-                                  ? 'border-red-300 text-red-700 bg-red-50 hover:bg-red-100 focus:ring-red-500'
-                                  : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-indigo-500'
-                              }`}
-                            >
-                              {loading ? '⏳' : operation.icon}{' '}
-                              {operation.title}
-                            </button>
-                          )}
+                            <p className="mt-2 text-sm text-gray-600">
+                              {operation.description}
+                            </p>
+                          </div>
+                          <div className="ml-4">
+                            {confirmOperation === operation.id ? (
+                              <div className="flex items-center space-x-2">
+                                <span className="text-xs text-red-600 font-medium">
+                                  Type &quot;{operation.confirmText}&quot; to
+                                  confirm:
+                                </span>
+                                <input
+                                  type="text"
+                                  placeholder={operation.confirmText}
+                                  className="text-xs border border-red-300 rounded px-2 py-1 w-32"
+                                  onKeyPress={(e) => {
+                                    if (
+                                      e.key === 'Enter' &&
+                                      e.currentTarget.value ===
+                                        operation.confirmText
+                                    ) {
+                                      performOperation(
+                                        operation.id,
+                                        operation.endpoint,
+                                        operation.confirmText
+                                      );
+                                    }
+                                  }}
+                                />
+                                <button
+                                  onClick={() => setConfirmOperation(null)}
+                                  className="text-xs text-gray-500 hover:text-gray-700"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() =>
+                                  performOperation(
+                                    operation.id,
+                                    operation.endpoint,
+                                    operation.confirmText
+                                  )
+                                }
+                                disabled={loading}
+                                className={`inline-flex items-center px-3 py-2 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${
+                                  operation.danger
+                                    ? 'border-red-300 text-red-700 bg-red-50 hover:bg-red-100 focus:ring-red-500'
+                                    : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-indigo-500'
+                                }`}
+                              >
+                                {loading ? '⏳' : operation.icon}{' '}
+                                {operation.title}
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Operation Result */}
-          {operationResult && (
-            <div className="mt-6">
-              <Alert>
-                <div
-                  className={`${operationResult.success ? 'text-green-700' : 'text-red-700'}`}
-                >
-                  <p className="font-medium">
-                    {operationResult.success ? '✅' : '❌'}{' '}
-                    {operationResult.message}
-                  </p>
-                  {operationResult.affectedRows !== undefined && (
-                    <p className="text-sm mt-1">
-                      Affected records: {operationResult.affectedRows}
+            {/* Operation Result */}
+            {operationResult && (
+              <div className="mt-6">
+                <Alert>
+                  <div
+                    className={`${operationResult.success ? 'text-green-700' : 'text-red-700'}`}
+                  >
+                    <p className="font-medium">
+                      {operationResult.success ? '✅' : '❌'}{' '}
+                      {operationResult.message}
                     </p>
-                  )}
-                </div>
-              </Alert>
-            </div>
-          )}
-
-          {/* Log Terminal */}
-          {showLogs && (
-            <div className="mt-6">
-              <div className="bg-white shadow rounded-lg">
-                <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    Operation Logs
-                  </h3>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={copyLogsToClipboard}
-                      className="text-xs text-gray-500 hover:text-gray-700 flex items-center"
-                    >
-                      <svg
-                        className="w-3 h-3 mr-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                        />
-                      </svg>
-                      Copy
-                    </button>
-                    <button
-                      onClick={clearLogs}
-                      className="text-xs text-gray-500 hover:text-gray-700"
-                    >
-                      Clear
-                    </button>
-                    <button
-                      onClick={() => setShowLogs(false)}
-                      className="text-xs text-gray-500 hover:text-gray-700"
-                    >
-                      Hide
-                    </button>
-                  </div>
-                </div>
-                <div className="bg-gray-900 p-4">
-                  <div className="font-mono text-xs space-y-1 max-h-64 overflow-y-auto">
-                    {logs.length === 0 ? (
-                      <div className="text-gray-500">No logs yet...</div>
-                    ) : (
-                      logs.map((log, index) => (
-                        <div
-                          key={index}
-                          className={
-                            log.includes('❌') || log.includes('💥')
-                              ? 'text-red-400'
-                              : log.includes('✅') || log.includes('🎉')
-                                ? 'text-green-400'
-                                : log.includes('📊') ||
-                                    log.includes('🚀') ||
-                                    log.includes('📋')
-                                  ? 'text-blue-400'
-                                  : 'text-gray-300'
-                          }
-                        >
-                          {log}
-                        </div>
-                      ))
+                    {operationResult.affectedRows !== undefined && (
+                      <p className="text-sm mt-1">
+                        Affected records: {operationResult.affectedRows}
+                      </p>
                     )}
                   </div>
-                  {loading && (
-                    <div className="mt-2 flex items-center text-gray-400">
-                      <div className="animate-spin w-3 h-3 border border-gray-400 border-t-transparent rounded-full mr-2"></div>
-                      <span className="text-xs">Processing...</span>
+                </Alert>
+              </div>
+            )}
+
+            {/* Log Terminal */}
+            {showLogs && (
+              <div className="mt-6">
+                <div className="bg-white shadow rounded-lg">
+                  <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 className="text-lg font-medium text-gray-900">
+                      Operation Logs
+                    </h3>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={copyLogsToClipboard}
+                        className="text-xs text-gray-500 hover:text-gray-700 flex items-center"
+                      >
+                        <svg
+                          className="w-3 h-3 mr-1"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                          />
+                        </svg>
+                        Copy
+                      </button>
+                      <button
+                        onClick={clearLogs}
+                        className="text-xs text-gray-500 hover:text-gray-700"
+                      >
+                        Clear
+                      </button>
+                      <button
+                        onClick={() => setShowLogs(false)}
+                        className="text-xs text-gray-500 hover:text-gray-700"
+                      >
+                        Hide
+                      </button>
                     </div>
-                  )}
+                  </div>
+                  <div className="bg-gray-900 p-4">
+                    <div className="font-mono text-xs space-y-1 max-h-64 overflow-y-auto">
+                      {logs.length === 0 ? (
+                        <div className="text-gray-500">No logs yet...</div>
+                      ) : (
+                        logs.map((log, index) => (
+                          <div
+                            key={index}
+                            className={
+                              log.includes('❌') || log.includes('💥')
+                                ? 'text-red-400'
+                                : log.includes('✅') || log.includes('🎉')
+                                  ? 'text-green-400'
+                                  : log.includes('📊') ||
+                                      log.includes('🚀') ||
+                                      log.includes('📋')
+                                    ? 'text-blue-400'
+                                    : 'text-gray-300'
+                            }
+                          >
+                            {log}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    {loading && (
+                      <div className="mt-2 flex items-center text-gray-400">
+                        <div className="animate-spin w-3 h-3 border border-gray-400 border-t-transparent rounded-full mr-2"></div>
+                        <span className="text-xs">Processing...</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
       </div>
     </ProtectedClient>
   );

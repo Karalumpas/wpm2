@@ -20,7 +20,10 @@ export async function POST(request: Request) {
 
     const now = new Date();
     const matches = await db
-      .select({ id: passwordResetTokens.id, userId: passwordResetTokens.userId })
+      .select({
+        id: passwordResetTokens.id,
+        userId: passwordResetTokens.userId,
+      })
       .from(passwordResetTokens)
       .where(
         and(
@@ -53,4 +56,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }
-

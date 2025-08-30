@@ -1,30 +1,29 @@
 # WooCommerce Product Manager v2
 
-En produktionsklar Next.js applikation til håndtering af WooCommerce produkter.
+Production-ready Next.js application for managing WooCommerce products with centralized media storage.
 
-## 🚀 Teknisk Stack
+## Tech Stack
 
-- **Next.js 14** med App Router
-- **TypeScript** i strict mode
-- **PostgreSQL** database
-- **Drizzle ORM** med migreringer
-- **NextAuth** til autentificering
-- **Tailwind CSS** til styling
-- **Vitest** til testing
-- **ESLint + Prettier** til kodekvalitet
-- **MinIO** object storage (S3-compatible)
-- **PhotoPrism** AI-powered foto management
+- Next.js 15 (App Router)
+- React 19 + TypeScript (strict mode)
+- PostgreSQL + Drizzle ORM (migrations)
+- NextAuth for authentication
+- Tailwind CSS v4
+- Vitest for tests
+- ESLint + Prettier
+- MinIO (S3-compatible object storage)
+- PhotoPrism (AI-powered photo management)
 
-## 📋 Forudsætninger
+## Requirements
 
 - Node.js 18+
-- Docker og Docker Compose
+- Docker + Docker Compose
 - Git
-- Mindst 4GB RAM til PhotoPrism
+- At least 4 GB RAM for PhotoPrism
 
-## 🛠️ Installation og Opsætning
+## Quick Start
 
-### 1. Klon og installer dependencies
+1) Install dependencies
 
 ```bash
 git clone <repository-url>
@@ -32,37 +31,23 @@ cd wpm2
 npm install
 ```
 
-### 2. Start PostgreSQL database
+2) Start required services (PostgreSQL, MinIO, PhotoPrism)
 
 ```bash
-# Start alle services (PostgreSQL, MinIO, PhotoPrism)
 npm run docker:up
-
-# Verificer at containerne kører
-docker compose ps
 ```
 
-**Services tilgængelige:**
-
-- PostgreSQL: localhost:5432
-- MinIO: localhost:9000 (admin: localhost:9001)
-- PhotoPrism: localhost:2342
-
-### 3. Kør database migreringer
+3) Apply database migrations
 
 ```bash
-# Generer migreringer (allerede gjort)
-npm run db:generate
-
-# Kør migreringer mod databasen
 npm run db:migrate
 ```
 
-### 4. Miljøvariabler
+4) Configure environment
 
-Kopier `.env.local` og tilpas efter behov:
+Create `.env.local` with at least:
 
-```bash
+```env
 # Database
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/wpm2
 
@@ -70,7 +55,7 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/wpm2
 NEXTAUTH_SECRET=your-secret-key-change-this-in-production
 NEXTAUTH_URL=http://localhost:3000
 
-# Encryption
+# Encryption (32 chars)
 ENCRYPTION_KEY=your-32-character-encryption-key-here
 
 # MinIO (Object Storage)
@@ -86,202 +71,105 @@ PHOTOPRISM_USER=admin
 PHOTOPRISM_PASSWORD=insecure
 ```
 
-### 5. Start udviklingsserveren
+5) Start the app
 
 ```bash
 npm run dev
 ```
 
-## 🔍 Service Adresser
+## URLs
 
-**Applikation:**
+- App: http://localhost:3000
+- API Health: http://localhost:3000/api/health
+- Services Health: http://localhost:3000/api/health/services
+- MinIO API: http://localhost:9000
+- MinIO Console: http://localhost:9001 (minioadmin / minioadmin123)
+- PhotoPrism: http://localhost:2342 (admin / insecure)
 
-- http://localhost:3000 - Hovedapplikation
-- http://localhost:3000/api/health - API healthcheck
-- http://localhost:3000/api/health/services - Services status
-
-**Object Storage (MinIO):**
-
-- http://localhost:9000 - MinIO API
-- http://localhost:9001 - MinIO Admin Console
-- Credentials: minioadmin / minioadmin123
-
-**Photo Management (PhotoPrism):**
-
-- http://localhost:2342 - PhotoPrism Interface
-- Credentials: admin / insecure
-
-## 🧪 Testing
+## Testing
 
 ```bash
-# Kør alle tests
-npm test
-
-# Kør tests i watch mode
-npm run test:watch
-
-# Kør tests med coverage
+npm test            # Run all tests
+npm run test:watch  # Watch mode
 npm run test:coverage
 ```
 
-## 📊 Database Administration
+## API Overview
 
-```bash
-# Åbn Drizzle Studio (database browser)
-npm run db:studio
-```
+- `GET /api/products` – Products with pagination and filters
+- `GET /api/products/filters` – Available filter values
+- `GET /api/brands` and `GET /api/categories` – Taxonomies
+- `POST /api/uploads` – Upload media to MinIO
+- `GET /api/media` and `DELETE /api/media` – Manage media
+- `GET/POST /api/photos` and `GET /api/photos/{uid}` – PhotoPrism
+- `GET /api/albums` and `POST /api/albums` – Albums
+- `GET /api/health` and `GET /api/health/services` – Health checks
 
-## 🔐 Autentificering Endpoints
-
-### Registrer ny bruger
-
-```bash
-POST /api/register
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "StrongPassword123"
-}
-```
-
-### Login
-
-```bash
-POST /api/auth/signin
-# Eller brug NextAuth login page: /api/auth/signin
-```
-
-### Logout
-
-```bash
-POST /api/auth/signout
-```
-
-## 🏥 Healthcheck
-
-```bash
-GET /api/health
-```
-
-Svarer med:
-
-```json
-{
-  "status": "ok",
-  "version": "0.1.0",
-  "db": "ok",
-  "timestamp": "2024-..."
-}
-```
-
-## 📁 Projektstruktur
+## Project Structure
 
 ```
 src/
-├── app/
-│   ├── api/
-│   │   ├── auth/[...nextauth]/
-│   │   ├── register/
-│   │   └── health/
-│   └── page.tsx
-├── db/
-│   ├── index.ts          # Database forbindelse
-│   └── schema.ts         # Database schema
-└── lib/
-    ├── auth.ts           # Password utilities
-    ├── auth-config.ts    # NextAuth konfiguration
-    └── validations.ts    # Zod schemas
-
+  app/
+    api/
+    page.tsx
+  db/
+    index.ts
+    schema.ts
+  lib/
+    auth.ts
+    auth-config.ts
+    validations.ts
 drizzle/
-└── migrations/           # Database migreringer
-
+  migrations/
 tests/
-├── setup.ts
-├── auth.test.ts          # Password utility tests
-├── api.test.ts           # API endpoint tests
-└── health.test.ts        # Healthcheck tests
+  setup.ts
 ```
 
-## 🧭 Navigation
-
-Applikationen bruger nu kun MainLayout-komponentens indbyggede sidebar til navigation. Den tidligere Navigation-komponent er fjernet.
-
-## 🔧 Udvikling Scripts
+## Scripts
 
 ```bash
-# Udvikling
-npm run dev              # Start development server
-npm run build            # Build for production
-npm run start            # Start production server
+# App
+npm run dev
+npm run build
+npm run start
 
 # Database
-npm run db:generate      # Generer nye migreringer
-npm run db:migrate       # Kør migreringer
-npm run db:push         # Push schema changes (development)
-npm run db:studio       # Åbn database browser
+npm run db:generate   # Generate new migrations
+npm run db:migrate    # Apply migrations
+npm run db:push       # Push schema changes (dev)
+npm run db:studio     # Open Drizzle Studio
+npm run db:seed       # Seed with test data
 
-# Docker services
-npm run docker:up         # Start alle services
-npm run docker:down       # Stop alle services
-npm run docker:minio      # Start kun MinIO
-npm run docker:photoprism # Start kun PhotoPrism
-npm run docker:services   # Start MinIO + PhotoPrism
-npm run docker:logs       # Vis logs fra alle services
+# Docker
+npm run docker:up
+npm run docker:down
+npm run docker:minio
+npm run docker:photoprism
+npm run docker:services
+npm run docker:logs
 
-# Kodekvalitet
-npm run lint            # Check ESLint
-npm run lint:fix        # Fix ESLint issues
-npm run format          # Format with Prettier
-npm run format:check    # Check Prettier formatting
-npm run type-check      # TypeScript type checking
+# Quality
+npm run lint
+npm run lint:fix
+npm run format
+npm run format:check
+npm run type-check
 ```
 
-## ✅ Kvalitetssikring
+## Security
 
-Dette projekt har følgende kvalitetssikring:
+- Passwords hashed with bcryptjs
+- Input validation with Zod
+- SQL injection protection via Drizzle
+- Server-side sessions (NextAuth)
+- Environment variable validation
 
-1. **TypeScript strict mode** - Fuld type safety
-2. **ESLint** - Kodekvalitet og konsistens
-3. **Prettier** - Ensartet kodeformatering
-4. **Husky** - Pre-commit hooks
-5. **Vitest** - Unit og integration tests
-6. **Zod** - Runtime input validering
+## Media Features (MinIO + PhotoPrism)
 
-## 🔒 Sikkerhed
+- Centralized object storage for product images (MinIO)
+- AI-powered photo indexing, search, and albums (PhotoPrism)
+- Featured and gallery images for products
+- RESTful API endpoints for media operations
 
-- Passwords hashet med bcryptjs (12 rounds)
-- Input validering med Zod
-- SQL injection beskyttelse via Drizzle ORM
-- Server-side sessions (ikke JWT)
-- Environment variable validering
+More details: see `PHOTOPRISM_MINIO_INTEGRATION.md`.
 
-## 📝 Nye Features - PhotoPrism og MinIO
-
-**Etape 2 - Media Management er komplet!**
-
-### 🗂️ Media Library
-
-- Upload billeder til MinIO object storage
-- Administrer produkt billeder
-- Automatisk file validering og sikkerhed
-
-### 📸 Photo Management
-
-- AI-powered foto organisering med PhotoPrism
-- Automatisk indeksering og tagging
-- Avanceret søgning og filtrering
-- Album administration
-
-### 🔗 Integration
-
-- Produkter kan have featured images
-- Media files koblet til brugere
-- RESTful API til alle media operationer
-
-**Næste etape vil indeholde:**
-
-- UI komponenter til login/registrering forbedringer
-- Avanceret produktbillede management
-- Bulk upload funktionalitet
-- CDN integration for optimeret performance

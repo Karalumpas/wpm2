@@ -1,124 +1,108 @@
-# Database Setup - Standardized Docker Configuration
+# Database Setup
 
-## 🐳 Database Strategy
+This project uses a Dockerized PostgreSQL database by default.
 
-This application now uses **Docker PostgreSQL** as the standard database configuration instead of external databases.
+## Overview
 
-## 📋 Setup Guide
+- Standard local DB: Docker PostgreSQL
+- Drizzle ORM for schema and migrations
+- Seed script for sample data and defaults
 
-### 1. Start Docker Database
+## Setup
+
+1) Start Docker services
 
 ```bash
 npm run docker:up
 ```
 
-### 2. Run Database Migrations
+2) Run database migrations
 
 ```bash
 npm run db:migrate
 ```
 
-### 3. Seed Database with Test Data
+3) Seed database (optional but recommended)
 
 ```bash
 npm run db:seed
 ```
 
-### 4. Start Development Server
+4) Start development server
 
 ```bash
 npm run dev
 ```
 
-## 🔧 Database Configuration
-
-**Docker PostgreSQL:**
+## Connection Details (Docker)
 
 - Host: `localhost`
 - Port: `5432`
 - Database: `wpm2`
-- Username: `postgres`
+- User: `postgres`
 - Password: `postgres`
-- Connection String: `postgresql://postgres:postgres@localhost:5432/wpm2`
+- URL: `postgresql://postgres:postgres@localhost:5432/wpm2`
 
-## 👤 Test Credentials
+## Test Credentials
 
-After running `npm run db:seed`, you can login with:
+After seeding you can log in with:
 
-- **Email:** `admin@wpm2.com`
-- **Password:** `admin123`
+- Email: `admin@wpm2.com`
+- Password: `admin123`
 
-## 📊 Database Schema
+## Main Tables
 
-The application includes these main tables:
+- `users` – Accounts and authentication
+- `settings` – User preferences and currency settings
+- `shops` – WooCommerce connections
+- `products` – Product catalog
+- `product_variants` – Product variations
+- `categories` – Product categories
+- `brands` – Product brands
+- `media_files` – Uploaded media and PhotoPrism links
 
-- `users` - User accounts and authentication
-- `settings` - User preferences and currency settings
-- `shops` - WooCommerce shop connections
-- `products` - Product catalog
-- `product_variants` - Product variations
-- `categories` - Product categories
-- `brands` - Product brands
-
-## 🛠️ Database Management Commands
+## Useful Commands
 
 ```bash
-# Start/stop Docker containers
+# Docker lifecycle
 npm run docker:up
 npm run docker:down
 
-# Database migrations
-npm run db:generate  # Generate new migration
-npm run db:migrate   # Apply migrations
-npm run db:push      # Push schema changes
+# Drizzle tools
+npm run db:generate   # create new migration
+npm run db:migrate    # apply migrations
+npm run db:push       # push schema changes (dev)
+npm run db:studio     # open Drizzle Studio
+npm run db:seed       # seed sample data
 
-# Database tools
-npm run db:studio    # Open Drizzle Studio
-npm run db:seed      # Seed with test data
-
-# Connect directly to database
+# psql inside the container
 docker exec -it wpm2-postgres psql -U postgres -d wpm2
 ```
 
-## 🔄 Migration from External Database
+## Migrate From External PostgreSQL
 
-If you have data on an external PostgreSQL database that you want to migrate:
-
-1. **Export data from external database:**
+Export from an external DB and import into Docker:
 
 ```bash
+# Export (example)
 pg_dump -h 192.168.0.180 -U your_user -d wpm2 --data-only --inserts > backup.sql
-```
 
-2. **Import to Docker database:**
-
-```bash
+# Import into Docker DB
 docker exec -i wpm2-postgres psql -U postgres -d wpm2 < backup.sql
 ```
 
-## ⚙️ Environment Variables
+## Environment Variable
 
-The `.env.local` file is configured for Docker:
+`.env.local` should include:
 
 ```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/wpm2
 ```
 
-## 🎯 Currency & Settings Features
+## Verify
 
-The application now supports:
+1) Visit `http://localhost:3000/api/health` – should return `{ "status": "ok" }`
+2) Log in with the test credentials
+3) Open `/settings` to configure currency
+4) Open `/products` to verify product listing and formatting
 
-- ✅ Multi-currency support (DKK, EUR, USD, GBP, SEK, NOK)
-- ✅ Configurable currency position (left/right with/without space)
-- ✅ User-specific settings storage
-- ✅ Default settings (DKK currency) for new users
-- ✅ Settings management UI in `/settings` page
-
-## 🔍 Verification
-
-Test that everything works:
-
-1. Visit `http://localhost:3000/api/health` - should return `{"status":"ok"}`
-2. Login with test credentials
-3. Navigate to `/settings` to configure currency
-4. Navigate to `/products` to see products with correct currency formatting

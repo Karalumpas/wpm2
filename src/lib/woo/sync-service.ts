@@ -455,7 +455,9 @@ export class WooCommerceProductSyncService {
                 product.id
               );
               const existing = await this.findExistingVariation(
-                variation.id.toString()
+                variation.id.toString(),
+                product.id,
+                syncData.sku
               );
 
               if (existing) {
@@ -699,14 +701,41 @@ export class WooCommerceProductSyncService {
     return found;
   }
 
-  private async findExistingVariation(wooCommerceId: string) {
-    const results = await db
-      .select()
-      .from(productVariants)
-      .where(eq(productVariants.wooCommerceId, wooCommerceId))
-      .limit(1);
+  private async findExistingVariation(
+    wooCommerceId: string,
+    productId: string,
+    sku?: string
+  ) {
+    try {
+      const results = await db
+        .select()
+        .from(productVariants)
+        .where(
+          and(
+            eq(productVariants.productId, productId),
+            eq(productVariants.wooCommerceId, wooCommerceId)
+          )
+        )
+        .limit(1);
 
-    return results[0] || null;
+      if (results[0]) return results[0];
+    } catch (err) {
+      console.warn(
+        'findExistingVariation by WooCommerce ID failed; falling back to SKU check. Error:',
+        err
+      );
+    }
+
+    if (sku) {
+      const bySku = await db
+        .select()
+        .from(productVariants)
+        .where(and(eq(productVariants.productId, productId), eq(productVariants.sku, sku)))
+        .limit(1);
+      return bySku[0] || null;
+    }
+
+    return null;
   }
 
   private async createCategory(data: CategorySyncData): Promise<string> {

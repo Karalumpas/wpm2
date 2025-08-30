@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ShopResponse } from '@/lib/validation/shops';
 import { ProtectedClient } from '@/components/auth/ProtectedClient';
@@ -181,6 +181,18 @@ function ShopCard({ shop, onUpdate }: ShopCardProps) {
   const [showTestLogs, setShowTestLogs] = useState(false);
   const [showSyncLogs, setShowSyncLogs] = useState(false);
   const [shouldUpdateOnClose, setShouldUpdateOnClose] = useState(false);
+  const [syncJobId, setSyncJobId] = useState<string | null>(null);
+  const progressSeenRef = useRef(0);
+  const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollTimerRef.current) {
+        clearInterval(pollTimerRef.current);
+      }
+    };
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {

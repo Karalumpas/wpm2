@@ -18,6 +18,13 @@ const eslintConfig = [
       'out/**',
       'build/**',
       'next-env.d.ts',
+      '**/*.js',
+      'create-dummy-user.js',
+      'debug-db.js',
+      'test-decrypt.js',
+      'dev.log',
+      'scripts/**/*.js',
+      'sync-*.json',
     ],
   },
 ];

@@ -569,3 +569,7 @@ Error details: {
     '    at AppRouteRouteModule.handle (E:\\wpm2\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:46008)'
 }
  GET /api/settings/user 500 in 318ms
+ GET /products 200 in 215ms
+ GET /products 200 in 142ms
+ GET /products 200 in 202ms
+ GET /products 200 in 204ms

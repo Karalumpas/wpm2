@@ -16,8 +16,10 @@ import {
   Globe,
   Images,
   Camera,
+  User,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
@@ -39,6 +41,7 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { data: session } = useSession();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -88,9 +91,19 @@ export function MainLayout({ children }: MainLayoutProps) {
                 </h1>
               </div>
               <div className="ml-4 flex items-center md:ml-6">
-                <div className="text-sm text-gray-500">
-                  Connected to: 192.168.0.180
-                </div>
+                {session?.user && (
+                  <div className="flex items-center space-x-4">
+                    <span className="text-sm text-gray-700">
+                      {session.user.email}
+                    </span>
+                    <button
+                      onClick={() => signOut({ callbackUrl: '/login' })}
+                      className="text-sm text-gray-500 hover:text-gray-700"
+                    >
+                      Log out
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -105,6 +118,7 @@ export function MainLayout({ children }: MainLayoutProps) {
 
 function Sidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   return (
     <div className="flex flex-1 flex-col min-h-0 bg-white border-r border-gray-200">
@@ -143,17 +157,16 @@ function Sidebar() {
           })}
         </nav>
 
-        {/* Connection status */}
-        <div className="flex-shrink-0 px-4 py-4 border-t border-gray-200">
-          <div className="flex items-center">
-            <div className="h-2 w-2 bg-green-400 rounded-full"></div>
-            <span className="ml-2 text-xs text-gray-500">
-              Database Connected
+        <div className="flex-shrink-0 border-t border-gray-200">
+          <Link
+            href="/profile"
+            className="flex items-center px-4 py-4 hover:bg-gray-50"
+          >
+            <User className="h-5 w-5 text-gray-400" />
+            <span className="ml-3 text-sm font-medium text-gray-700">
+              {session?.user?.email ?? 'Profile'}
             </span>
-          </div>
-          <div className="mt-1 text-xs text-gray-400">
-            PostgreSQL: 192.168.0.180:5432
-          </div>
+          </Link>
         </div>
       </div>
     </div>

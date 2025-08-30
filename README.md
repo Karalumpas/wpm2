@@ -203,6 +203,10 @@ tests/
 └── health.test.ts        # Healthcheck tests
 ```
 
+## 🧭 Navigation
+
+Applikationen bruger nu kun MainLayout-komponentens indbyggede sidebar til navigation. Den tidligere Navigation-komponent er fjernet.
+
 ## 🔧 Udvikling Scripts
 
 ```bash

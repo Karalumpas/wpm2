@@ -60,7 +60,7 @@ export type ProcessedSearchParams = z.infer<typeof processedSearchParamsSchema>;
  */
 export function parseSearchParams(searchParams: Record<string, string | string[] | undefined>): ProcessedSearchParams {
   // Convert URLSearchParams to plain object and handle arrays
-  const params: Record<string, any> = {};
+  const params: Record<string, string | undefined> = {};
   
   Object.entries(searchParams).forEach(([key, value]) => {
     if (Array.isArray(value)) {

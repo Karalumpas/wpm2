@@ -103,7 +103,9 @@ export function ProductRow({ product }: ProductRowProps) {
   );
 }
 
-function PriceRange({ product, settings }: { product: ProductListItem, settings: any }) {
+import type { UserSettings } from '@/types/settings';
+
+function PriceRange({ product, settings }: { product: ProductListItem; settings: UserSettings }) {
   // Since ProductListItem doesn't have variants, we'll just show the base price
   return <span className="font-medium text-sm">{formatPrice(product.basePrice, settings)}</span>;
 }

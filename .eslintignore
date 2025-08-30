@@ -1,9 +1,0 @@
-# Temporary files to ignore from linting
-*.js
-test-*.js
-create-dummy-user.js
-debug-db.js
-dev.log
-
-# Test files (more relaxed linting)
-tests/

@@ -18,7 +18,7 @@ interface OperationResult {
   success: boolean;
   message: string;
   affectedRows?: number;
-  details?: any;
+  details?: unknown;
 }
 
 export default function SettingsPage() {
@@ -35,7 +35,7 @@ export default function SettingsPage() {
   const [settingsUpdateLoading, setSettingsUpdateLoading] = useState(false);
   const [settingsUpdateResult, setSettingsUpdateResult] = useState<string | null>(null);
 
-  const handleSettingsUpdate = async (key: string, value: any) => {
+  const handleSettingsUpdate = async (key: string, value: unknown) => {
     try {
       setSettingsUpdateLoading(true);
       setSettingsUpdateResult(null);
@@ -381,7 +381,7 @@ export default function SettingsPage() {
                 </dl>
               ) : (
                 <div className="text-center py-4">
-                  <p className="text-sm text-gray-500">Click "Refresh Stats" to load data</p>
+                  <p className="text-sm text-gray-500">Click &quot;Refresh Stats&quot; to load data</p>
                 </div>
               )}
             </div>
@@ -416,7 +416,7 @@ export default function SettingsPage() {
                         {confirmOperation === operation.id ? (
                           <div className="flex items-center space-x-2">
                             <span className="text-xs text-red-600 font-medium">
-                              Type "{operation.confirmText}" to confirm:
+                              Type &quot;{operation.confirmText}&quot; to confirm:
                             </span>
                             <input
                               type="text"

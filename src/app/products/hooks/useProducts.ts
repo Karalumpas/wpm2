@@ -21,7 +21,7 @@ interface ProductsResponse {
 
 interface UseProductsResult {
   data: ProductsResponse | undefined;
-  error: any;
+  error: unknown;
   isLoading: boolean;
   isValidating: boolean;
   mutate: () => void;

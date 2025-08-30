@@ -17,7 +17,8 @@ export async function POST(request: NextRequest) {
     `);
     
     console.log('🔸 Database sizes before optimization:');
-    tablesBefore.forEach((row: any) => {
+    type TableSizeRow = { tablename: string; size: string };
+    (tablesBefore as unknown as TableSizeRow[]).forEach((row: TableSizeRow) => {
       console.log(`   ${row.tablename}: ${row.size}`);
     });
     
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
     `);
     
     console.log('🔸 Database sizes after optimization:');
-    tablesAfter.forEach((row: any) => {
+    (tablesAfter as unknown as TableSizeRow[]).forEach((row: TableSizeRow) => {
       console.log(`   ${row.tablename}: ${row.size}`);
     });
     

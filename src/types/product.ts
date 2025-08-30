@@ -38,7 +38,7 @@ export interface ProductVariant {
     width?: string;
     height?: string;
   };
-  attributes?: Record<string, any>;
+  attributes?: Record<string, unknown>;
   images?: string[];
   isActive: boolean;
   createdAt: string;
@@ -90,7 +90,7 @@ export interface Product {
   variants?: ProductVariant[];
   
   // Custom attributes
-  attributes?: Record<string, any>;
+  attributes?: Record<string, unknown>;
   
   // Status
   isActive: boolean;

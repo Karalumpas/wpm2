@@ -234,3 +234,43 @@ export const settings = pgTable('settings', {
   userIdIdx: index('settings_user_id_idx').on(table.userId),
   userUniqueIdx: unique('settings_user_unique').on(table.userId), // One setting per user
 }));
+
+// Media files table for MinIO and PhotoPrism integration
+export const mediaFiles = pgTable(
+  'media_files',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    // File identification
+    fileName: text('file_name').notNull(),
+    originalFileName: text('original_file_name').notNull(),
+    objectName: text('object_name').notNull().unique(), // MinIO object path
+    // File metadata
+    fileSize: numeric('file_size', { precision: 12, scale: 0 }).notNull(),
+    mimeType: text('mime_type').notNull(),
+    width: numeric('width', { precision: 6, scale: 0 }),
+    height: numeric('height', { precision: 6, scale: 0 }),
+    // Storage locations
+    minioUrl: text('minio_url').notNull(), // URL from MinIO
+    photoPrismUID: text('photoprism_uid'), // PhotoPrism photo UID if indexed
+    // Relationships
+    productId: uuid('product_id').references(() => products.id, { onDelete: 'set null' }),
+    userId: uuid('user_id').references(() => users.id).notNull(),
+    // Flags
+    isIndexed: boolean('is_indexed').default(false).notNull(), // Whether indexed in PhotoPrism
+    isFeatured: boolean('is_featured').default(false).notNull(), // Featured image for product
+    // Timestamps
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+    indexedAt: timestamp('indexed_at'), // When indexed in PhotoPrism
+  },
+  (table) => ({
+    objectNameIdx: index('media_files_object_name_idx').on(table.objectName),
+    productIdIdx: index('media_files_product_id_idx').on(table.productId),
+    userIdIdx: index('media_files_user_id_idx').on(table.userId),
+    photoPrismUIDIdx: index('media_files_photoprism_uid_idx').on(table.photoPrismUID),
+    mimeTypeIdx: index('media_files_mime_type_idx').on(table.mimeType),
+    isIndexedIdx: index('media_files_is_indexed_idx').on(table.isIndexed),
+    isFeaturedIdx: index('media_files_is_featured_idx').on(table.isFeatured),
+    createdAtIdx: index('media_files_created_at_idx').on(table.createdAt.desc()),
+  })
+);

@@ -13,7 +13,9 @@ import {
   Home,
   Menu,
   X,
-  Globe
+  Globe,
+  Images,
+  Camera
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -24,6 +26,8 @@ const navigation = [
   { name: 'Brands', href: '/brands', icon: Building2 },
   { name: 'Orders', href: '/orders', icon: ShoppingCart },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Media Library', href: '/media', icon: Images },
+  { name: 'Photos', href: '/photos', icon: Camera },
   { name: 'Connections', href: '/connections', icon: Globe },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];

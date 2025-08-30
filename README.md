@@ -12,12 +12,15 @@ En produktionsklar Next.js applikation til håndtering af WooCommerce produkter.
 - **Tailwind CSS** til styling
 - **Vitest** til testing
 - **ESLint + Prettier** til kodekvalitet
+- **MinIO** object storage (S3-compatible)
+- **PhotoPrism** AI-powered foto management
 
 ## 📋 Forudsætninger
 
 - Node.js 18+
 - Docker og Docker Compose
 - Git
+- Mindst 4GB RAM til PhotoPrism
 
 ## 🛠️ Installation og Opsætning
 
@@ -32,12 +35,17 @@ npm install
 ### 2. Start PostgreSQL database
 
 ```bash
-# Start database container
+# Start alle services (PostgreSQL, MinIO, PhotoPrism)
 npm run docker:up
 
-# Verificer at containeren kører
-docker ps
+# Verificer at containerne kører
+docker compose ps
 ```
+
+**Services tilgængelige:**
+- PostgreSQL: localhost:5432
+- MinIO: localhost:9000 (admin: localhost:9001)
+- PhotoPrism: localhost:2342
 
 ### 3. Kør database migreringer
 
@@ -60,6 +68,21 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/wpm2
 # NextAuth
 NEXTAUTH_SECRET=your-secret-key-change-this-in-production
 NEXTAUTH_URL=http://localhost:3000
+
+# Encryption
+ENCRYPTION_KEY=your-32-character-encryption-key-here
+
+# MinIO (Object Storage)
+MINIO_ENDPOINT=localhost
+MINIO_PORT=9000
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin123
+MINIO_USE_SSL=false
+
+# PhotoPrism (Photo Management)
+PHOTOPRISM_URL=http://localhost:2342
+PHOTOPRISM_USER=admin
+PHOTOPRISM_PASSWORD=insecure
 ```
 
 ### 5. Start udviklingsserveren
@@ -68,7 +91,21 @@ NEXTAUTH_URL=http://localhost:3000
 npm run dev
 ```
 
-Applikationen er nu tilgængelig på [http://localhost:3000](http://localhost:3000)
+## 🔍 Service Adresser
+
+**Applikation:**
+- http://localhost:3000 - Hovedapplikation
+- http://localhost:3000/api/health - API healthcheck
+- http://localhost:3000/api/health/services - Services status
+
+**Object Storage (MinIO):**
+- http://localhost:9000 - MinIO API
+- http://localhost:9001 - MinIO Admin Console
+- Credentials: minioadmin / minioadmin123
+
+**Photo Management (PhotoPrism):**
+- http://localhost:2342 - PhotoPrism Interface
+- Credentials: admin / insecure
 
 ## 🧪 Testing
 
@@ -176,9 +213,13 @@ npm run db:migrate       # Kør migreringer
 npm run db:push         # Push schema changes (development)
 npm run db:studio       # Åbn database browser
 
-# Docker
-npm run docker:up       # Start PostgreSQL
-npm run docker:down     # Stop PostgreSQL
+# Docker services
+npm run docker:up         # Start alle services
+npm run docker:down       # Stop alle services
+npm run docker:minio      # Start kun MinIO
+npm run docker:photoprism # Start kun PhotoPrism
+npm run docker:services   # Start MinIO + PhotoPrism
+npm run docker:logs       # Vis logs fra alle services
 
 # Kodekvalitet
 npm run lint            # Check ESLint
@@ -207,11 +248,28 @@ Dette projekt har følgende kvalitetssikring:
 - Server-side sessions (ikke JWT)
 - Environment variable validering
 
-## 📝 Næste Skridt
+## 📝 Nye Features - PhotoPrism og MinIO
 
-Etape 1 er nu komplet! Næste etape vil indeholde:
+**Etape 2 - Media Management er komplet!**
 
-- UI komponenter til login/registrering
-- Dashboard med produkthåndtering
-- WooCommerce API integration
-- Avanceret testing og monitoring
+### 🗂️ Media Library
+- Upload billeder til MinIO object storage
+- Administrer produkt billeder
+- Automatisk file validering og sikkerhed
+
+### 📸 Photo Management
+- AI-powered foto organisering med PhotoPrism
+- Automatisk indeksering og tagging
+- Avanceret søgning og filtrering
+- Album administration
+
+### 🔗 Integration
+- Produkter kan have featured images
+- Media files koblet til brugere
+- RESTful API til alle media operationer
+
+**Næste etape vil indeholde:**
+- UI komponenter til login/registrering forbedringer
+- Avanceret produktbillede management
+- Bulk upload funktionalitet
+- CDN integration for optimeret performance

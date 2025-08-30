@@ -40,15 +40,40 @@ export default function VariantsTable({
     setSelected((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const onBulk = (action: 'edit' | 'sync' | 'export') => {
+  const onBulk = async (action: 'edit' | 'sync' | 'export') => {
     const ids = variants.filter((v) => selected[v.id]).map((v) => v.id);
     if (!ids.length) return;
-    // TODO: wire to backend endpoints
-    console.log('Bulk action', action, ids);
-    // Simple visual feedback (non-blocking)
-    alert(
-      `${action === 'edit' ? 'Rediger' : action === 'sync' ? 'Synkronisér' : 'Eksportér'}: ${ids.length} varianter`
-    );
+    try {
+      if (action === 'sync') {
+        await fetch('/api/variants/bulk/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ids }),
+        });
+        alert(`Synkroniserede ${ids.length} varianter`);
+      } else if (action === 'export') {
+        await fetch('/api/variants/bulk/export', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ids }),
+        });
+        alert(`Eksporterede ${ids.length} varianter (kø ved backend)`);
+      } else if (action === 'edit') {
+        const price = prompt('Ny pris (tom for at springe over)');
+        const stockStatus = prompt('Ny lagerstatus (instock/outofstock/onbackorder)');
+        await fetch('/api/variants/bulk/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            updates: ids.map((id) => ({ id, price: price || undefined, stockStatus: stockStatus || undefined })),
+          }),
+        });
+        alert(`Opdaterede ${ids.length} varianter`);
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Handling fejlede');
+    }
   };
 
   return (

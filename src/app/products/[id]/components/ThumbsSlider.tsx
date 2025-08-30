@@ -6,9 +6,11 @@ import { useRef } from 'react';
 export default function ThumbsSlider({
   images,
   altBase,
+  onSelect,
 }: {
   images: string[];
   altBase: string;
+  onSelect?: (index: number) => void;
 }) {
   const scroller = useRef<HTMLDivElement>(null);
 
@@ -29,6 +31,7 @@ export default function ThumbsSlider({
             key={`${src}-${i}`}
             className="w-16 h-16 rounded-lg overflow-hidden border hover:scale-105 transition-transform duration-150 flex-shrink-0 snap-start"
             title={`Image ${i + 1}`}
+            onClick={() => onSelect && onSelect(i)}
           >
             <Image
               src={src}
@@ -62,4 +65,3 @@ export default function ThumbsSlider({
     </div>
   );
 }
-

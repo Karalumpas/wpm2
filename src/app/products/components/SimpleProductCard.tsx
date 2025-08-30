@@ -17,7 +17,7 @@ export function SimpleProductCard({ product }: SimpleProductCardProps) {
   const displayImage =
     product.featuredImage ||
     (product.images && product.images.length > 0 ? product.images[0] : null);
-  const variantImages = Array.from(new Set(product.variantImages || []));
+  const galleryThumbs = Array.from(new Set(product.images || []));
 
   const [imageError, setImageError] = useState(false);
   const [hoveredVariant, setHoveredVariant] = useState<string | null>(null);
@@ -58,21 +58,21 @@ export function SimpleProductCard({ product }: SimpleProductCardProps) {
           )}
         </div>
 
-        {/* Variant thumbnails (for variable products) */}
-        {product.type === 'variable' && variantImages.length > 0 && (
+        {/* Gallery thumbnails (hover to preview main image) */}
+        {galleryThumbs.length > 0 && (
           <div className="mb-4">
             <div className="flex gap-2 overflow-x-auto">
-              {variantImages.map((img, i) => (
+              {galleryThumbs.map((img, i) => (
                 <div
                   key={i}
                   className="w-12 h-12 rounded-md overflow-hidden border border-gray-200 flex-shrink-0"
-                  title={`Variant ${i + 1}`}
+                  title={`Image ${i + 1}`}
                   onMouseEnter={() => setHoveredVariant(img)}
                   onMouseLeave={() => setHoveredVariant(null)}
                 >
                   <Image
                     src={img}
-                    alt={`${product.name} variant ${i + 1}`}
+                    alt={`${product.name} image ${i + 1}`}
                     width={48}
                     height={48}
                     className="w-full h-full object-cover"

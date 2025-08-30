@@ -56,6 +56,26 @@ export async function initializeMinIO() {
   }
 }
 
+// Ensure bucket has public read policy (idempotent)
+export async function ensurePublicReadPolicy(): Promise<void> {
+  try {
+    const policy = {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Effect: 'Allow',
+          Principal: { AWS: ['*'] },
+          Action: ['s3:GetObject'],
+          Resource: [`arn:aws:s3:::${DEFAULT_BUCKET}/*`],
+        },
+      ],
+    };
+    await minioClient.setBucketPolicy(DEFAULT_BUCKET, JSON.stringify(policy));
+  } catch (error) {
+    console.warn('Failed to set public bucket policy:', error);
+  }
+}
+
 // Helper function to generate object name
 export function generateObjectName(
   fileName: string,

@@ -9,7 +9,11 @@ import {
   categories,
 } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { formatDateTime, formatDimensions, formatPrice } from '@/lib/formatters';
+import {
+  formatDateTime,
+  formatDimensions,
+  formatPrice,
+} from '@/lib/formatters';
 import VariantsTable from './variants/VariantsTable';
 
 type PageProps = {

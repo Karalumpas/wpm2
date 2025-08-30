@@ -11,7 +11,11 @@ type VariantRow = {
   stockStatus: string;
 };
 
-export default function VariantsTable({ variants }: { variants: VariantRow[] }) {
+export default function VariantsTable({
+  variants,
+}: {
+  variants: VariantRow[];
+}) {
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const allSelected = useMemo(
     () => variants.length > 0 && variants.every((v) => selected[v.id]),
@@ -103,7 +107,10 @@ export default function VariantsTable({ variants }: { variants: VariantRow[] }) 
       {/* Rows */}
       <div className="divide-y">
         {variants.map((v) => (
-          <div key={v.id} className="grid grid-cols-12 gap-4 px-4 py-3 items-center">
+          <div
+            key={v.id}
+            className="grid grid-cols-12 gap-4 px-4 py-3 items-center"
+          >
             <div className="col-span-12 md:col-span-1">
               <input
                 type="checkbox"
@@ -124,8 +131,18 @@ export default function VariantsTable({ variants }: { variants: VariantRow[] }) 
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-300">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
                     </svg>
                   </div>
                 )}
@@ -163,4 +180,3 @@ export default function VariantsTable({ variants }: { variants: VariantRow[] }) 
     </div>
   );
 }
-

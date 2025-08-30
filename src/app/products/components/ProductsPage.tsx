@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ProcessedSearchParams, serializeSearchParams } from '../params';
+import { ProcessedSearchParams } from '../params';
 import { ProductsToolbar } from './ProductsToolbar';
 import { ProductsList } from './ProductsList';
 import { useProducts } from '../hooks/useProducts';
-import { useUrlState } from '../hooks/useUrlState';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 
@@ -18,8 +17,40 @@ export function ProductsPage({ initialParams }: ProductsPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  // URL state management
-  const { params, updateParams, resetParams } = useUrlState(initialParams);
+  // Use local state instead of URL state to prevent infinite loops
+  const [params, setParams] = useState<ProcessedSearchParams>(initialParams);
+  
+  // Update local state when URL parameters change (for direct navigation)
+  useEffect(() => {
+    const currentPage = searchParams.get('page');
+    const pageNum = currentPage ? parseInt(currentPage) : 1;
+    
+    if (pageNum !== params.page) {
+      // Use a timeout to debounce URL changes and prevent loops
+      const timeoutId = setTimeout(() => {
+        setParams(prev => ({ ...prev, page: pageNum }));
+      }, 10);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [searchParams]);
+  
+  // Stabilize params to prevent unnecessary re-renders
+  const stableParams = useMemo(() => params, [
+    params.search,
+    params.sortBy, 
+    params.sortOrder,
+    params.limit,
+    params.page,
+    params.cursor,
+    params.status,
+    params.type,
+    params.brandIds.join(','),
+    params.categoryIds.join(','),
+    params.shopIds.join(','),
+    params.viewMode,
+    params.paginationMode
+  ]);
   
   // Fetch products with SWR
   const {
@@ -31,38 +62,33 @@ export function ProductsPage({ initialParams }: ProductsPageProps) {
     loadMore,
     hasMore,
     isLoadingMore
-  } = useProducts(params);
-
-  // Debug logging
-  console.log('🖥️ ProductsPage state:', {
-    data,
-    error,
-    isLoading,
-    params,
-    productsCount: data?.products?.length,
-    paginationTotal: data?.pagination?.total
-  });
+  } = useProducts(stableParams);
 
   // Handle parameter updates
-  const handleParamsUpdate = (updates: Partial<ProcessedSearchParams>) => {
-    updateParams(updates);
-  };
+  const handleParamsUpdate = useCallback((updates: Partial<ProcessedSearchParams>) => {
+    setParams(prev => ({ ...prev, ...updates }));
+  }, []);
 
   // Handle reset
-  const handleReset = () => {
-    resetParams();
-  };
+  const handleReset = useCallback(() => {
+    setParams(initialParams);
+  }, [initialParams]);
 
   // Handle pagination
-  const handlePageChange = (page: number) => {
-    updateParams({ page, cursor: undefined });
-  };
+  const handlePageChange = useCallback((page: number) => {
+    setParams(prev => ({ ...prev, page, cursor: undefined }));
+    
+    // Update URL to reflect current page
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+    newSearchParams.set('page', page.toString());
+    router.push(`/products?${newSearchParams.toString()}`, { scroll: false });
+  }, [router, searchParams]);
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     if (hasMore && !isLoadingMore) {
       loadMore();
     }
-  };
+  }, [hasMore, isLoadingMore, loadMore]);
 
   // Error state
   if (error) {
@@ -74,6 +100,7 @@ export function ProductsPage({ initialParams }: ProductsPageProps) {
           onReset={handleReset}
           isLoading={isLoading}
           totalCount={0}
+          onPageChange={handlePageChange}
         />
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
@@ -94,6 +121,8 @@ export function ProductsPage({ initialParams }: ProductsPageProps) {
         onReset={handleReset}
         isLoading={isLoading || isValidating}
         totalCount={data?.pagination?.total || 0}
+        pagination={data?.pagination}
+        onPageChange={handlePageChange}
       />
 
       {/* Products List */}

@@ -14,11 +14,24 @@ export function useUrlState(initialParams: ProcessedSearchParams) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Current parameters from URL
+  // Stable reference to initial params
+  const stableInitialParams = useMemo(() => initialParams, []);
+
+  // Use initial params as base and only re-parse when URL actually changes
   const params = useMemo(() => {
+    const urlString = searchParams.toString();
+    
+    // Return initial params if URL is empty to prevent unnecessary updates
+    if (!urlString) {
+      return stableInitialParams;
+    }
+    
+    // Parse current URL params
     const current = Object.fromEntries(searchParams.entries());
-    return normalizeParams(parseSearchParams(current));
-  }, [searchParams]);
+    const parsed = normalizeParams(parseSearchParams(current));
+    
+    return parsed;
+  }, [searchParams.toString(), stableInitialParams]); // Only depend on URL string and stable initial params
 
   // Update parameters
   const updateParams = useCallback((updates: Partial<ProcessedSearchParams>) => {

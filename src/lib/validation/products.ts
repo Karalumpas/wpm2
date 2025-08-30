@@ -6,7 +6,12 @@ export const productSortFields = [
   'basePrice', 
   'sku',
   'createdAt',
-  'updatedAt'
+  'updatedAt',
+  'status',
+  'type',
+  'stockQuantity',
+  'weight',
+  'variantCount'
 ] as const;
 
 export const sortOrder = ['asc', 'desc'] as const;
@@ -40,6 +45,7 @@ export const getProductsQuerySchema = z.object({
   type: z.enum(productType).optional(),
   brandIds: z.array(z.string().uuid()).optional(),
   categoryIds: z.array(z.string().uuid()).optional(),
+  shopIds: z.array(z.string().uuid()).optional(),
 });
 
 export type GetProductsQuery = z.infer<typeof getProductsQuerySchema>;
@@ -66,7 +72,17 @@ export const productsListResponseSchema = z.object({
   items: z.array(productListItemSchema),
   hasMore: z.boolean(),
   nextCursor: z.string().optional(),
-  total: z.number().optional(), // Only if cheap to compute
+  total: z.number().optional(), // Total count for page-based pagination
+  pagination: z.object({
+    page: z.number(),
+    limit: z.number(),
+    total: z.number(),
+    totalPages: z.number(),
+    hasNext: z.boolean(),
+    hasPrev: z.boolean(),
+    cursor: z.string().optional(),
+    nextCursor: z.string().optional(),
+  }).optional(),
 });
 
 export type ProductsListResponse = z.infer<typeof productsListResponseSchema>;

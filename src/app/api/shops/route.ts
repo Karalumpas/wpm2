@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { shops } from '@/db/schema';
+import { shops, products } from '@/db/schema';
 import { createShopSchema } from '@/lib/validation/shops';
 import { encryptToCompact } from '@/lib/security/crypto';
 import { WooCommerceClient } from '@/lib/woo/client';
-import { eq } from 'drizzle-orm';
+import { eq, count } from 'drizzle-orm';
 
 export async function GET() {
-  console.log('GET /api/shops called');
   try {
+    // Get shops with product counts for filtering
     const userShops = await db
       .select({
         id: shops.id,
@@ -19,12 +19,21 @@ export async function GET() {
         lastConnectionCheckAt: shops.lastConnectionCheckAt,
         createdAt: shops.createdAt,
         updatedAt: shops.updatedAt,
+        productCount: count(products.id),
       })
       .from(shops)
+      .leftJoin(products, eq(shops.id, products.shopId))
+      .groupBy(shops.id)
       .orderBy(shops.updatedAt);
 
-    console.log('Found shops:', userShops.length, userShops);
-    return NextResponse.json(userShops);
+    // Format for filter dropdown
+    const shopsForFilter = userShops.map(shop => ({
+      id: shop.id,
+      name: shop.name,
+      count: shop.productCount,
+    }));
+
+    return NextResponse.json({ shops: shopsForFilter });
   } catch (error) {
     console.error('Error fetching shops:', error);
     return NextResponse.json(
@@ -35,13 +44,10 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  console.log('POST /api/shops called');
   try {
     const body = await request.json();
-    console.log('Request body received:', JSON.stringify(body, null, 2));
     
     const validatedData = createShopSchema.parse(body);
-    console.log('Data validated successfully:', validatedData);
 
     // Check if URL already exists
     const existingShop = await db

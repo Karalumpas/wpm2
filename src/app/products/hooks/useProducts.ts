@@ -35,8 +35,6 @@ interface UseProductsResult {
  */
 async function fetcher(url: string): Promise<ProductsResponse> {
   try {
-    console.log('🚀 Fetcher called with URL:', url);
-    
     const response = await fetch(url);
     
     if (!response.ok) {
@@ -45,31 +43,26 @@ async function fetcher(url: string): Promise<ProductsResponse> {
     
     const apiData = await response.json();
     
-    console.log('🔄 Fetcher received API data:', apiData);
-    
     // Transform API response to expected format
-    // API returns: { items, hasMore, nextCursor }
+    // API returns: { items, hasMore, nextCursor, total?, pagination? }
     // Component expects: { products, pagination }
     
     const transformedData = {
       products: apiData.items || [],
-      pagination: {
-        page: 1, // TODO: Extract from URL params if needed
+      pagination: apiData.pagination || {
+        page: 1,
         limit: apiData.items?.length || 0,
-        total: apiData.items?.length || 0, // TODO: Get actual total from API
-        totalPages: 1, // TODO: Calculate based on total
+        total: apiData.total || apiData.items?.length || 0,
+        totalPages: apiData.total ? Math.ceil(apiData.total / (apiData.items?.length || 1)) : 1,
         hasNext: apiData.hasMore || false,
-        hasPrev: false, // TODO: Calculate based on current page
-        cursor: undefined, // TODO: Extract from request
+        hasPrev: false,
+        cursor: undefined,
         nextCursor: apiData.nextCursor,
       },
     };
     
-    console.log('✨ Fetcher transformed data:', transformedData);
-    
     return transformedData;
   } catch (error) {
-    console.error('❌ Fetcher error:', error);
     throw error;
   }
 }
@@ -86,6 +79,7 @@ function buildApiUrl(params: ProcessedSearchParams): string {
   if (params.type) searchParams.set('type', params.type);
   if (params.brandIds.length > 0) searchParams.set('brandIds', params.brandIds.join(','));
   if (params.categoryIds.length > 0) searchParams.set('categoryIds', params.categoryIds.join(','));
+  if (params.shopIds.length > 0) searchParams.set('shopIds', params.shopIds.join(','));
   
   searchParams.set('sortBy', params.sortBy);
   searchParams.set('sortOrder', params.sortOrder);
@@ -101,15 +95,49 @@ function buildApiUrl(params: ProcessedSearchParams): string {
  * Hook for fetching products with SWR
  */
 export function useProducts(params: ProcessedSearchParams): UseProductsResult {
-  const apiUrl = useMemo(() => buildApiUrl(params), [params]);
+  // Create stable cache key to prevent unnecessary re-fetches
+  const cacheKey = useMemo(() => {
+    const stableParams = {
+      search: params.search || '',
+      status: params.status || '',
+      type: params.type || '',
+      brandIds: [...params.brandIds].sort().join(','),
+      categoryIds: [...params.categoryIds].sort().join(','),
+      sortBy: params.sortBy,
+      sortOrder: params.sortOrder,
+      limit: params.limit,
+      page: params.page || '',
+      cursor: params.cursor || ''
+    };
+    
+    return `/api/products?${new URLSearchParams(
+      Object.entries(stableParams)
+        .filter(([_, v]) => v !== '')
+        .map(([k, v]) => [k, String(v)])
+    ).toString()}`;
+  }, [
+    params.search,
+    params.status,
+    params.type,
+    params.brandIds.join(','),
+    params.categoryIds.join(','),
+    params.sortBy,
+    params.sortOrder,
+    params.limit,
+    params.page,
+    params.cursor
+  ]);
   
   const { data, error, isLoading, isValidating, mutate } = useSWR<ProductsResponse>(
-    apiUrl,
+    cacheKey,
     fetcher,
     {
       revalidateOnFocus: false,
-      revalidateOnReconnect: true,
-      dedupingInterval: 5000,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
+      dedupingInterval: 30000, // Increased from 10s to 30s
+      errorRetryCount: 1, // Reduced from 2 to 1
+      errorRetryInterval: 5000, // Increased from 2s to 5s
     }
   );
 

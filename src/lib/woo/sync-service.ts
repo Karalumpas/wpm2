@@ -60,6 +60,16 @@ export class WooCommerceProductSyncService {
     };
 
     try {
+      // Step 0: Initialize image sync
+      this.updateProgress('categories', 0, 100, 'Initializing image sync service...');
+      try {
+        await imageSyncService.initializeBucket();
+        console.log('✅ MinIO bucket initialized for image sync');
+      } catch (error) {
+        console.warn('⚠️ Failed to initialize MinIO bucket:', error);
+        // Don't fail the entire sync if MinIO is not available
+      }
+
       // Step 1: Sync Categories
       this.updateProgress('categories', 0, 100, 'Starting category synchronization...');
       const categoryResult = await this.syncCategories();

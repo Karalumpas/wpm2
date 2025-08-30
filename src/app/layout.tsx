@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { MainLayout } from '@/components/layout/MainLayout';
+import { SettingsProvider } from '@/contexts/SettingsContext';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -15,9 +16,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased" suppressHydrationWarning={true}>
-        <MainLayout>
-          {children}
-        </MainLayout>
+        <SettingsProvider>
+          <MainLayout>
+            {children}
+          </MainLayout>
+        </SettingsProvider>
       </body>
     </html>
   );

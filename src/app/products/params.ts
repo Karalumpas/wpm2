@@ -10,7 +10,7 @@ import { z } from 'zod';
 // Re-export enums from API validation for consistency
 export const productStatusEnum = z.enum(['published', 'draft', 'private']);
 export const productTypeEnum = z.enum(['simple', 'variable', 'grouped']);
-export const sortByEnum = z.enum(['name', 'basePrice', 'sku', 'createdAt', 'updatedAt']);
+export const sortByEnum = z.enum(['name', 'basePrice', 'sku', 'createdAt', 'updatedAt', 'status', 'type', 'stockQuantity', 'weight', 'variantCount']);
 export const sortOrderEnum = z.enum(['asc', 'desc']);
 export const viewModeEnum = z.enum(['grid', 'list']);
 export const paginationModeEnum = z.enum(['pages', 'loadMore']);
@@ -31,6 +31,7 @@ export const productsSearchParamsSchema = z.object({
   type: productTypeEnum.optional(),
   brandIds: z.string().optional(), // Will be split into array
   categoryIds: z.string().optional(), // Will be split into array
+  shopIds: z.string().optional(), // Will be split into array
   
   // Display & Pagination
   limit: z.coerce.number().int().min(1).max(100).default(25),
@@ -48,6 +49,7 @@ export const productsSearchParamsSchema = z.object({
 export const processedSearchParamsSchema = productsSearchParamsSchema.extend({
   brandIds: z.array(z.string().uuid()).default([]),
   categoryIds: z.array(z.string().uuid()).default([]),
+  shopIds: z.array(z.string().uuid()).default([]),
 });
 
 export type ProductsSearchParams = z.infer<typeof productsSearchParamsSchema>;
@@ -94,10 +96,22 @@ export function parseSearchParams(searchParams: Record<string, string | string[]
       })
     : [];
 
+  const shopIds = baseParams.shopIds 
+    ? baseParams.shopIds.split(',').filter(Boolean).filter(id => {
+        try {
+          z.string().uuid().parse(id);
+          return true;
+        } catch {
+          return false;
+        }
+      })
+    : [];
+
   return {
     ...baseParams,
     brandIds,
     categoryIds,
+    shopIds,
   };
 }
 
@@ -110,7 +124,7 @@ export function serializeSearchParams(params: Partial<ProcessedSearchParams>): R
   Object.entries(params).forEach(([key, value]) => {
     if (value === undefined || value === null) return;
     
-    if (key === 'brandIds' || key === 'categoryIds') {
+    if (key === 'brandIds' || key === 'categoryIds' || key === 'shopIds') {
       if (Array.isArray(value) && value.length > 0) {
         result[key] = value.join(',');
       }

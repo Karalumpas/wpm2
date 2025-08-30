@@ -443,34 +443,40 @@ export class WooCommerceProductSyncService {
         );
 
         try {
-          // Fetch variations for this product
-          const variations = (await this.client.get(
-            `/products/${product.wooCommerceId}/variations?per_page=100`
-          )) as WooCommerceProductVariation[];
+          // Fetch variations for this product with pagination
+          let vpage = 1;
+          const perPage = 100;
+          let hasMore = true;
+          while (hasMore) {
+            const variations = (await this.client.get(
+              `/products/${product.wooCommerceId}/variations?page=${vpage}&per_page=${perPage}`
+            )) as WooCommerceProductVariation[];
+            hasMore = variations.length === perPage;
+            vpage++;
 
-          for (const variation of variations) {
-            try {
-              const syncData = this.mapVariationToSyncData(
-                variation,
-                product.id
-              );
-              const existing = await this.findExistingVariation(
-                variation.id.toString(),
-                product.id,
-                syncData.sku
-              );
-
-              if (existing) {
-                await this.updateVariation(existing.id, syncData);
-                result.updated++;
-              } else {
-                await this.createVariation(syncData);
-                result.created++;
+            for (const variation of variations) {
+              try {
+                const syncData = this.mapVariationToSyncData(
+                  variation,
+                  product.id
+                );
+                const existing = await this.findExistingVariation(
+                  variation.id.toString(),
+                  product.id,
+                  syncData.sku
+                );
+                if (existing) {
+                  await this.updateVariation(existing.id, syncData);
+                  result.updated++;
+                } else {
+                  await this.createVariation(syncData);
+                  result.created++;
+                }
+              } catch (error) {
+                result.errors.push(
+                  `Failed to sync variation ${variation.id}: ${error instanceof Error ? error.message : 'Unknown error'}`
+                );
               }
-            } catch (error) {
-              result.errors.push(
-                `Failed to sync variation ${variation.id}: ${error instanceof Error ? error.message : 'Unknown error'}`
-              );
             }
           }
         } catch (error) {

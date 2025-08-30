@@ -60,16 +60,7 @@ export default async function Home() {
   }
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-gray-600">
-            Welcome to WooCommerce Product Manager v2. Manage your product
-            catalog efficiently.
-          </p>
-        </div>
-      </div>
+      {/* Page Header removed per request */}
 
       {/* Database Status */}
       <div className="px-4 sm:px-6 lg:px-8">

@@ -70,21 +70,24 @@ async function fetcher(url: string): Promise<ProductsResponse> {
 /**
  * Build API URL from parameters
  */
-function buildApiUrl(params: ProcessedSearchParams): string {
+export function buildApiUrl(params: ProcessedSearchParams): string {
   const searchParams = new URLSearchParams();
-  
+
   // Add non-empty parameters
   if (params.search) searchParams.set('search', params.search);
   if (params.status) searchParams.set('status', params.status);
   if (params.type) searchParams.set('type', params.type);
-  if (params.brandIds.length > 0) searchParams.set('brandIds', params.brandIds.join(','));
-  if (params.categoryIds.length > 0) searchParams.set('categoryIds', params.categoryIds.join(','));
-  if (params.shopIds.length > 0) searchParams.set('shopIds', params.shopIds.join(','));
-  
+  if (params.brandIds.length > 0)
+    params.brandIds.forEach(id => searchParams.append('brandIds', id));
+  if (params.categoryIds.length > 0)
+    params.categoryIds.forEach(id => searchParams.append('categoryIds', id));
+  if (params.shopIds.length > 0)
+    params.shopIds.forEach(id => searchParams.append('shopIds', id));
+
   searchParams.set('sortBy', params.sortBy);
   searchParams.set('sortOrder', params.sortOrder);
   searchParams.set('limit', params.limit.toString());
-  
+
   if (params.page) searchParams.set('page', params.page.toString());
   if (params.cursor) searchParams.set('cursor', params.cursor);
 
@@ -97,30 +100,21 @@ function buildApiUrl(params: ProcessedSearchParams): string {
 export function useProducts(params: ProcessedSearchParams): UseProductsResult {
   // Create stable cache key to prevent unnecessary re-fetches
   const cacheKey = useMemo(() => {
-    const stableParams = {
-      search: params.search || '',
-      status: params.status || '',
-      type: params.type || '',
-      brandIds: [...params.brandIds].sort().join(','),
-      categoryIds: [...params.categoryIds].sort().join(','),
-      sortBy: params.sortBy,
-      sortOrder: params.sortOrder,
-      limit: params.limit,
-      page: params.page || '',
-      cursor: params.cursor || ''
+    const sortedParams: ProcessedSearchParams = {
+      ...params,
+      brandIds: [...params.brandIds].sort(),
+      categoryIds: [...params.categoryIds].sort(),
+      shopIds: [...params.shopIds].sort(),
     };
-    
-    return `/api/products?${new URLSearchParams(
-      Object.entries(stableParams)
-        .filter(([_, v]) => v !== '')
-        .map(([k, v]) => [k, String(v)])
-    ).toString()}`;
+
+    return buildApiUrl(sortedParams);
   }, [
     params.search,
     params.status,
     params.type,
     params.brandIds.join(','),
     params.categoryIds.join(','),
+    params.shopIds.join(','),
     params.sortBy,
     params.sortOrder,
     params.limit,

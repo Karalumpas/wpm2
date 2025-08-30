@@ -16,6 +16,7 @@ export async function POST() {
 }
 
 export async function GET() {
-  return NextResponse.json({ message: 'POST to apply public read policy to MinIO bucket.' });
+  return NextResponse.json({
+    message: 'POST to apply public read policy to MinIO bucket.',
+  });
 }
-

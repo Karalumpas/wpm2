@@ -6,8 +6,12 @@ import { eq } from 'drizzle-orm';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const updates: Array<{ id: string; price?: string; stockStatus?: string; sku?: string }> =
-      body?.updates || [];
+    const updates: Array<{
+      id: string;
+      price?: string;
+      stockStatus?: string;
+      sku?: string;
+    }> = body?.updates || [];
     for (const u of updates) {
       await db
         .update(productVariants)
@@ -25,4 +29,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
-

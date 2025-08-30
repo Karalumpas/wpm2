@@ -21,8 +21,10 @@ export default function ProductEditor({ initial }: { initial: ProductData }) {
   const [form, setForm] = useState<ProductData>(initial);
   const [saving, setSaving] = useState(false);
 
-  const onChange = (key: keyof ProductData, value: any) =>
-    setForm((f) => ({ ...f, [key]: value }));
+  const onChange = <K extends keyof ProductData>(
+    key: K,
+    value: ProductData[K]
+  ) => setForm((f) => ({ ...f, [key]: value }));
 
   const save = async () => {
     try {
@@ -96,7 +98,9 @@ export default function ProductEditor({ initial }: { initial: ProductData }) {
           <select
             className="w-full border rounded-md px-3 py-2"
             value={form.status}
-            onChange={(e) => onChange('status', e.target.value as ProductData['status'])}
+            onChange={(e) =>
+              onChange('status', e.target.value as ProductData['status'])
+            }
           >
             <option value="published">published</option>
             <option value="draft">draft</option>
@@ -107,7 +111,9 @@ export default function ProductEditor({ initial }: { initial: ProductData }) {
           <select
             className="w-full border rounded-md px-3 py-2"
             value={form.type}
-            onChange={(e) => onChange('type', e.target.value as ProductData['type'])}
+            onChange={(e) =>
+              onChange('type', e.target.value as ProductData['type'])
+            }
           >
             <option value="simple">simple</option>
             <option value="variable">variable</option>
@@ -202,7 +208,13 @@ export default function ProductEditor({ initial }: { initial: ProductData }) {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block text-sm">
       <span className="text-gray-600">{label}</span>

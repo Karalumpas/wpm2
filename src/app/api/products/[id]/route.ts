@@ -8,7 +8,11 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const [p] = await db.select().from(products).where(eq(products.id, params.id)).limit(1);
+    const [p] = await db
+      .select()
+      .from(products)
+      .where(eq(products.id, params.id))
+      .limit(1);
     if (!p) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     return NextResponse.json(p);
   } catch (error) {
@@ -47,4 +51,3 @@ export async function PUT(
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
-

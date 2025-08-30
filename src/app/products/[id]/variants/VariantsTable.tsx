@@ -60,12 +60,18 @@ export default function VariantsTable({
         alert(`Eksporterede ${ids.length} varianter (kø ved backend)`);
       } else if (action === 'edit') {
         const price = prompt('Ny pris (tom for at springe over)');
-        const stockStatus = prompt('Ny lagerstatus (instock/outofstock/onbackorder)');
+        const stockStatus = prompt(
+          'Ny lagerstatus (instock/outofstock/onbackorder)'
+        );
         await fetch('/api/variants/bulk/update', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            updates: ids.map((id) => ({ id, price: price || undefined, stockStatus: stockStatus || undefined })),
+            updates: ids.map((id) => ({
+              id,
+              price: price || undefined,
+              stockStatus: stockStatus || undefined,
+            })),
           }),
         });
         alert(`Opdaterede ${ids.length} varianter`);

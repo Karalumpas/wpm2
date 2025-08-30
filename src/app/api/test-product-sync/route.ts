@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { shops } from '@/db/schema';
 import { WooCommerceClient } from '@/lib/woo/client';
+import type { WooCommerceProduct } from '@/lib/woo/types';
 import { WooCommerceProductSyncService } from '@/lib/woo/sync-service';
 import { decryptFromCompact } from '@/lib/security/crypto';
 import { eq } from 'drizzle-orm';
@@ -58,7 +59,9 @@ export async function POST(request: NextRequest) {
 
     // Get a few products for testing
     console.log(`📦 Fetching ${productLimit} products from WooCommerce...`);
-    const products = await client.get(`/products?per_page=${productLimit}&status=publish`) as any[];
+    const products = (await client.get(
+      `/products?per_page=${productLimit}&status=publish`
+    )) as WooCommerceProduct[];
 
     if (products.length === 0) {
       return NextResponse.json(

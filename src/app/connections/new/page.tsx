@@ -413,5 +413,6 @@ export default function NewShopPage() {
         </div>
       </div>
     </div>
+  </ProtectedClient>
   );
 }

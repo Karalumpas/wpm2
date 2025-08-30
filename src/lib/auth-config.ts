@@ -42,7 +42,7 @@ export const authOptions: NextAuthOptions = {
           return {
             id: user[0].id,
             email: user[0].email,
-          } as any;
+          };
         } catch {
           return null;
         }
@@ -51,14 +51,14 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     jwt({ token, user }) {
-      if (user) {
-        token.id = (user as any).id as string;
+      if (user && typeof (user as { id?: unknown }).id === 'string') {
+        token.id = (user as { id?: string }).id as string;
       }
       return token;
     },
     session({ session, token }) {
-      if (session.user && (token as any).id) {
-        session.user.id = (token as any).id as string;
+      if (session.user && typeof token.id === 'string') {
+        session.user.id = token.id;
       }
       return session;
     },

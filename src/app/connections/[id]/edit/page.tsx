@@ -866,5 +866,6 @@ export default function EditShopPage() {
         </div>
       </div>
     </div>
+  </ProtectedClient>
   );
 }

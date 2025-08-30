@@ -573,3 +573,24 @@ Error details: {
  GET /products 200 in 142ms
  GET /products 200 in 202ms
  GET /products 200 in 204ms
+ Ô£ô Compiled in 414ms
+ Ô£ô Compiled /products in 102ms
+­ƒûÑ´©Å ProductsPage state: {
+  data: undefined,
+  error: undefined,
+  isLoading: true,
+  params: {
+    sortBy: 'updatedAt',
+    sortOrder: 'desc',
+    brandIds: [],
+    categoryIds: [],
+    limit: 25,
+    viewMode: 'grid',
+    paginationMode: 'pages'
+  },
+  productsCount: undefined,
+  paginationTotal: undefined
+}
+ GET /products 200 in 783ms
+ GET /products 200 in 961ms
+ GET /favicon.ico?favicon.0b3bf435.ico 200 in 349ms

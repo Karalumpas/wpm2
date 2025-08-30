@@ -29,7 +29,11 @@ export class WooCommerceProductSyncService {
   private debugMode: boolean = false; // Set to false to disable debug in production
   private debugLogs: string[] = []; // Separate debug logs from errors
 
-  constructor(shopId: string, client: WooCommerceClient, userId?: string | null) {
+  constructor(
+    shopId: string,
+    client: WooCommerceClient,
+    userId?: string | null
+  ) {
     this.shopId = shopId;
     this.client = client;
     this.userId = userId;

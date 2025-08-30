@@ -168,7 +168,8 @@ export class ImageSyncService {
     if (!userId) return; // Cannot register without a user owner
     const urls: Array<{ url: string; isFeatured: boolean }> = [];
     if (featuredImage) urls.push({ url: featuredImage, isFeatured: true });
-    for (const u of galleryImages || []) urls.push({ url: u, isFeatured: false });
+    for (const u of galleryImages || [])
+      urls.push({ url: u, isFeatured: false });
 
     for (const { url, isFeatured } of urls) {
       try {
@@ -176,7 +177,9 @@ export class ImageSyncService {
         // Get object stat for size and mime
         const stat = await minioClient.statObject(this.bucketName, objectName);
         const size = (stat.size ?? 0).toString();
-        const mimeType = (stat.metaData && (stat.metaData['content-type'] as string)) || this.guessMimeType(fileName);
+        const mimeType =
+          (stat.metaData && (stat.metaData['content-type'] as string)) ||
+          this.guessMimeType(fileName);
 
         // Upsert by object_name
         const existing = await db
@@ -220,7 +223,10 @@ export class ImageSyncService {
     }
   }
 
-  private parseCentralUrl(url: string): { objectName: string; fileName: string } {
+  private parseCentralUrl(url: string): {
+    objectName: string;
+    fileName: string;
+  } {
     const u = new URL(url);
     // Pathname like /<bucket>/<object>
     const parts = u.pathname.split('/').filter(Boolean);

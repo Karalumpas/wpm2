@@ -148,6 +148,7 @@ export default function ShopBuilderClient() {
   const [showCatalog, setShowCatalog] = useState(true);
   const [showBuilder, setShowBuilder] = useState(true);
   const [productWindows, setProductWindows] = useState<Array<{ id: string; pos: { x: number; y: number } }>>([]);
+  const [windowsScaleWithCanvas, setWindowsScaleWithCanvas] = useState(false);
 
   // Infinite canvas pan/zoom
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });

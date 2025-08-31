@@ -128,6 +128,10 @@ export class WooCommerceProductSyncService {
       result.details!.variationsUpdated = variationResult.updated;
       result.details!.errors.push(...variationResult.errors);
 
+      // Backfill galleries for products missing a gallery using variant images
+      this.updateProgress('products', 100, 100, 'Backfilling product galleries from variant images...');
+      await this.backfillMissingGalleriesForShop();
+
       // Add debug logs if enabled (but not as errors)
       if (this.debugMode && this.debugLogs.length > 0) {
         console.log('Debug logs:', this.debugLogs);
@@ -479,6 +483,9 @@ export class WooCommerceProductSyncService {
               }
             }
           }
+
+          // After syncing variations, ensure product gallery is populated from variant images if missing
+          await this.ensureGalleryFromVariantImages(product.id);
         } catch (error) {
           result.errors.push(
             `Failed to sync variations for product ${product.name}: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -492,6 +499,66 @@ export class WooCommerceProductSyncService {
     }
 
     return result;
+  }
+
+  // If a product has no gallery images but variants do, set gallery to unique variant images (excluding featured image)
+  private async ensureGalleryFromVariantImages(productId: string): Promise<void> {
+    try {
+      const prodRows = await db.select().from(products).where(eq(products.id, productId)).limit(1);
+      const product = prodRows[0];
+      if (!product) return;
+
+      const currentGallery: unknown = (
+        product as unknown as { galleryImages?: unknown }
+      ).galleryImages;
+      const galleryList: string[] = Array.isArray(currentGallery) ? (currentGallery as string[]) : [];
+      if (galleryList.length > 0) return; // Already has a gallery
+
+      const varRows = await db
+        .select({ image: productVariants.image })
+        .from(productVariants)
+        .where(eq(productVariants.productId, productId));
+
+      const variantImages = varRows
+        .map((r) => r.image)
+        .filter((u): u is string => typeof u === 'string' && u.length > 0);
+      if (variantImages.length === 0) return;
+
+      const featured: string | null = (
+        product as unknown as { featuredImage?: string | null }
+      ).featuredImage || null;
+      const unique = Array.from(new Set(variantImages.filter((u) => !featured || u !== featured)));
+      if (unique.length === 0) return;
+
+      await db
+        .update(products)
+        .set({ galleryImages: unique as unknown as string[], updatedAt: new Date() })
+        .where(eq(products.id, productId));
+    } catch (e) {
+      // Non-fatal; log and continue
+      console.warn('ensureGalleryFromVariantImages failed for', productId, e);
+    }
+  }
+
+  // Backfill for all products in this shop that lack gallery images
+  private async backfillMissingGalleriesForShop(): Promise<void> {
+    try {
+      const shopProducts = await db
+        .select({ id: products.id, galleryImages: products.galleryImages })
+        .from(products)
+        .where(eq(products.shopId, this.shopId));
+
+      for (const p of shopProducts) {
+        const gallery: unknown = (
+          p as unknown as { galleryImages?: unknown }
+        ).galleryImages;
+        if (!Array.isArray(gallery) || gallery.length === 0) {
+          await this.ensureGalleryFromVariantImages(p.id);
+        }
+      }
+    } catch (e) {
+      console.warn('backfillMissingGalleriesForShop failed', e);
+    }
   }
 
   private mapCategoryToSyncData(

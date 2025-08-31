@@ -74,7 +74,7 @@ export function ProductsList({
         </div>
       )}
 
-      {/* Load More or Pagination */}
+      {/* Load More (pagination chips are rendered above in ProductsPage) */}
       {paginationMode === 'loadMore' ? (
         <div className="flex justify-center">
           {hasMore && (
@@ -87,11 +87,7 @@ export function ProductsList({
             </button>
           )}
         </div>
-      ) : (
-        pagination && (
-          <Pagination pagination={pagination} onPageChange={onPageChange} />
-        )
-      )}
+      ) : null}
     </div>
   );
 }

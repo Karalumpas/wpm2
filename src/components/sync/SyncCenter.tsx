@@ -262,7 +262,9 @@ export function SyncCenter() {
           <div className="p-4 border-b flex items-center justify-between bg-white/90">
             <div className="flex items-center gap-2">
               <RefreshCcw className="h-5 w-5 text-indigo-600" />
-              <h2 className="text-lg font-bold text-gray-900">Synkronisering</h2>
+              <h2 className="text-lg font-bold text-gray-900">
+                Synkronisering
+              </h2>
             </div>
             <button
               aria-label={open ? 'Skjul sidebar' : 'Vis sidebar'}
@@ -274,121 +276,121 @@ export function SyncCenter() {
           </div>
 
           <div className="p-4 space-y-5 overflow-auto">
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  onClick={handleStartAll}
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-indigo-600 text-white shadow hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                  disabled={starting}
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={handleStartAll}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-indigo-600 text-white shadow hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                disabled={starting}
+              >
+                {starting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+                Start synk (alle shops)
+              </button>
+              <div className="flex items-center gap-2">
+                <select
+                  className="px-2.5 py-2 border rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  value={selectedShop}
+                  onChange={(e) => setSelectedShop(e.target.value)}
                 >
-                  {starting ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Play className="h-4 w-4" />
-                  )}
-                  Start synk (alle shops)
-                </button>
-                <div className="flex items-center gap-2">
-                  <select
-                    className="px-2.5 py-2 border rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                    value={selectedShop}
-                    onChange={(e) => setSelectedShop(e.target.value)}
-                  >
-                    <option value="">Vælg shop…</option>
-                    {shopsData?.shops.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.name}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    onClick={handleStartSingle}
-                    disabled={!selectedShop || starting}
-                    className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-gray-300 hover:bg-gray-50 text-gray-900 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                  >
-                    <Play className="h-4 w-4" /> Start for shop
-                  </button>
-                </div>
+                  <option value="">Vælg shop…</option>
+                  {shopsData?.shops.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
                 <button
-                  onClick={() => refresh()}
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-gray-300 hover:bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                  onClick={handleStartSingle}
+                  disabled={!selectedShop || starting}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-gray-300 hover:bg-gray-50 text-gray-900 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 >
-                  <RefreshCcw className="h-4 w-4" /> Opdater
+                  <Play className="h-4 w-4" /> Start for shop
                 </button>
               </div>
+              <button
+                onClick={() => refresh()}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-gray-300 hover:bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              >
+                <RefreshCcw className="h-4 w-4" /> Opdater
+              </button>
+            </div>
 
-              {error && (
-                <div className="text-sm text-rose-700">
-                  Fejl ved hentning af jobstatus: {error}
-                </div>
-              )}
+            {error && (
+              <div className="text-sm text-rose-700">
+                Fejl ved hentning af jobstatus: {error}
+              </div>
+            )}
 
-              {isLoading && jobs.length === 0 ? (
-                <div className="flex items-center gap-2 text-gray-700 text-sm">
-                  <Loader2 className="h-4 w-4 animate-spin" /> Henter status…
-                </div>
-              ) : (
-                <div className="grid gap-3">
-                  {ordered.length === 0 ? (
-                    <div className="text-sm text-gray-700">
-                      Ingen job endnu. Start en synk for at se status.
-                    </div>
-                  ) : (
-                    ordered.map((job) => (
-                      <div
-                        key={job.id}
-                        className={`rounded-lg ${selectedJob?.id === job.id ? 'ring-2 ring-indigo-400' : ''}`}
-                        onClick={() => setSelectedJobId(job.id)}
-                        role="button"
-                        tabIndex={0}
-                      >
-                        <JobCard job={job} onChange={refresh} />
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-
-              {/* Terminal-like log viewer for selected job */}
-              {selectedJob && (
-                <div className="mt-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-sm font-semibold text-gray-900">
-                      Job log:{' '}
-                      {selectedJob.shopName || selectedJob.shopId.slice(0, 8)}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {(selectedJob.status === 'completed' ||
-                        selectedJob.status === 'failed' ||
-                        selectedJob.status === 'paused' ||
-                        selectedJob.status === 'queued') && (
-                        <button
-                          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-300 hover:bg-gray-50 text-gray-900"
-                          onClick={async () => {
-                            const r = await removeSyncJob(selectedJob.id);
-                            if (!('error' in r)) {
-                              await refresh();
-                              setSelectedJobId(null);
-                            }
-                          }}
-                          title="Fjern job fra liste"
-                        >
-                          Fjern job
-                        </button>
-                      )}
-                    </div>
+            {isLoading && jobs.length === 0 ? (
+              <div className="flex items-center gap-2 text-gray-700 text-sm">
+                <Loader2 className="h-4 w-4 animate-spin" /> Henter status…
+              </div>
+            ) : (
+              <div className="grid gap-3">
+                {ordered.length === 0 ? (
+                  <div className="text-sm text-gray-700">
+                    Ingen job endnu. Start en synk for at se status.
                   </div>
-                  <div className="h-48 sm:h-64 w-full bg-[#0b1020] text-[#d1e7ff] rounded-lg border border-[#1f2742] font-mono text-xs p-3 overflow-auto shadow-inner">
-                    {(selectedJob.logs || []).slice(-400).map((line, idx) => (
-                      <div key={idx} className="whitespace-pre">
-                        {line}
-                      </div>
-                    ))}
-                    {(!selectedJob.logs || selectedJob.logs.length === 0) && (
-                      <div className="text-[#8aa4cf]">Ingen log endnu…</div>
+                ) : (
+                  ordered.map((job) => (
+                    <div
+                      key={job.id}
+                      className={`rounded-lg ${selectedJob?.id === job.id ? 'ring-2 ring-indigo-400' : ''}`}
+                      onClick={() => setSelectedJobId(job.id)}
+                      role="button"
+                      tabIndex={0}
+                    >
+                      <JobCard job={job} onChange={refresh} />
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* Terminal-like log viewer for selected job */}
+            {selectedJob && (
+              <div className="mt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-sm font-semibold text-gray-900">
+                    Job log:{' '}
+                    {selectedJob.shopName || selectedJob.shopId.slice(0, 8)}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {(selectedJob.status === 'completed' ||
+                      selectedJob.status === 'failed' ||
+                      selectedJob.status === 'paused' ||
+                      selectedJob.status === 'queued') && (
+                      <button
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-300 hover:bg-gray-50 text-gray-900"
+                        onClick={async () => {
+                          const r = await removeSyncJob(selectedJob.id);
+                          if (!('error' in r)) {
+                            await refresh();
+                            setSelectedJobId(null);
+                          }
+                        }}
+                        title="Fjern job fra liste"
+                      >
+                        Fjern job
+                      </button>
                     )}
                   </div>
                 </div>
-              )}
+                <div className="h-48 sm:h-64 w-full bg-[#0b1020] text-[#d1e7ff] rounded-lg border border-[#1f2742] font-mono text-xs p-3 overflow-auto shadow-inner">
+                  {(selectedJob.logs || []).slice(-400).map((line, idx) => (
+                    <div key={idx} className="whitespace-pre">
+                      {line}
+                    </div>
+                  ))}
+                  {(!selectedJob.logs || selectedJob.logs.length === 0) && (
+                    <div className="text-[#8aa4cf]">Ingen log endnu…</div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

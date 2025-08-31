@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ProcessedSearchParams } from '../params';
 import { ProductsToolbar } from './ProductsToolbar';
 import { ProductsList } from './ProductsList';
+import { Pagination } from './Pagination';
 import { useProducts } from '../hooks/useProducts';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
@@ -133,6 +134,16 @@ export function ProductsPage({ initialParams }: ProductsPageProps) {
         pagination={data?.pagination}
         onPageChange={handlePageChange}
       />
+
+      {/* Pagination chips above products (when using pages mode) */}
+      {params.paginationMode === 'pages' && data?.pagination && (
+        <div className="-mt-4">
+          <Pagination
+            pagination={data.pagination}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
 
       {/* Products List */}
       <ProductsList

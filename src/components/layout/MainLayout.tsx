@@ -80,7 +80,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                 <X className="h-6 w-6 text-white" />
               </button>
             </div>
-            <Sidebar />
+            <Sidebar collapsed={false} onToggleCollapse={() => {}} />
           </div>
         </div>
       </div>
@@ -106,10 +106,18 @@ export function MainLayout({ children }: MainLayoutProps) {
         )}
         style={{ width: rightCollapsed ? '4rem' : '16rem' }}
       >
-        <SyncSidebar collapsed={rightCollapsed} onToggleCollapse={() => setRightCollapsed((c) => !c)} />
+        <SyncSidebar
+          collapsed={rightCollapsed}
+          onToggleCollapse={() => setRightCollapsed((c) => !c)}
+        />
       </div>
 
-      <div className={cn(sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64', rightCollapsed ? 'lg:pr-16' : 'lg:pr-64')}>
+      <div
+        className={cn(
+          sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64',
+          rightCollapsed ? 'lg:pr-16' : 'lg:pr-64'
+        )}
+      >
         {/* Top bar */}
         <div className="sticky top-0 z-10 bg-white shadow">
           <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">

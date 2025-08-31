@@ -1,7 +1,7 @@
 'use client';
 
 import { Product, ProductListItem, PaginationInfo } from '@/types/product';
-import { SimpleProductCard } from './SimpleProductCard';
+import { EnhancedProductCard } from './EnhancedProductCard';
 import { ProductRow } from './ProductRow';
 import { Pagination } from './Pagination';
 
@@ -49,7 +49,7 @@ export function ProductsList({
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {products.map((product) => (
-            <SimpleProductCard key={product.id} product={product} />
+            <EnhancedProductCard key={product.id} product={product} />
           ))}
         </div>
       ) : (

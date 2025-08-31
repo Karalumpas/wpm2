@@ -25,8 +25,7 @@ import SyncCenter from '@/components/sync/SyncCenter';
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
   { name: 'Products', href: '/products', icon: Package },
-  { name: 'Categories', href: '/categories', icon: Tags },
-  { name: 'Brands', href: '/brands', icon: Building2 },
+  { name: 'Shop Builder', href: '/shop-builder', icon: Building2 },
   { name: 'Orders', href: '/orders', icon: ShoppingCart },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Media Library', href: '/media', icon: Images },

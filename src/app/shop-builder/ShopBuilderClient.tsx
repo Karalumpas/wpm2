@@ -201,6 +201,8 @@ export default function ShopBuilderClient() {
     } catch {}
   }
   useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const onKeyDown = (ev: KeyboardEvent) => {
       if (ev.code === 'Space') spaceDownRef.current = true;
     };
@@ -212,6 +214,7 @@ export default function ShopBuilderClient() {
     return () => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
+      document.body.style.overflow = prev;
     };
   }, []);
 
@@ -636,6 +639,13 @@ export default function ShopBuilderClient() {
               Open Catalog
             </button>
           )}
+          <button
+            className="text-xs px-2 py-1 rounded border bg-white hover:bg-gray-50"
+            onClick={() => setWindowsScaleWithCanvas((v) => !v)}
+            title="Toggle whether windows scale with canvas"
+          >
+            {windowsScaleWithCanvas ? 'Windows: Scaled' : 'Windows: Fixed'}
+          </button>
         </div>
 
         {showBuilder && (

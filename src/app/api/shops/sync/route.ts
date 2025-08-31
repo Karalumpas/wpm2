@@ -1,3 +1,6 @@
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createSyncServiceForShop } from '@/lib/woo/sync-service';
 import type { SyncProgress } from '@/lib/woo/types';

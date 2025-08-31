@@ -13,11 +13,7 @@ export async function GET(request: NextRequest) {
     const sp = request.nextUrl.searchParams;
     const q = sp.get('q') || undefined;
     const limit = sp.get('limit') ? Math.min(2000, Math.max(1, Number(sp.get('limit')))) : undefined;
-    const where: any[] = [];
-    if (q) {
-      const pattern = `%${q}%`;
-      where.push(ilike(brands.name, pattern));
-    }
+    const whereClause = q ? ilike(brands.name, `%${q}%`) : undefined;
     // Get brands with product counts
     const brandsWithCounts = await db
       .select({
@@ -28,7 +24,7 @@ export async function GET(request: NextRequest) {
         `.as('productCount'),
       })
       .from(brands)
-      .where(where.length ? and(...where) : undefined as any)
+      .where(whereClause)
       .orderBy(brands.name)
       .limit(limit ?? 10000);
 
@@ -63,7 +59,7 @@ export async function POST(request: NextRequest) {
     const [created] = await db.insert(brands).values({ name: data.name }).returning();
     return NextResponse.json({ success: true, brand: created }, { status: 201 });
   } catch (error) {
-    const message = error && typeof error === 'object' && 'message' in error ? (error as any).message : 'Invalid request';
+    const message = error instanceof Error ? error.message : 'Invalid request';
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

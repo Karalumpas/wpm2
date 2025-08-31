@@ -25,8 +25,8 @@ export async function POST(request: NextRequest) {
       rows = items.map((it) => {
         const out: Record<string, unknown> = {};
         for (const m of mapping) {
-          const val = (it as any)[m.source];
-          out[m.target] = Array.isArray(val) ? val.join('|') : val;
+          const raw = it[m.source as keyof typeof it];
+          out[m.target] = Array.isArray(raw) ? raw.join('|') : raw ?? '';
         }
         return out;
       });
@@ -46,7 +46,10 @@ export async function POST(request: NextRequest) {
 
     if (format === 'csv') {
       const headers = mapping.length ? mapping.map((m) => m.target) : Object.keys(rows[0] || {});
-      const csv = toCsv(headers, rows.map((r) => headers.map((h) => (r as any)[h] ?? '')));
+      const csv = toCsv(
+        headers,
+        rows.map((r) => headers.map((h) => String((r as Record<string, unknown>)[h] ?? '')))
+      );
       return new NextResponse(csv, { status: 200, headers: { 'Content-Type': 'text/csv' } });
     }
     return NextResponse.json({ platform, items: rows });

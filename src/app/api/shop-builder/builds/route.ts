@@ -7,9 +7,8 @@ export async function GET(request: NextRequest) {
   const sp = request.nextUrl.searchParams;
   const q = sp.get('q') || undefined;
   try {
-    const where = [] as any[];
-    if (q) where.push(ilike(shopBuilds.name, `%${q}%`));
-    const rows = await db
+    const whereClause = q ? ilike(shopBuilds.name, `%${q}%`) : undefined;
+    const base = db
       .select({
         id: shopBuilds.id,
         name: shopBuilds.name,
@@ -17,9 +16,9 @@ export async function GET(request: NextRequest) {
         updatedAt: shopBuilds.updatedAt,
       })
       .from(shopBuilds)
-      .where(where.length ? and(...where) : undefined as any)
       .orderBy(shopBuilds.updatedAt)
       .limit(200);
+    const rows = whereClause ? await base.where(whereClause) : await base;
     return NextResponse.json({ builds: rows });
   } catch (e) {
     return NextResponse.json({ error: 'Failed to list builds' }, { status: 500 });
@@ -45,4 +44,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to create build' }, { status: 400 });
   }
 }
-

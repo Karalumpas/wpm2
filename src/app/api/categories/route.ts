@@ -15,11 +15,24 @@ export async function GET(request: NextRequest) {
     const q = sp.get('q') || undefined;
     const limit = sp.get('limit') ? Math.min(2000, Math.max(1, Number(sp.get('limit')))) : undefined;
 
-    const where = [] as any[];
-    if (shopId) where.push(eq(categories.shopId, shopId));
-    if (q) {
+    let whereClause:
+      | ReturnType<typeof eq>
+      | ReturnType<typeof or>
+      | ReturnType<typeof and>
+      | undefined;
+    if (shopId && q) {
       const pattern = `%${q}%`;
-      where.push(or(ilike(categories.name, pattern), ilike(categories.slug, pattern)));
+      whereClause = and(
+        eq(categories.shopId, shopId),
+        or(ilike(categories.name, pattern), ilike(categories.slug, pattern))
+      );
+    } else if (shopId) {
+      whereClause = eq(categories.shopId, shopId);
+    } else if (q) {
+      const pattern = `%${q}%`;
+      whereClause = or(ilike(categories.name, pattern), ilike(categories.slug, pattern));
+    } else {
+      whereClause = undefined;
     }
 
     const categoriesWithCounts = await db
@@ -34,7 +47,7 @@ export async function GET(request: NextRequest) {
         `.as('productCount'),
       })
       .from(categories)
-      .where(where.length ? and(...where) : undefined as any)
+      .where(whereClause)
       .orderBy(categories.name)
       .limit(limit ?? 10000);
 
@@ -70,10 +83,11 @@ export async function POST(request: NextRequest) {
           .replace(/-+/g, '-');
 
     // Check unique constraint (name + parentId)
+    const parentValue: string | null = data.parentId ?? null;
     const conflict = await db
       .select({ id: categories.id })
       .from(categories)
-      .where(and(eq(categories.name, data.name), eq(categories.parentId, (data.parentId ?? null) as any)))
+      .where(and(eq(categories.name, data.name), eq(categories.parentId, parentValue)))
       .limit(1);
     if (conflict.length) {
       return NextResponse.json({ error: 'A category with this name already exists under the same parent.' }, { status: 400 });
@@ -85,13 +99,13 @@ export async function POST(request: NextRequest) {
         name: data.name,
         slug,
         description: data.description,
-        parentId: (data.parentId ?? null) as any,
+        parentId: parentValue,
       })
       .returning();
 
     return NextResponse.json({ success: true, category: created }, { status: 201 });
   } catch (error) {
-    const message = error && typeof error === 'object' && 'message' in error ? (error as any).message : 'Invalid request';
+    const message = error instanceof Error ? error.message : 'Invalid request';
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

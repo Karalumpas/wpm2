@@ -1,6 +1,7 @@
 import { db } from '@/db';
 import { shops } from '@/db/schema';
 import { createSyncServiceForShop } from '@/lib/woo/sync-service';
+import type { WooCommerceProductSyncService } from '@/lib/woo/sync-service';
 import { eq } from 'drizzle-orm';
 
 type JobStatus = 'queued' | 'running' | 'paused' | 'completed' | 'failed';
@@ -102,12 +103,11 @@ class BackgroundSyncQueue {
         throw new Error(`Shop not found: ${job.shopId}`);
       }
 
-      const service = await createSyncServiceForShop(job.shopId);
+      const service: WooCommerceProductSyncService = await createSyncServiceForShop(job.shopId);
 
       // Attach job controller for pause/cancel support
       const controller = this.ensureController(job.id);
-      // Lazy import type to avoid circular
-      (service as any).setController?.({
+      service.setController?.({
         isPaused: () => controller.paused,
         isCancelled: () => controller.cancelled,
         waitIfPaused: async () => {
@@ -163,7 +163,7 @@ class BackgroundSyncQueue {
           if (!this.paused) return;
           await new Promise<void>((resolve) => this.waiters.push(resolve));
         },
-      } as any;
+      };
       this.controllers.set(jobId, c);
     }
     return c;

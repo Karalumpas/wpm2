@@ -19,8 +19,7 @@ export async function POST(request: NextRequest) {
     await db.delete(brands).where(inArray(brands.id, sourceIds));
     return NextResponse.json({ success: true });
   } catch (error) {
-    const message = error && typeof error === 'object' && 'message' in error ? (error as any).message : 'Invalid request';
+    const message = error instanceof Error ? error.message : 'Invalid request';
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }
-

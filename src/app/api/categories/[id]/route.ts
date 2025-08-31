@@ -38,7 +38,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
       const conflict = await db
         .select({ id: categories.id })
         .from(categories)
-        .where(and(eq(categories.name, nextName), eq(categories.parentId, nextParent as any), sql`id <> ${id}`))
+        .where(and(eq(categories.name, nextName), eq(categories.parentId, nextParent), sql`id <> ${id}`))
         .limit(1);
       if (conflict.length) {
         return NextResponse.json({ error: 'A category with this name already exists under the same parent.' }, { status: 400 });
@@ -66,7 +66,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
         name: data.name,
         slug: slug,
         description: data.description,
-        parentId: data.parentId as any,
+        parentId: data.parentId ?? null,
         updatedAt: new Date(),
       })
       .where(eq(categories.id, id))
@@ -74,7 +74,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
     return NextResponse.json({ success: true, category: updated });
   } catch (error) {
-    const message = error && typeof error === 'object' && 'message' in error ? (error as any).message : 'Invalid request';
+    const message = error instanceof Error ? error.message : 'Invalid request';
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }
@@ -112,13 +112,13 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
     const parentId = parentRow[0]?.parentId ?? null;
     await db
       .update(categories)
-      .set({ parentId: parentId as any, updatedAt: new Date() })
+      .set({ parentId: parentId, updatedAt: new Date() })
       .where(eq(categories.parentId, id));
 
     await db.delete(categories).where(eq(categories.id, id));
     return NextResponse.json({ success: true });
   } catch (error) {
-    const message = error && typeof error === 'object' && 'message' in error ? (error as any).message : 'Invalid request';
+    const message = error instanceof Error ? error.message : 'Invalid request';
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

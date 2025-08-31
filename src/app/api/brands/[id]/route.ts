@@ -28,7 +28,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
     return NextResponse.json({ success: true, brand: updated });
   } catch (error) {
-    const message = error && typeof error === 'object' && 'message' in error ? (error as any).message : 'Invalid request';
+    const message = error instanceof Error ? error.message : 'Invalid request';
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }
@@ -63,8 +63,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     await db.delete(brands).where(eq(brands.id, id));
     return NextResponse.json({ success: true });
   } catch (error) {
-    const message = error && typeof error === 'object' && 'message' in error ? (error as any).message : 'Invalid request';
+    const message = error instanceof Error ? error.message : 'Invalid request';
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }
-

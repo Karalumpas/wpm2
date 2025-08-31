@@ -159,7 +159,9 @@ export default function ShopBuilderClient() {
     setInventoryPolicy(build.inventoryPolicy);
     setShopId(build.sourceShopId || '');
     const cfg = build.config || {};
-    setCategories((cfg.categories || []).map((c: any) => ({ id: crypto.randomUUID(), name: c.name, productIds: c.productIds || [] })));
+    type RawCat = { name: string; productIds?: string[] };
+    const rawCats = (cfg.categories || []) as RawCat[];
+    setCategories(rawCats.map((c) => ({ id: crypto.randomUUID(), name: c.name, productIds: c.productIds || [] })));
     setTags(cfg.tags || []);
     setSelectedProducts(cfg.products || []);
   }
@@ -490,7 +492,7 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
                           </div>
                           <div className="mt-2 grid grid-cols-2 gap-2">
                             <input className="border rounded px-2 py-1 text-xs" value={b.title || ''} onChange={(e) => setLayoutBlocks((bs) => bs.map((x) => x.id === b.id ? { ...x, title: e.target.value } : x))} />
-                            <select className="border rounded px-2 py-1 text-xs" value={b.source?.type || 'selected'} onChange={(e) => setLayoutBlocks((bs) => bs.map((x) => x.id === b.id ? { ...x, source: { ...(x.source||{}), type: e.target.value as any } } : x))}>
+                            <select className="border rounded px-2 py-1 text-xs" value={b.source?.type || 'selected'} onChange={(e) => setLayoutBlocks((bs) => bs.map((x) => x.id === b.id ? { ...x, source: { ...(x.source||{}), type: e.target.value as 'selected' | 'collection' | 'category' } } : x))}>
                               <option value="selected">Selected</option>
                               <option value="collection">Collection</option>
                               <option value="category">Category</option>
@@ -769,7 +771,7 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
                         </div>
                         <div className="mt-2 grid grid-cols-2 gap-2">
                           <input className="border rounded px-2 py-1 text-xs" value={b.title || ''} onChange={(e) => setLayoutBlocks((bs) => bs.map((x) => x.id===b.id?{...x, title: e.target.value}:x))} placeholder="Title"/>
-                          <select className="border rounded px-2 py-1 text-xs" value={b.source?.type || 'selected'} onChange={(e) => setLayoutBlocks((bs) => bs.map((x) => x.id===b.id?{...x, source:{ type: e.target.value as any}}:x))}>
+                          <select className="border rounded px-2 py-1 text-xs" value={b.source?.type || 'selected'} onChange={(e) => setLayoutBlocks((bs) => bs.map((x) => x.id===b.id?{...x, source:{ type: (e.target.value as 'selected' | 'collection' | 'category')}}:x))}>
                             <option value="selected">Selected</option>
                             <option value="collection">Collection</option>
                             <option value="category">Category</option>
@@ -938,7 +940,7 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
             </div>
             <div>
               <label className="text-xs text-gray-700">Inventory policy</label>
-              <select className="w-full border rounded px-2 py-2 text-sm" value={inventoryPolicy} onChange={(e) => setInventoryPolicy(e.target.value as any)}>
+              <select className="w-full border rounded px-2 py-2 text-sm" value={inventoryPolicy} onChange={(e) => setInventoryPolicy(e.target.value as 'sync' | 'snapshot' | 'manual')}>
                 <option value="snapshot">Snapshot (copy current stock)</option>
                 <option value="sync">Sync (keep in sync)</option>
                 <option value="manual">Manual (no stock sync)</option>
@@ -968,16 +970,16 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
             {activeTab==='feeds' && (
               <div className="mt-4 space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <select className="border rounded px-2 py-1 text-sm" value={feedPlatform} onChange={(e) => setFeedPlatform(e.target.value as any)}>
+                  <select className="border rounded px-2 py-1 text-sm" value={feedPlatform} onChange={(e) => setFeedPlatform(e.target.value as 'woocommerce' | 'google' | 'facebook')}>
                     <option value="woocommerce">WooCommerce</option>
                     <option value="google">Google Merchant</option>
                     <option value="facebook">Facebook/Meta</option>
                   </select>
-                  <select className="border rounded px-2 py-1 text-sm" value={feedFormat} onChange={(e) => setFeedFormat(e.target.value as any)}>
+                  <select className="border rounded px-2 py-1 text-sm" value={feedFormat} onChange={(e) => setFeedFormat(e.target.value as 'json' | 'csv')}>
                     <option value="json">JSON</option>
                     <option value="csv">CSV</option>
                   </select>
-                  <select className="border rounded px-2 py-1 text-sm" value={feedSource.type} onChange={(e) => setFeedSource({ type: e.target.value as any })}>
+                  <select className="border rounded px-2 py-1 text-sm" value={feedSource.type} onChange={(e) => setFeedSource({ type: e.target.value as 'selected' | 'category' | 'collection' })}>
                     <option value="selected">Selected</option>
                     <option value="category">Builder Category</option>
                     <option value="collection">Collection</option>
@@ -1003,7 +1005,7 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
                     {feedMapping.map((m, idx) => (
                       <div key={idx} className="flex items-center gap-2">
                         <input className="border rounded px-2 py-1 text-xs w-40" value={m.target} onChange={(e) => setFeedMapping((mm) => mm.map((x, i) => i===idx?{...x, target: e.target.value}:x))} placeholder="target field" />
-                        <select className="border rounded px-2 py-1 text-xs" value={m.source} onChange={(e) => setFeedMapping((mm) => mm.map((x, i) => i===idx?{...x, source: e.target.value as any}:x))}>
+                        <select className="border rounded px-2 py-1 text-xs" value={m.source} onChange={(e) => setFeedMapping((mm) => mm.map((x, i) => i===idx?{...x, source: e.target.value as MappingRow['source']}:x))}>
                           <option value="name">name</option>
                           <option value="sku">sku</option>
                           <option value="basePrice">price</option>

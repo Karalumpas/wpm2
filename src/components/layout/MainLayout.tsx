@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useSession, signOut } from 'next-auth/react';
-import SyncCenter from '@/components/sync/SyncCenter';
+import SyncSidebar from '@/components/sync/SyncSidebar';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
@@ -42,6 +42,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [rightCollapsed, setRightCollapsed] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const { data: session } = useSession();
 
@@ -84,7 +85,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         </div>
       </div>
 
-      {/* Desktop sidebar */}
+      {/* Desktop left sidebar */}
       <div
         className={cn(
           'hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col transition-[width]',
@@ -98,7 +99,17 @@ export function MainLayout({ children }: MainLayoutProps) {
       </div>
 
       {/* Main content */}
-      <div className={cn(sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64')}>
+      {/* Right sync sidebar */}
+      <div
+        className={cn(
+          'hidden lg:fixed lg:inset-y-0 lg:right-0 lg:flex lg:flex-col transition-[width]'
+        )}
+        style={{ width: rightCollapsed ? '4rem' : '16rem' }}
+      >
+        <SyncSidebar collapsed={rightCollapsed} onToggleCollapse={() => setRightCollapsed((c) => !c)} />
+      </div>
+
+      <div className={cn(sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64', rightCollapsed ? 'lg:pr-16' : 'lg:pr-64')}>
         {/* Top bar */}
         <div className="sticky top-0 z-10 bg-white shadow">
           <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
@@ -157,8 +168,7 @@ export function MainLayout({ children }: MainLayoutProps) {
 
         {/* Page content */}
         <main className="py-6">{children}</main>
-        {/* Global sync overlay + CTA */}
-        <SyncCenter />
+        {/* Right sidebar handles sync UI */}
       </div>
     </div>
   );

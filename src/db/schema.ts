@@ -348,3 +348,25 @@ export const mediaFiles = pgTable(
     ),
   })
 );
+
+// Shop Builder persistence (save/load builds)
+export const shopBuilds = pgTable(
+  'shop_builds',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id),
+    name: text('name').notNull(),
+    slug: text('slug').notNull(),
+    currency: text('currency').default('DKK').notNull(),
+    inventoryPolicy: text('inventory_policy').default('snapshot').notNull(),
+    sourceShopId: uuid('source_shop_id').references(() => shops.id),
+    // Stored JSON config for forward compatibility (categories/tags/selection)
+    config: jsonb('config').default('{}').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (t) => ({
+    slugIdx: index('shop_builds_slug_idx').on(t.slug),
+    userIdx: index('shop_builds_user_idx').on(t.userId),
+  })
+);

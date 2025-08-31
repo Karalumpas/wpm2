@@ -2,7 +2,7 @@
 
 import useSWR from 'swr';
 import { useEffect, useMemo, useState } from 'react';
-import { Search, FolderPlus, Save, X, Download, Settings, Package, Folder, Tag } from 'lucide-react';
+import { Search, FolderPlus, Download, Settings, Package, Folder, Tag } from 'lucide-react';
 
 type Product = {
   id: string;
@@ -50,6 +50,44 @@ export default function ShopBuilderClient() {
   const [tags, setTags] = useState<string[]>([]);
   const [selectedTag, setSelectedTag] = useState('');
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  // Persistence
+  const { data: buildsData, mutate: reloadBuilds } = useSWR<{ builds: Array<{ id: string; name: string; slug: string }> }>(
+    '/api/shop-builder/builds', fetcher
+  );
+  const [activeBuildId, setActiveBuildId] = useState<string | null>(null);
+
+  async function saveBuild() {
+    const payload = {
+      name: builderName,
+      slug: builderSlug,
+      currency,
+      inventoryPolicy,
+      sourceShopId: shopId || null,
+      config,
+    };
+    if (!activeBuildId) {
+      await fetch('/api/shop-builder/builds', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    } else {
+      await fetch(`/api/shop-builder/builds/${activeBuildId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    }
+    await reloadBuilds();
+  }
+
+  async function loadBuild(id: string) {
+    const res = await fetch(`/api/shop-builder/builds/${id}`);
+    if (!res.ok) return;
+    const { build } = await res.json();
+    setActiveBuildId(build.id);
+    setBuilderName(build.name);
+    setBuilderSlug(build.slug);
+    setCurrency(build.currency);
+    setInventoryPolicy(build.inventoryPolicy);
+    setShopId(build.sourceShopId || '');
+    const cfg = build.config || {};
+    setCategories((cfg.categories || []).map((c: any) => ({ id: crypto.randomUUID(), name: c.name, productIds: c.productIds || [] })));
+    setTags(cfg.tags || []);
+    setSelectedProducts(cfg.products || []);
+  }
 
   useEffect(() => {
     setBuilderSlug(
@@ -176,6 +214,15 @@ export default function ShopBuilderClient() {
           {/* Builder header */}
           <div className="bg-white border border-gray-200 rounded-lg p-3 flex items-center gap-3">
             <input className="flex-1 border rounded px-2 py-2 text-sm" value={builderName} onChange={(e) => setBuilderName(e.target.value)} placeholder="Webshop name" />
+            <select className="border rounded px-2 py-2 text-sm" value={activeBuildId || ''} onChange={(e) => e.target.value ? loadBuild(e.target.value) : null}>
+              <option value="">Load build…</option>
+              {(buildsData?.builds || []).map((b) => (
+                <option key={b.id} value={b.id}>{b.name}</option>
+              ))}
+            </select>
+            <button className="inline-flex items-center gap-2 px-3 py-2 rounded-md border hover:bg-gray-50" onClick={saveBuild}>
+              Save
+            </button>
             <button className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-indigo-600 text-white shadow hover:brightness-110" onClick={exportConfig}>
               <Download className="h-4 w-4" /> Export
             </button>
@@ -292,4 +339,3 @@ export default function ShopBuilderClient() {
     </div>
   );
 }
-

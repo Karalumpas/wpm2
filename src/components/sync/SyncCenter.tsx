@@ -2,8 +2,23 @@
 
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
-import { useSyncJobs, startBackgroundSync, controlSyncJob, removeSyncJob, type SyncJob } from '@/hooks/useSyncJobs';
-import { RefreshCcw, X, Play, CircleAlert, CheckCircle2, Loader2, Pause, Square } from 'lucide-react';
+import {
+  useSyncJobs,
+  startBackgroundSync,
+  controlSyncJob,
+  removeSyncJob,
+  type SyncJob,
+} from '@/hooks/useSyncJobs';
+import {
+  RefreshCcw,
+  X,
+  Play,
+  CircleAlert,
+  CheckCircle2,
+  Loader2,
+  Pause,
+  Square,
+} from 'lucide-react';
 
 function formatTime(d?: Date) {
   if (!d) return '-';
@@ -18,51 +33,88 @@ function statusBadge(job: SyncJob) {
   const common = 'px-2 py-0.5 text-xs rounded-full border';
   switch (job.status) {
     case 'queued':
-      return <span className={`${common} bg-amber-50 text-amber-800 border-amber-200`}>Kø</span>;
+      return (
+        <span
+          className={`${common} bg-amber-50 text-amber-800 border-amber-200`}
+        >
+          Kø
+        </span>
+      );
     case 'running':
-      return <span className={`${common} bg-blue-50 text-blue-800 border-blue-200`}>Kører</span>;
+      return (
+        <span className={`${common} bg-blue-50 text-blue-800 border-blue-200`}>
+          Kører
+        </span>
+      );
     case 'paused':
-      return <span className={`${common} bg-gray-100 text-gray-700 border-gray-200`}>Pauset</span>;
+      return (
+        <span className={`${common} bg-gray-100 text-gray-700 border-gray-200`}>
+          Pauset
+        </span>
+      );
     case 'completed':
-      return <span className={`${common} bg-emerald-50 text-emerald-800 border-emerald-200`}>Færdig</span>;
+      return (
+        <span
+          className={`${common} bg-emerald-50 text-emerald-800 border-emerald-200`}
+        >
+          Færdig
+        </span>
+      );
     case 'failed':
-      return <span className={`${common} bg-rose-50 text-rose-800 border-rose-200`}>Fejlet</span>;
+      return (
+        <span className={`${common} bg-rose-50 text-rose-800 border-rose-200`}>
+          Fejlet
+        </span>
+      );
   }
 }
 
 function ProgressBar({ current, total }: { current: number; total: number }) {
-  const pct = total > 0 ? Math.min(100, Math.round((current / total) * 100)) : 0;
+  const pct =
+    total > 0 ? Math.min(100, Math.round((current / total) * 100)) : 0;
   return (
     <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-      <div className="h-2 bg-gradient-to-r from-indigo-500 to-blue-500" style={{ width: `${pct}%` }} />
+      <div
+        className="h-2 bg-gradient-to-r from-indigo-500 to-blue-500"
+        style={{ width: `${pct}%` }}
+      />
     </div>
   );
 }
 
 function JobCard({ job, onChange }: { job: SyncJob; onChange: () => void }) {
-  const lastProgress = job.progress && job.progress.length ? job.progress[job.progress.length - 1] : undefined;
+  const lastProgress =
+    job.progress && job.progress.length
+      ? job.progress[job.progress.length - 1]
+      : undefined;
   const isRunning = job.status === 'running' || job.status === 'queued';
-  const icon = job.status === 'failed' ? (
-    <CircleAlert className="h-4 w-4 text-rose-600" />
-  ) : job.status === 'completed' ? (
-    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-  ) : (
-    <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />
-  );
+  const icon =
+    job.status === 'failed' ? (
+      <CircleAlert className="h-4 w-4 text-rose-600" />
+    ) : job.status === 'completed' ? (
+      <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+    ) : (
+      <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />
+    );
 
   return (
     <div className="border rounded-lg p-3 bg-white shadow-sm">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           {icon}
-          <div className="text-sm font-semibold text-gray-900">{job.shopName || `Shop: ${job.shopId.slice(0, 8)}…`}</div>
+          <div className="text-sm font-semibold text-gray-900">
+            {job.shopName || `Shop: ${job.shopId.slice(0, 8)}…`}
+          </div>
         </div>
         <div className="flex items-center gap-2">
           {statusBadge(job)}
           {job.status === 'running' && (
             <button
               className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50"
-              onClick={async () => { await controlSyncJob(job.id, 'pause'); onChange(); }}
+              onClick={async () => {
+                await controlSyncJob(job.id, 'pause');
+                onChange();
+              }}
               title="Pause"
             >
               <Pause className="h-3.5 w-3.5" /> Pause
@@ -71,16 +123,24 @@ function JobCard({ job, onChange }: { job: SyncJob; onChange: () => void }) {
           {job.status === 'paused' && (
             <button
               className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50"
-              onClick={async () => { await controlSyncJob(job.id, 'resume'); onChange(); }}
+              onClick={async () => {
+                await controlSyncJob(job.id, 'resume');
+                onChange();
+              }}
               title="Genoptag"
             >
               <Play className="h-3.5 w-3.5" /> Genoptag
             </button>
           )}
-          {(job.status === 'running' || job.status === 'queued' || job.status === 'paused') && (
+          {(job.status === 'running' ||
+            job.status === 'queued' ||
+            job.status === 'paused') && (
             <button
               className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50 text-rose-600 border-rose-200"
-              onClick={async () => { await controlSyncJob(job.id, 'cancel'); onChange(); }}
+              onClick={async () => {
+                await controlSyncJob(job.id, 'cancel');
+                onChange();
+              }}
               title="Stop"
             >
               <Square className="h-3.5 w-3.5" /> Stop
@@ -93,7 +153,9 @@ function JobCard({ job, onChange }: { job: SyncJob; onChange: () => void }) {
         <div>Enqueued: {formatTime(job.enqueuedAt as Date)}</div>
         <div>Start: {formatTime(job.startedAt as Date | undefined)}</div>
         <div>Slut: {formatTime(job.finishedAt as Date | undefined)}</div>
-        <div className="truncate">{job.message ?? (isRunning ? 'Arbejder…' : '')}</div>
+        <div className="truncate">
+          {job.message ?? (isRunning ? 'Arbejder…' : '')}
+        </div>
       </div>
 
       {lastProgress && (
@@ -104,8 +166,14 @@ function JobCard({ job, onChange }: { job: SyncJob; onChange: () => void }) {
               {lastProgress.current}/{lastProgress.total}
             </div>
           </div>
-          <ProgressBar current={lastProgress.current} total={lastProgress.total} />
-          <div className="text-xs text-gray-700 truncate" title={lastProgress.message}>
+          <ProgressBar
+            current={lastProgress.current}
+            total={lastProgress.total}
+          />
+          <div
+            className="text-xs text-gray-700 truncate"
+            title={lastProgress.message}
+          >
             {lastProgress.message}
           </div>
         </div>
@@ -118,7 +186,9 @@ export function SyncCenter() {
   const [open, setOpen] = useState(false);
   const [starting, setStarting] = useState(false);
   const { jobs, isLoading, error, refresh } = useSyncJobs();
-  const { data: shopsData } = useSWR<{ shops: Array<{ id: string; name: string; count: number }> }>(
+  const { data: shopsData } = useSWR<{
+    shops: Array<{ id: string; name: string; count: number }>;
+  }>(
     '/api/shops',
     async (url) => {
       const res = await fetch(url, { cache: 'no-store' });
@@ -133,15 +203,22 @@ export function SyncCenter() {
   const ordered = useMemo(() => {
     // running/queued first, then recent
     return [...jobs].sort((a, b) => {
-      const order = (s: SyncJob['status']) => (s === 'running' ? 0 : s === 'queued' ? 1 : s === 'failed' ? 2 : 3);
+      const order = (s: SyncJob['status']) =>
+        s === 'running' ? 0 : s === 'queued' ? 1 : s === 'failed' ? 2 : 3;
       const byStatus = order(a.status) - order(b.status);
       if (byStatus !== 0) return byStatus;
       const at = (x?: Date) => (x ? x.getTime() : 0);
-      return at(b.startedAt as Date | undefined) - at(a.startedAt as Date | undefined);
+      return (
+        at(b.startedAt as Date | undefined) -
+        at(a.startedAt as Date | undefined)
+      );
     });
   }, [jobs]);
 
-  const selectedJob = ordered.find((j) => j.id === selectedJobId) || ordered.find((j) => j.status === 'running') || ordered[0];
+  const selectedJob =
+    ordered.find((j) => j.id === selectedJobId) ||
+    ordered.find((j) => j.status === 'running') ||
+    ordered[0];
 
   const handleStartAll = async () => {
     try {
@@ -184,14 +261,19 @@ export function SyncCenter() {
       {open && (
         <div className="fixed inset-0 z-50">
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)} />
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setOpen(false)}
+          />
 
           {/* Panel */}
           <div className="absolute right-0 top-0 h-full w-full sm:w-[560px] bg-white shadow-xl border-l animate-in slide-in-from-right duration-200">
             <div className="p-4 border-b flex items-center justify-between bg-white/90">
               <div className="flex items-center gap-2">
                 <RefreshCcw className="h-5 w-5 text-indigo-600" />
-                <h2 className="text-lg font-bold text-gray-900">Synkronisering</h2>
+                <h2 className="text-lg font-bold text-gray-900">
+                  Synkronisering
+                </h2>
               </div>
               <button
                 aria-label="Luk"
@@ -209,7 +291,11 @@ export function SyncCenter() {
                   className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-indigo-600 text-white shadow hover:brightness-110 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-indigo-400"
                   disabled={starting}
                 >
-                  {starting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                  {starting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Play className="h-4 w-4" />
+                  )}
                   Start synk (alle shops)
                 </button>
                 <div className="flex items-center gap-2">
@@ -242,7 +328,9 @@ export function SyncCenter() {
               </div>
 
               {error && (
-                <div className="text-sm text-rose-700">Fejl ved hentning af jobstatus: {error}</div>
+                <div className="text-sm text-rose-700">
+                  Fejl ved hentning af jobstatus: {error}
+                </div>
               )}
 
               {isLoading && jobs.length === 0 ? (
@@ -252,7 +340,10 @@ export function SyncCenter() {
               ) : (
                 <div className="grid gap-3">
                   {ordered.length === 0 ? (
-                    <div className="text-sm text-gray-700">Ingen job endnu. Start en synk for at se status.</div>) : (
+                    <div className="text-sm text-gray-700">
+                      Ingen job endnu. Start en synk for at se status.
+                    </div>
+                  ) : (
                     ordered.map((job) => (
                       <div
                         key={job.id}
@@ -273,13 +364,23 @@ export function SyncCenter() {
                 <div className="mt-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="text-sm font-semibold text-gray-900">
-                      Job log: {selectedJob.shopName || selectedJob.shopId.slice(0, 8)}
+                      Job log:{' '}
+                      {selectedJob.shopName || selectedJob.shopId.slice(0, 8)}
                     </div>
                     <div className="flex items-center gap-2">
-                      {(selectedJob.status === 'completed' || selectedJob.status === 'failed' || selectedJob.status === 'paused' || selectedJob.status === 'queued') && (
+                      {(selectedJob.status === 'completed' ||
+                        selectedJob.status === 'failed' ||
+                        selectedJob.status === 'paused' ||
+                        selectedJob.status === 'queued') && (
                         <button
                           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-300 hover:bg-gray-50 text-gray-900"
-                          onClick={async () => { const r = await removeSyncJob(selectedJob.id); if (!('error' in r)) { await refresh(); setSelectedJobId(null); } }}
+                          onClick={async () => {
+                            const r = await removeSyncJob(selectedJob.id);
+                            if (!('error' in r)) {
+                              await refresh();
+                              setSelectedJobId(null);
+                            }
+                          }}
                           title="Fjern job fra liste"
                         >
                           Fjern job

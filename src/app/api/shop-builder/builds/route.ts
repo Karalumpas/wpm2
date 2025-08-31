@@ -21,7 +21,10 @@ export async function GET(request: NextRequest) {
     const rows = whereClause ? await base.where(whereClause) : await base;
     return NextResponse.json({ builds: rows });
   } catch (e) {
-    return NextResponse.json({ error: 'Failed to list builds' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to list builds' },
+      { status: 500 }
+    );
   }
 }
 
@@ -41,6 +44,9 @@ export async function POST(request: NextRequest) {
       .returning();
     return NextResponse.json({ build: row }, { status: 201 });
   } catch (e) {
-    return NextResponse.json({ error: 'Failed to create build' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Failed to create build' },
+      { status: 400 }
+    );
   }
 }

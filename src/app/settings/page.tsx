@@ -223,7 +223,9 @@ export default function SettingsPage() {
                 <h1 className="text-3xl font-bold leading-tight text-gray-900">
                   Settings
                 </h1>
-                <p className="mt-1 text-sm text-gray-600">Manage appearance, database and system settings</p>
+                <p className="mt-1 text-sm text-gray-600">
+                  Manage appearance, database and system settings
+                </p>
               </div>
               <div className="flex space-x-2">
                 <button
@@ -413,18 +415,44 @@ export default function SettingsPage() {
               {/* Appearance */}
               <div className="xl:col-span-2">
                 <div className="bg-white shadow rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Appearance</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Appearance
+                  </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <div className="text-sm font-medium text-gray-900 mb-2">Color theme</div>
+                      <div className="text-sm font-medium text-gray-900 mb-2">
+                        Color theme
+                      </div>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {([
-                          { id: 'ocean', name: 'Ocean', swatch: ['#1d4ed8','#2563eb','#93c5fd'] },
-                          { id: 'sunset', name: 'Sunset', swatch: ['#ea580c','#fb923c','#fed7aa'] },
-                          { id: 'forest', name: 'Forest', swatch: ['#16a34a','#34d399','#bbf7d0'] },
-                          { id: 'royal', name: 'Royal', swatch: ['#7c3aed','#a78bfa','#ddd6fe'] },
-                          { id: 'neutral', name: 'Neutral', swatch: ['#3f3f46','#a1a1aa','#e4e4e7'] },
-                        ] as const).map((t) => (
+                        {(
+                          [
+                            {
+                              id: 'ocean',
+                              name: 'Ocean',
+                              swatch: ['#1d4ed8', '#2563eb', '#93c5fd'],
+                            },
+                            {
+                              id: 'sunset',
+                              name: 'Sunset',
+                              swatch: ['#ea580c', '#fb923c', '#fed7aa'],
+                            },
+                            {
+                              id: 'forest',
+                              name: 'Forest',
+                              swatch: ['#16a34a', '#34d399', '#bbf7d0'],
+                            },
+                            {
+                              id: 'royal',
+                              name: 'Royal',
+                              swatch: ['#7c3aed', '#a78bfa', '#ddd6fe'],
+                            },
+                            {
+                              id: 'neutral',
+                              name: 'Neutral',
+                              swatch: ['#3f3f46', '#a1a1aa', '#e4e4e7'],
+                            },
+                          ] as const
+                        ).map((t) => (
                           <button
                             key={t.id}
                             onClick={() => handleSettingsUpdate('theme', t.id)}
@@ -433,22 +461,32 @@ export default function SettingsPage() {
                           >
                             <div className="flex items-center gap-2">
                               {t.swatch.map((c, i) => (
-                                <span key={i} className="h-5 w-5 rounded" style={{ background: c }} />
+                                <span
+                                  key={i}
+                                  className="h-5 w-5 rounded"
+                                  style={{ background: c }}
+                                />
                               ))}
                             </div>
-                            <div className="mt-2 text-xs text-gray-800">{t.name}</div>
+                            <div className="mt-2 text-xs text-gray-800">
+                              {t.name}
+                            </div>
                           </button>
                         ))}
                       </div>
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-gray-900 mb-2">Font</div>
+                      <div className="text-sm font-medium text-gray-900 mb-2">
+                        Font
+                      </div>
                       <div className="flex flex-wrap gap-2">
-                        {([
-                          { id: 'sans', name: 'Sans-serif' },
-                          { id: 'serif', name: 'Serif' },
-                          { id: 'mono', name: 'Monospace' },
-                        ] as const).map((f) => (
+                        {(
+                          [
+                            { id: 'sans', name: 'Sans-serif' },
+                            { id: 'serif', name: 'Serif' },
+                            { id: 'mono', name: 'Monospace' },
+                          ] as const
+                        ).map((f) => (
                           <button
                             key={f.id}
                             onClick={() => handleSettingsUpdate('font', f.id)}
@@ -463,7 +501,12 @@ export default function SettingsPage() {
                           <input
                             type="checkbox"
                             checked={!!settings.largeText}
-                            onChange={(e) => handleSettingsUpdate('largeText', e.target.checked)}
+                            onChange={(e) =>
+                              handleSettingsUpdate(
+                                'largeText',
+                                e.target.checked
+                              )
+                            }
                           />
                           Larger base font
                         </label>

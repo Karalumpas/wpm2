@@ -2,7 +2,21 @@
 
 import useSWR from 'swr';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Search, FolderPlus, Download, Settings, Package, Folder, Tag, Layout, ListChecks, SlidersHorizontal, Layers, Trash2, PlusCircle } from 'lucide-react';
+import {
+  Search,
+  FolderPlus,
+  Download,
+  Settings,
+  Package,
+  Folder,
+  Tag,
+  Layout,
+  ListChecks,
+  SlidersHorizontal,
+  Layers,
+  Trash2,
+  PlusCircle,
+} from 'lucide-react';
 import DraggableWindow from '@/components/ui/DraggableWindow';
 
 type Product = {
@@ -38,9 +52,27 @@ const fetcher = async (url: string) => {
 };
 
 type BuilderCategory = { id: string; name: string; productIds: string[] };
-type Rule = { field: 'name' | 'sku' | 'price' | 'status' | 'type' | 'builderCategory'; op: 'contains' | 'equals' | 'lt' | 'gt'; value: string };
-type Collection = { id: string; name: string; rules: Rule[]; logic?: 'all' | 'any'; limit?: number; sortBy?: 'name' | 'price' | 'updatedAt'; sortOrder?: 'asc' | 'desc' };
-type LayoutBlock = { id: string; type: 'hero' | 'grid' | 'carousel'; title?: string; source?: { type: 'collection' | 'category' | 'selected'; id?: string }; columns?: number };
+type Rule = {
+  field: 'name' | 'sku' | 'price' | 'status' | 'type' | 'builderCategory';
+  op: 'contains' | 'equals' | 'lt' | 'gt';
+  value: string;
+};
+type Collection = {
+  id: string;
+  name: string;
+  rules: Rule[];
+  logic?: 'all' | 'any';
+  limit?: number;
+  sortBy?: 'name' | 'price' | 'updatedAt';
+  sortOrder?: 'asc' | 'desc';
+};
+type LayoutBlock = {
+  id: string;
+  type: 'hero' | 'grid' | 'carousel';
+  title?: string;
+  source?: { type: 'collection' | 'category' | 'selected'; id?: string };
+  columns?: number;
+};
 
 export default function ShopBuilderClient() {
   // Catalog
@@ -66,20 +98,32 @@ export default function ShopBuilderClient() {
   const [builderName, setBuilderName] = useState('New Webshop');
   const [builderSlug, setBuilderSlug] = useState('new-webshop');
   const [currency, setCurrency] = useState('DKK');
-  const [inventoryPolicy, setInventoryPolicy] = useState<'sync' | 'snapshot' | 'manual'>('snapshot');
+  const [inventoryPolicy, setInventoryPolicy] = useState<
+    'sync' | 'snapshot' | 'manual'
+  >('snapshot');
   const [categories, setCategories] = useState<BuilderCategory[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [selectedTag, setSelectedTag] = useState('');
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   // Advanced tabs and features
-  const [activeTab, setActiveTab] = useState<'structure' | 'collections' | 'layout' | 'feeds' | 'bulk'>('structure');
+  const [activeTab, setActiveTab] = useState<
+    'structure' | 'collections' | 'layout' | 'feeds' | 'bulk'
+  >('structure');
   const [collections, setCollections] = useState<Collection[]>([]);
   const [layoutBlocks, setLayoutBlocks] = useState<LayoutBlock[]>([]);
-  const [feedPlatform, setFeedPlatform] = useState<'woocommerce' | 'google' | 'facebook'>('woocommerce');
+  const [feedPlatform, setFeedPlatform] = useState<
+    'woocommerce' | 'google' | 'facebook'
+  >('woocommerce');
   const [feedFormat, setFeedFormat] = useState<'json' | 'csv'>('json');
   const [feedPreview, setFeedPreview] = useState<string>('');
-  const [feedSource, setFeedSource] = useState<{ type: 'selected' | 'category' | 'collection'; id?: string }>({ type: 'selected' });
-  type MappingRow = { target: string; source: keyof Product | 'categories' | 'tags' };
+  const [feedSource, setFeedSource] = useState<{
+    type: 'selected' | 'category' | 'collection';
+    id?: string;
+  }>({ type: 'selected' });
+  type MappingRow = {
+    target: string;
+    source: keyof Product | 'categories' | 'tags';
+  };
   const [feedMapping, setFeedMapping] = useState<MappingRow[]>([
     { target: 'id', source: 'sku' },
     { target: 'title', source: 'name' },
@@ -93,9 +137,9 @@ export default function ShopBuilderClient() {
   const [previewPage, setPreviewPage] = useState(1);
   const [previewTargetCat, setPreviewTargetCat] = useState<string>('');
   // Persistence
-  const { data: buildsData, mutate: reloadBuilds } = useSWR<{ builds: Array<{ id: string; name: string; slug: string }> }>(
-    '/api/shop-builder/builds', fetcher
-  );
+  const { data: buildsData, mutate: reloadBuilds } = useSWR<{
+    builds: Array<{ id: string; name: string; slug: string }>;
+  }>('/api/shop-builder/builds', fetcher);
   const [activeBuildId, setActiveBuildId] = useState<string | null>(null);
 
   // Floating canvas/windows state
@@ -105,13 +149,23 @@ export default function ShopBuilderClient() {
 
   // Infinite dotted canvas pan
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const panningRef = useRef<null | { startX: number; startY: number; panX: number; panY: number }>(null);
+  const panningRef = useRef<null | {
+    startX: number;
+    startY: number;
+    panX: number;
+    panY: number;
+  }>(null);
   const spaceDownRef = useRef(false);
 
   function onBackgroundPointerDown(e: React.PointerEvent<HTMLDivElement>) {
     if (e.button === 1 || spaceDownRef.current) {
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-      panningRef.current = { startX: e.clientX, startY: e.clientY, panX: pan.x, panY: pan.y };
+      panningRef.current = {
+        startX: e.clientX,
+        startY: e.clientY,
+        panX: pan.x,
+        panY: pan.y,
+      };
     }
   }
   function onBackgroundPointerMove(e: React.PointerEvent<HTMLDivElement>) {
@@ -120,15 +174,24 @@ export default function ShopBuilderClient() {
     setPan({ x: panX + (e.clientX - startX), y: panY + (e.clientY - startY) });
   }
   function onBackgroundPointerUp(e: React.PointerEvent<HTMLDivElement>) {
-    try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
     panningRef.current = null;
   }
   useEffect(() => {
-    const onKeyDown = (ev: KeyboardEvent) => { if (ev.code === 'Space') spaceDownRef.current = true; };
-    const onKeyUp = (ev: KeyboardEvent) => { if (ev.code === 'Space') spaceDownRef.current = false; };
+    const onKeyDown = (ev: KeyboardEvent) => {
+      if (ev.code === 'Space') spaceDownRef.current = true;
+    };
+    const onKeyUp = (ev: KeyboardEvent) => {
+      if (ev.code === 'Space') spaceDownRef.current = false;
+    };
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
-    return () => { window.removeEventListener('keydown', onKeyDown); window.removeEventListener('keyup', onKeyUp); };
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+    };
   }, []);
 
   async function saveBuild() {
@@ -141,9 +204,17 @@ export default function ShopBuilderClient() {
       config,
     };
     if (!activeBuildId) {
-      await fetch('/api/shop-builder/builds', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      await fetch('/api/shop-builder/builds', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
     } else {
-      await fetch(`/api/shop-builder/builds/${activeBuildId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      await fetch(`/api/shop-builder/builds/${activeBuildId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
     }
     await reloadBuilds();
   }
@@ -161,7 +232,13 @@ export default function ShopBuilderClient() {
     const cfg = build.config || {};
     type RawCat = { name: string; productIds?: string[] };
     const rawCats = (cfg.categories || []) as RawCat[];
-    setCategories(rawCats.map((c) => ({ id: crypto.randomUUID(), name: c.name, productIds: c.productIds || [] })));
+    setCategories(
+      rawCats.map((c) => ({
+        id: crypto.randomUUID(),
+        name: c.name,
+        productIds: c.productIds || [],
+      }))
+    );
     setTags(cfg.tags || []);
     setSelectedProducts(cfg.products || []);
   }
@@ -179,17 +256,32 @@ export default function ShopBuilderClient() {
 
   // DnD helpers
   function onDragStartProduct(e: React.DragEvent, id: string) {
-    e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'product', id }));
+    e.dataTransfer.setData(
+      'text/plain',
+      JSON.stringify({ type: 'product', id })
+    );
   }
   function onDragStartCategory(e: React.DragEvent, id: string) {
-    e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'category', id }));
+    e.dataTransfer.setData(
+      'text/plain',
+      JSON.stringify({ type: 'category', id })
+    );
   }
   async function onDropToCategory(e: React.DragEvent, catId: string) {
     e.preventDefault();
     try {
-      const data = JSON.parse(e.dataTransfer.getData('text/plain')) as { type: 'product' | 'category'; id: string };
+      const data = JSON.parse(e.dataTransfer.getData('text/plain')) as {
+        type: 'product' | 'category';
+        id: string;
+      };
       if (data.type === 'product') {
-        setCategories((cs) => cs.map((c) => (c.id === catId && !c.productIds.includes(data.id) ? { ...c, productIds: [...c.productIds, data.id] } : c)));
+        setCategories((cs) =>
+          cs.map((c) =>
+            c.id === catId && !c.productIds.includes(data.id)
+              ? { ...c, productIds: [...c.productIds, data.id] }
+              : c
+          )
+        );
       }
     } catch {}
   }
@@ -224,67 +316,109 @@ export default function ShopBuilderClient() {
   function addCollection() {
     const name = prompt('Collection name')?.trim();
     if (!name) return;
-    setCollections((cs) => [...cs, { id: crypto.randomUUID(), name, rules: [] }]);
+    setCollections((cs) => [
+      ...cs,
+      { id: crypto.randomUUID(), name, rules: [] },
+    ]);
   }
   function addRule(colId: string) {
-    setCollections((cs) => cs.map((c) => (c.id === colId ? { ...c, rules: [...c.rules, { field: 'name', op: 'contains', value: '' }] } : c)));
+    setCollections((cs) =>
+      cs.map((c) =>
+        c.id === colId
+          ? {
+              ...c,
+              rules: [...c.rules, { field: 'name', op: 'contains', value: '' }],
+            }
+          : c
+      )
+    );
   }
   function updateRule(colId: string, idx: number, patch: Partial<Rule>) {
-    setCollections((cs) => cs.map((c) => (c.id === colId ? { ...c, rules: c.rules.map((r, i) => (i === idx ? { ...r, ...patch } : r)) } : c)));
+    setCollections((cs) =>
+      cs.map((c) =>
+        c.id === colId
+          ? {
+              ...c,
+              rules: c.rules.map((r, i) =>
+                i === idx ? { ...r, ...patch } : r
+              ),
+            }
+          : c
+      )
+    );
   }
   function removeRule(colId: string, idx: number) {
-    setCollections((cs) => cs.map((c) => (c.id === colId ? { ...c, rules: c.rules.filter((_, i) => i !== idx) } : c)));
+    setCollections((cs) =>
+      cs.map((c) =>
+        c.id === colId
+          ? { ...c, rules: c.rules.filter((_, i) => i !== idx) }
+          : c
+      )
+    );
   }
   function deleteCollection(colId: string) {
     if (!confirm('Delete this collection?')) return;
     setCollections((cs) => cs.filter((c) => c.id !== colId));
   }
-function matchCollection(c: Collection, ps: Product[]): Product[] {
-  let matched = ps.filter((p) => {
-    const evalRule = (r: Rule): boolean => {
-      const val = r.field === 'name' ? p.name : r.field === 'sku' ? p.sku : r.field === 'price' ? (p.basePrice ? parseFloat(String(p.basePrice)) : NaN) : r.field === 'status' ? (p.status || '') : r.field === 'type' ? (p.type || '') : '';
-      if (r.field === 'builderCategory') {
-        const cat = categories.find((cc) => cc.id === r.value);
-        return cat ? cat.productIds.includes(p.id) : false;
-      }
-      if (r.field === 'price') {
-        const num = typeof val === 'number' ? val : Number(val);
-        if (Number.isNaN(num)) return false;
-        const v = Number(r.value);
-        if (r.op === 'lt') return num < v;
-        if (r.op === 'gt') return num > v;
-        if (r.op === 'equals') return num === v;
+  function matchCollection(c: Collection, ps: Product[]): Product[] {
+    let matched = ps.filter((p) => {
+      const evalRule = (r: Rule): boolean => {
+        const val =
+          r.field === 'name'
+            ? p.name
+            : r.field === 'sku'
+              ? p.sku
+              : r.field === 'price'
+                ? p.basePrice
+                  ? parseFloat(String(p.basePrice))
+                  : NaN
+                : r.field === 'status'
+                  ? p.status || ''
+                  : r.field === 'type'
+                    ? p.type || ''
+                    : '';
+        if (r.field === 'builderCategory') {
+          const cat = categories.find((cc) => cc.id === r.value);
+          return cat ? cat.productIds.includes(p.id) : false;
+        }
+        if (r.field === 'price') {
+          const num = typeof val === 'number' ? val : Number(val);
+          if (Number.isNaN(num)) return false;
+          const v = Number(r.value);
+          if (r.op === 'lt') return num < v;
+          if (r.op === 'gt') return num > v;
+          if (r.op === 'equals') return num === v;
+          return false;
+        }
+        const s = String(val).toLowerCase();
+        const needle = r.value.toLowerCase();
+        if (r.op === 'contains') return s.includes(needle);
+        if (r.op === 'equals') return s === needle;
         return false;
-      }
-      const s = String(val).toLowerCase();
-      const needle = r.value.toLowerCase();
-      if (r.op === 'contains') return s.includes(needle);
-      if (r.op === 'equals') return s === needle;
-      return false;
-    };
-    if (!c.logic || c.logic === 'all') return c.rules.every(evalRule);
-    return c.rules.some(evalRule);
-  });
-  if (c.sortBy) {
-    const dir = c.sortOrder === 'asc' ? 1 : -1;
-    matched = matched.slice().sort((a, b) => {
-      const by = c.sortBy!;
-      if (by === 'price') {
-        const av = a.basePrice ? Number(a.basePrice) : 0;
-        const bv = b.basePrice ? Number(b.basePrice) : 0;
-        return (av - bv) * dir;
-      }
-      if (by === 'updatedAt') {
-        const av = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-        const bv = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-        return (av - bv) * dir;
-      }
-      return a.name.localeCompare(b.name) * dir;
+      };
+      if (!c.logic || c.logic === 'all') return c.rules.every(evalRule);
+      return c.rules.some(evalRule);
     });
+    if (c.sortBy) {
+      const dir = c.sortOrder === 'asc' ? 1 : -1;
+      matched = matched.slice().sort((a, b) => {
+        const by = c.sortBy!;
+        if (by === 'price') {
+          const av = a.basePrice ? Number(a.basePrice) : 0;
+          const bv = b.basePrice ? Number(b.basePrice) : 0;
+          return (av - bv) * dir;
+        }
+        if (by === 'updatedAt') {
+          const av = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+          const bv = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+          return (av - bv) * dir;
+        }
+        return a.name.localeCompare(b.name) * dir;
+      });
+    }
+    if (c.limit && c.limit > 0) return matched.slice(0, c.limit);
+    return matched;
   }
-  if (c.limit && c.limit > 0) return matched.slice(0, c.limit);
-  return matched;
-}
 
   const config = useMemo(() => {
     return {
@@ -292,17 +426,37 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
       slug: builderSlug,
       currency,
       inventoryPolicy,
-      categories: categories.map((c) => ({ name: c.name, productIds: c.productIds })),
+      categories: categories.map((c) => ({
+        name: c.name,
+        productIds: c.productIds,
+      })),
       tags,
       collections,
       layout: layoutBlocks,
       transforms: { titlePrefix, titleSuffix, pricePercent },
       products: Array.from(
-        new Set([...selectedProducts, ...categories.flatMap((c) => c.productIds)])
+        new Set([
+          ...selectedProducts,
+          ...categories.flatMap((c) => c.productIds),
+        ])
       ),
       sourceShopId: shopId || null,
     };
-  }, [builderName, builderSlug, currency, inventoryPolicy, categories, tags, selectedProducts, shopId, collections, layoutBlocks, titlePrefix, titleSuffix, pricePercent]);
+  }, [
+    builderName,
+    builderSlug,
+    currency,
+    inventoryPolicy,
+    categories,
+    tags,
+    selectedProducts,
+    shopId,
+    collections,
+    layoutBlocks,
+    titlePrefix,
+    titleSuffix,
+    pricePercent,
+  ]);
 
   async function exportConfig() {
     const res = await fetch('/api/shop-builder/export', {
@@ -336,12 +490,28 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
       image: p.featuredImage,
       status: p.status,
       type: p.type,
-      categories: categories.filter((c) => c.productIds.includes(p.id)).map((c) => c.name),
+      categories: categories
+        .filter((c) => c.productIds.includes(p.id))
+        .map((c) => c.name),
       tags,
     }));
-    const mapping = feedMapping.map((m) => ({ target: m.target, source: m.source }));
-    const res = await fetch(`/api/shop-builder/feeds/preview?format=${feedFormat}&platform=${feedPlatform}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ config, items, mapping }) });
-    setFeedPreview(feedFormat === 'csv' ? await res.text() : JSON.stringify(await res.json(), null, 2));
+    const mapping = feedMapping.map((m) => ({
+      target: m.target,
+      source: m.source,
+    }));
+    const res = await fetch(
+      `/api/shop-builder/feeds/preview?format=${feedFormat}&platform=${feedPlatform}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ config, items, mapping }),
+      }
+    );
+    setFeedPreview(
+      feedFormat === 'csv'
+        ? await res.text()
+        : JSON.stringify(await res.json(), null, 2)
+    );
   }
 
   // Layout DnD handlers
@@ -353,13 +523,22 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
   }
   function onCanvasDrop(e: React.DragEvent, index?: number) {
     e.preventDefault();
-    const type = e.dataTransfer.getData('application/x-layout-palette') as LayoutBlock['type'];
+    const type = e.dataTransfer.getData(
+      'application/x-layout-palette'
+    ) as LayoutBlock['type'];
     const blkId = e.dataTransfer.getData('application/x-layout-block');
     if (type) {
-      const nb: LayoutBlock = { id: crypto.randomUUID(), type, title: type.toUpperCase(), source: { type: 'selected' }, columns: type==='grid'?3:undefined };
+      const nb: LayoutBlock = {
+        id: crypto.randomUUID(),
+        type,
+        title: type.toUpperCase(),
+        source: { type: 'selected' },
+        columns: type === 'grid' ? 3 : undefined,
+      };
       setLayoutBlocks((bs) => {
         const arr = [...bs];
-        if (typeof index === 'number') arr.splice(index, 0, nb); else arr.push(nb);
+        if (typeof index === 'number') arr.splice(index, 0, nb);
+        else arr.push(nb);
         return arr;
       });
       return;
@@ -395,68 +574,185 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
 
         <div className="absolute top-2 left-2 z-50 flex gap-2">
           {!showBuilder && (
-            <button className="text-xs px-2 py-1 rounded border bg-white hover:bg-gray-50" onClick={() => setShowBuilder(true)}>Open Builder</button>
+            <button
+              className="text-xs px-2 py-1 rounded border bg-white hover:bg-gray-50"
+              onClick={() => setShowBuilder(true)}
+            >
+              Open Builder
+            </button>
           )}
           {!showCatalog && (
-            <button className="text-xs px-2 py-1 rounded border bg-white hover:bg-gray-50" onClick={() => setShowCatalog(true)}>Open Catalog</button>
+            <button
+              className="text-xs px-2 py-1 rounded border bg-white hover:bg-gray-50"
+              onClick={() => setShowCatalog(true)}
+            >
+              Open Catalog
+            </button>
           )}
         </div>
 
         {showBuilder && (
-          <DraggableWindow id="builder" title="Shop Builder" initialPos={{ x: 320, y: 80 }} initialSize={{ w: 900 }} onClose={() => setShowBuilder(false)}>
+          <DraggableWindow
+            id="builder"
+            title="Shop Builder"
+            initialPos={{ x: 320, y: 80 }}
+            initialSize={{ w: 900 }}
+            onClose={() => setShowBuilder(false)}
+          >
             <div className="mb-3 flex items-center gap-2">
-              <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='structure'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('structure')}><Folder className="h-4 w-4"/> Structure</button>
-              <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='collections'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('collections')}><ListChecks className="h-4 w-4"/> Collections</button>
-              <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='layout'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('layout')}><Layout className="h-4 w-4"/> Layout</button>
-              <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='feeds'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('feeds')}><Layers className="h-4 w-4"/> Feeds</button>
-              <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='bulk'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('bulk')}><SlidersHorizontal className="h-4 w-4"/> Bulk</button>
+              <button
+                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'structure' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+                onClick={() => setActiveTab('structure')}
+              >
+                <Folder className="h-4 w-4" /> Structure
+              </button>
+              <button
+                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'collections' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+                onClick={() => setActiveTab('collections')}
+              >
+                <ListChecks className="h-4 w-4" /> Collections
+              </button>
+              <button
+                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'layout' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+                onClick={() => setActiveTab('layout')}
+              >
+                <Layout className="h-4 w-4" /> Layout
+              </button>
+              <button
+                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'feeds' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+                onClick={() => setActiveTab('feeds')}
+              >
+                <Layers className="h-4 w-4" /> Feeds
+              </button>
+              <button
+                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'bulk' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+                onClick={() => setActiveTab('bulk')}
+              >
+                <SlidersHorizontal className="h-4 w-4" /> Bulk
+              </button>
             </div>
 
             <div className="bg-white border border-gray-200 rounded-lg p-3 flex items-center gap-3">
-              <input className="flex-1 border rounded px-2 py-2 text-sm" value={builderName} onChange={(e) => setBuilderName(e.target.value)} placeholder="Webshop name" />
-              <select className="border rounded px-2 py-2 text-sm" value={activeBuildId || ''} onChange={(e) => e.target.value ? loadBuild(e.target.value) : null}>
+              <input
+                className="flex-1 border rounded px-2 py-2 text-sm"
+                value={builderName}
+                onChange={(e) => setBuilderName(e.target.value)}
+                placeholder="Webshop name"
+              />
+              <select
+                className="border rounded px-2 py-2 text-sm"
+                value={activeBuildId || ''}
+                onChange={(e) =>
+                  e.target.value ? loadBuild(e.target.value) : null
+                }
+              >
                 <option value="">Load build.</option>
                 {(buildsData?.builds || []).map((b) => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
                 ))}
               </select>
-              <button className="inline-flex items-center gap-2 px-3 py-2 rounded-md border hover:bg-gray-50" onClick={saveBuild}>
+              <button
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-md border hover:bg-gray-50"
+                onClick={saveBuild}
+              >
                 Save
               </button>
-              <button className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-indigo-600 text-white shadow hover:brightness-110" onClick={exportConfig}>
+              <button
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-indigo-600 text-white shadow hover:brightness-110"
+                onClick={exportConfig}
+              >
                 <Download className="h-4 w-4" /> Export
               </button>
             </div>
 
-            {activeTab==='structure' && (
+            {activeTab === 'structure' && (
               <div className="bg-white border border-gray-200 rounded-lg p-3 mt-3">
                 <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2 font-semibold text-gray-900"><Folder className="h-4 w-4" /> Categories</div>
-                  <button className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50" onClick={createCategory}><FolderPlus className="h-3.5 w-3.5" /> New</button>
+                  <div className="flex items-center gap-2 font-semibold text-gray-900">
+                    <Folder className="h-4 w-4" /> Categories
+                  </div>
+                  <button
+                    className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50"
+                    onClick={createCategory}
+                  >
+                    <FolderPlus className="h-3.5 w-3.5" /> New
+                  </button>
                 </div>
-                {categories.length === 0 && <div className="text-sm text-gray-700">No builder categories yet. Create your structure and drag products into each list.</div>}
+                {categories.length === 0 && (
+                  <div className="text-sm text-gray-700">
+                    No builder categories yet. Create your structure and drag
+                    products into each list.
+                  </div>
+                )}
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {categories.map((c) => (
-                    <div key={c.id} className="border rounded-md p-2" draggable onDragStart={(e) => onDragStartCategory(e, c.id)} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onDropToCategory(e, c.id)}>
+                    <div
+                      key={c.id}
+                      className="border rounded-md p-2"
+                      draggable
+                      onDragStart={(e) => onDragStartCategory(e, c.id)}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => onDropToCategory(e, c.id)}
+                    >
                       <div className="flex items-center justify-between mb-2">
-                        <div className="text-sm font-semibold text-gray-900 truncate" title={c.name}>{c.name}</div>
+                        <div
+                          className="text-sm font-semibold text-gray-900 truncate"
+                          title={c.name}
+                        >
+                          {c.name}
+                        </div>
                         <div className="flex items-center gap-2">
-                          <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => renameCategory(c.id)}>Rename</button>
-                          <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => deleteCategory(c.id)}>Delete</button>
+                          <button
+                            className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                            onClick={() => renameCategory(c.id)}
+                          >
+                            Rename
+                          </button>
+                          <button
+                            className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                            onClick={() => deleteCategory(c.id)}
+                          >
+                            Delete
+                          </button>
                         </div>
                       </div>
                       <div className="min-h-[120px] rounded border border-dashed border-gray-300 p-2">
                         {c.productIds.length === 0 && (
-                          <div className="text-xs text-gray-600">Drop products here.</div>
+                          <div className="text-xs text-gray-600">
+                            Drop products here.
+                          </div>
                         )}
                         <div className="space-y-1">
                           {c.productIds.map((pid) => {
                             const p = products.find((x) => x.id === pid);
                             if (!p) return null;
                             return (
-                              <div key={pid} className="text-xs px-2 py-1 rounded bg-gray-50 border flex items-center justify-between">
+                              <div
+                                key={pid}
+                                className="text-xs px-2 py-1 rounded bg-gray-50 border flex items-center justify-between"
+                              >
                                 <span className="truncate">{p.name}</span>
-                                <button className="ml-2 text-[10px] px-1.5 py-0.5 rounded border" onClick={() => setCategories((cs) => cs.map((cc) => (cc.id === c.id ? { ...cc, productIds: cc.productIds.filter((id) => id !== pid) } : cc)))}>Remove</button>
+                                <button
+                                  className="ml-2 text-[10px] px-1.5 py-0.5 rounded border"
+                                  onClick={() =>
+                                    setCategories((cs) =>
+                                      cs.map((cc) =>
+                                        cc.id === c.id
+                                          ? {
+                                              ...cc,
+                                              productIds: cc.productIds.filter(
+                                                (id) => id !== pid
+                                              ),
+                                            }
+                                          : cc
+                                      )
+                                    )
+                                  }
+                                >
+                                  Remove
+                                </button>
                               </div>
                             );
                           })}
@@ -468,31 +764,97 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
               </div>
             )}
 
-            {activeTab==='layout' && (
+            {activeTab === 'layout' && (
               <div className="bg-white border border-gray-200 rounded-lg p-3 mt-3">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <div className="border rounded p-2">
-                    <div className="text-xs font-semibold text-gray-900 mb-1">Palette</div>
-                    {(['hero','grid','carousel'] as const).map((t) => (
-                      <div key={t} className="border rounded p-2 mb-1 bg-gray-50" draggable onDragStart={(e) => onPaletteDragStart(e, t)}>
+                    <div className="text-xs font-semibold text-gray-900 mb-1">
+                      Palette
+                    </div>
+                    {(['hero', 'grid', 'carousel'] as const).map((t) => (
+                      <div
+                        key={t}
+                        className="border rounded p-2 mb-1 bg-gray-50"
+                        draggable
+                        onDragStart={(e) => onPaletteDragStart(e, t)}
+                      >
                         {t.toUpperCase()}
                       </div>
                     ))}
                   </div>
-                  <div className="md:col-span-2 border rounded p-2 min-h-[200px]" onDragOver={(e) => e.preventDefault()} onDrop={(e) => onCanvasDrop(e)}>
-                    {layoutBlocks.length === 0 && <div className="text-sm text-gray-700">Drag blocks here from the palette.</div>}
+                  <div
+                    className="md:col-span-2 border rounded p-2 min-h-[200px]"
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => onCanvasDrop(e)}
+                  >
+                    {layoutBlocks.length === 0 && (
+                      <div className="text-sm text-gray-700">
+                        Drag blocks here from the palette.
+                      </div>
+                    )}
                     <div className="space-y-2">
                       {layoutBlocks.map((b, i) => (
-                        <div key={b.id} className="border rounded p-2 bg-white" draggable onDragStart={(e) => onBlockDragStart(e, b.id)} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onCanvasDrop(e, i)}>
+                        <div
+                          key={b.id}
+                          className="border rounded p-2 bg-white"
+                          draggable
+                          onDragStart={(e) => onBlockDragStart(e, b.id)}
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={(e) => onCanvasDrop(e, i)}
+                        >
                           <div className="flex items-center justify-between">
-                            <div className="text-xs font-semibold text-gray-900">{b.type.toUpperCase()}</div>
+                            <div className="text-xs font-semibold text-gray-900">
+                              {b.type.toUpperCase()}
+                            </div>
                             <div className="flex items-center gap-1">
-                              <button className="text-[11px] px-2 py-0.5 rounded border" onClick={() => setLayoutBlocks((bs) => bs.filter((x) => x.id !== b.id))}>Remove</button>
+                              <button
+                                className="text-[11px] px-2 py-0.5 rounded border"
+                                onClick={() =>
+                                  setLayoutBlocks((bs) =>
+                                    bs.filter((x) => x.id !== b.id)
+                                  )
+                                }
+                              >
+                                Remove
+                              </button>
                             </div>
                           </div>
                           <div className="mt-2 grid grid-cols-2 gap-2">
-                            <input className="border rounded px-2 py-1 text-xs" value={b.title || ''} onChange={(e) => setLayoutBlocks((bs) => bs.map((x) => x.id === b.id ? { ...x, title: e.target.value } : x))} />
-                            <select className="border rounded px-2 py-1 text-xs" value={b.source?.type || 'selected'} onChange={(e) => setLayoutBlocks((bs) => bs.map((x) => x.id === b.id ? { ...x, source: { ...(x.source||{}), type: e.target.value as 'selected' | 'collection' | 'category' } } : x))}>
+                            <input
+                              className="border rounded px-2 py-1 text-xs"
+                              value={b.title || ''}
+                              onChange={(e) =>
+                                setLayoutBlocks((bs) =>
+                                  bs.map((x) =>
+                                    x.id === b.id
+                                      ? { ...x, title: e.target.value }
+                                      : x
+                                  )
+                                )
+                              }
+                            />
+                            <select
+                              className="border rounded px-2 py-1 text-xs"
+                              value={b.source?.type || 'selected'}
+                              onChange={(e) =>
+                                setLayoutBlocks((bs) =>
+                                  bs.map((x) =>
+                                    x.id === b.id
+                                      ? {
+                                          ...x,
+                                          source: {
+                                            ...(x.source || {}),
+                                            type: e.target.value as
+                                              | 'selected'
+                                              | 'collection'
+                                              | 'category',
+                                          },
+                                        }
+                                      : x
+                                  )
+                                )
+                              }
+                            >
                               <option value="selected">Selected</option>
                               <option value="collection">Collection</option>
                               <option value="category">Category</option>
@@ -506,60 +868,122 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
               </div>
             )}
 
-            {activeTab==='feeds' && (
+            {activeTab === 'feeds' && (
               <div className="mt-4">
-                <textarea className="w-full h-40 font-mono text-xs border rounded p-2" value={feedPreview} onChange={()=>{}}/>
+                <textarea
+                  className="w-full h-40 font-mono text-xs border rounded p-2"
+                  value={feedPreview}
+                  onChange={() => {}}
+                />
               </div>
             )}
 
-            {activeTab==='bulk' && (
+            {activeTab === 'bulk' && (
               <div className="mt-4 space-y-2">
                 <div className="grid grid-cols-1 gap-2">
-                  <input className="border rounded px-2 py-2 text-sm" placeholder="Title prefix" value={titlePrefix} onChange={(e) => setTitlePrefix(e.target.value)} />
-                  <input className="border rounded px-2 py-2 text-sm" placeholder="Title suffix" value={titleSuffix} onChange={(e) => setTitleSuffix(e.target.value)} />
+                  <input
+                    className="border rounded px-2 py-2 text-sm"
+                    placeholder="Title prefix"
+                    value={titlePrefix}
+                    onChange={(e) => setTitlePrefix(e.target.value)}
+                  />
+                  <input
+                    className="border rounded px-2 py-2 text-sm"
+                    placeholder="Title suffix"
+                    value={titleSuffix}
+                    onChange={(e) => setTitleSuffix(e.target.value)}
+                  />
                   <div className="flex items-center gap-2">
                     <label className="text-sm text-gray-800">Price +/-%</label>
-                    <input type="number" className="border rounded px-2 py-2 text-sm w-24" value={pricePercent} onChange={(e) => setPricePercent(Number(e.target.value))} />
+                    <input
+                      type="number"
+                      className="border rounded px-2 py-2 text-sm w-24"
+                      value={pricePercent}
+                      onChange={(e) => setPricePercent(Number(e.target.value))}
+                    />
                   </div>
                 </div>
-                <div className="text-[11px] text-gray-600">Transforms stored in build config; apply during export/import/feed gen.</div>
+                <div className="text-[11px] text-gray-600">
+                  Transforms stored in build config; apply during
+                  export/import/feed gen.
+                </div>
               </div>
             )}
           </DraggableWindow>
         )}
 
         {showCatalog && (
-          <DraggableWindow id="catalog" title="Central Catalog" initialPos={{ x: 40, y: 80 }} initialSize={{ w: 320 }} onClose={() => setShowCatalog(false)}>
+          <DraggableWindow
+            id="catalog"
+            title="Central Catalog"
+            initialPos={{ x: 40, y: 80 }}
+            initialSize={{ w: 320 }}
+            onClose={() => setShowCatalog(false)}
+          >
             <div className="flex items-center justify-between mb-2">
               <div className="font-semibold text-gray-900">Central Catalog</div>
-              <button className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50" onClick={() => reloadProducts()}>Refresh</button>
+              <button
+                className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50"
+                onClick={() => reloadProducts()}
+              >
+                Refresh
+              </button>
             </div>
             <div className="flex items-center gap-2 mb-3">
               <div className="relative flex-1">
                 <Search className="h-4 w-4 absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input className="pl-7 pr-2 py-2 border rounded-md text-sm w-full" placeholder="Search products." value={query} onChange={(e) => setQuery(e.target.value)} />
+                <input
+                  className="pl-7 pr-2 py-2 border rounded-md text-sm w-full"
+                  placeholder="Search products."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
               </div>
-              <select className="px-2 py-2 border rounded-md text-sm" value={shopId} onChange={(e) => setShopId(e.target.value)}>
+              <select
+                className="px-2 py-2 border rounded-md text-sm"
+                value={shopId}
+                onChange={(e) => setShopId(e.target.value)}
+              >
                 <option value="">All shops</option>
                 {(shopsData?.shops || []).map((s) => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
                 ))}
               </select>
             </div>
             <div className="grid gap-2 max-h-[60vh] overflow-auto">
               {products.map((p) => (
-                <div key={p.id} className="border rounded-md p-2 hover:bg-gray-50 flex items-center gap-2" draggable onDragStart={(e) => onDragStartProduct(e, p.id)}>
+                <div
+                  key={p.id}
+                  className="border rounded-md p-2 hover:bg-gray-50 flex items-center gap-2"
+                  draggable
+                  onDragStart={(e) => onDragStartProduct(e, p.id)}
+                >
                   <div className="h-8 w-8 rounded bg-gray-200 overflow-hidden flex items-center justify-center">
                     <Package className="h-4 w-4 text-gray-600" />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-sm font-medium text-gray-900 truncate">{p.name}</div>
+                    <div className="text-sm font-medium text-gray-900 truncate">
+                      {p.name}
+                    </div>
                     <div className="text-xs text-gray-700">SKU: {p.sku}</div>
                   </div>
-                  <button className="ml-auto text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => setSelectedProducts((sp) => (sp.includes(p.id) ? sp : [...sp, p.id]))}>Select</button>
+                  <button
+                    className="ml-auto text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                    onClick={() =>
+                      setSelectedProducts((sp) =>
+                        sp.includes(p.id) ? sp : [...sp, p.id]
+                      )
+                    }
+                  >
+                    Select
+                  </button>
                 </div>
               ))}
-              {products.length === 0 && <div className="text-sm text-gray-700">No products match.</div>}
+              {products.length === 0 && (
+                <div className="text-sm text-gray-700">No products match.</div>
+              )}
             </div>
           </DraggableWindow>
         )}
@@ -567,40 +991,98 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
         {/* Collections Preview Modal (float mode) */}
         {previewColId && (
           <div className="fixed inset-0 z-50">
-            <div className="absolute inset-0 bg-black/40" onClick={() => setPreviewColId(null)} />
+            <div
+              className="absolute inset-0 bg-black/40"
+              onClick={() => setPreviewColId(null)}
+            />
             <div className="absolute inset-0 p-6 flex items-center justify-center">
               <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg border border-gray-200">
                 <div className="p-3 border-b flex items-center justify-between">
-                  <div className="text-sm font-semibold text-gray-900">Collection preview</div>
-                  <button className="text-sm px-2 py-1 rounded border hover:bg-gray-50" onClick={() => setPreviewColId(null)}>Close</button>
+                  <div className="text-sm font-semibold text-gray-900">
+                    Collection preview
+                  </div>
+                  <button
+                    className="text-sm px-2 py-1 rounded border hover:bg-gray-50"
+                    onClick={() => setPreviewColId(null)}
+                  >
+                    Close
+                  </button>
                 </div>
                 <div className="p-3 space-y-2">
                   {(() => {
                     const c = collections.find((x) => x.id === previewColId);
-                    if (!c) return <div className="text-sm text-gray-700">Not found</div>;
+                    if (!c)
+                      return (
+                        <div className="text-sm text-gray-700">Not found</div>
+                      );
                     const all = matchCollection(c, products);
                     const pageSize = 30;
-                    const totalPages = Math.max(1, Math.ceil(all.length / pageSize));
+                    const totalPages = Math.max(
+                      1,
+                      Math.ceil(all.length / pageSize)
+                    );
                     const page = Math.min(previewPage, totalPages);
-                    const slice = all.slice((page - 1) * pageSize, page * pageSize);
+                    const slice = all.slice(
+                      (page - 1) * pageSize,
+                      page * pageSize
+                    );
                     const addAllToSelected = () => {
-                      setSelectedProducts((prev) => Array.from(new Set([...prev, ...all.map((p) => p.id)])));
+                      setSelectedProducts((prev) =>
+                        Array.from(new Set([...prev, ...all.map((p) => p.id)]))
+                      );
                     };
                     const addAllToCategory = () => {
                       if (!previewTargetCat) return;
-                      setCategories((cs) => cs.map((cc) => cc.id === previewTargetCat ? { ...cc, productIds: Array.from(new Set([...(cc.productIds || []), ...all.map((p) => p.id)])) } : cc));
+                      setCategories((cs) =>
+                        cs.map((cc) =>
+                          cc.id === previewTargetCat
+                            ? {
+                                ...cc,
+                                productIds: Array.from(
+                                  new Set([
+                                    ...(cc.productIds || []),
+                                    ...all.map((p) => p.id),
+                                  ])
+                                ),
+                              }
+                            : cc
+                        )
+                      );
                     };
                     return (
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
-                          <select className="border rounded px-2 py-1 text-xs" value={previewTargetCat} onChange={(e) => setPreviewTargetCat(e.target.value)}>
+                          <select
+                            className="border rounded px-2 py-1 text-xs"
+                            value={previewTargetCat}
+                            onChange={(e) =>
+                              setPreviewTargetCat(e.target.value)
+                            }
+                          >
                             <option value="">Choose builder category.</option>
-                            {categories.map((bc) => <option key={bc.id} value={bc.id}>{bc.name}</option>)}
+                            {categories.map((bc) => (
+                              <option key={bc.id} value={bc.id}>
+                                {bc.name}
+                              </option>
+                            ))}
                           </select>
-                          <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={addAllToSelected}>Add all to Selected</button>
-                          <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={addAllToCategory} disabled={!previewTargetCat}>Add all to Category</button>
+                          <button
+                            className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                            onClick={addAllToSelected}
+                          >
+                            Add all to Selected
+                          </button>
+                          <button
+                            className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                            onClick={addAllToCategory}
+                            disabled={!previewTargetCat}
+                          >
+                            Add all to Category
+                          </button>
                         </div>
-                        <div className="text-xs text-gray-700 mb-2">Matched {all.length} products</div>
+                        <div className="text-xs text-gray-700 mb-2">
+                          Matched {all.length} products
+                        </div>
                         <div className="max-h-72 overflow-auto border rounded">
                           <table className="min-w-full text-xs">
                             <thead className="bg-gray-50">
@@ -614,19 +1096,43 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
                             <tbody>
                               {slice.map((p) => (
                                 <tr key={p.id} className="border-t">
-                                  <td className="px-2 py-1 truncate">{p.name}</td>
+                                  <td className="px-2 py-1 truncate">
+                                    {p.name}
+                                  </td>
                                   <td className="px-2 py-1">{p.sku}</td>
-                                  <td className="px-2 py-1">{p.basePrice ?? '-'}</td>
-                                  <td className="px-2 py-1">{p.status ?? '-'}</td>
+                                  <td className="px-2 py-1">
+                                    {p.basePrice ?? '-'}
+                                  </td>
+                                  <td className="px-2 py-1">
+                                    {p.status ?? '-'}
+                                  </td>
                                 </tr>
                               ))}
                             </tbody>
                           </table>
                         </div>
                         <div className="mt-2 flex items-center justify-between">
-                          <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" disabled={page<=1} onClick={() => setPreviewPage((p) => Math.max(1, p-1))}>Prev</button>
-                          <div className="text-xs text-gray-700">Page {page} / {totalPages}</div>
-                          <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" disabled={page>=totalPages} onClick={() => setPreviewPage((p) => Math.min(totalPages, p+1))}>Next</button>
+                          <button
+                            className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                            disabled={page <= 1}
+                            onClick={() =>
+                              setPreviewPage((p) => Math.max(1, p - 1))
+                            }
+                          >
+                            Prev
+                          </button>
+                          <div className="text-xs text-gray-700">
+                            Page {page} / {totalPages}
+                          </div>
+                          <button
+                            className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                            disabled={page >= totalPages}
+                            onClick={() =>
+                              setPreviewPage((p) => Math.min(totalPages, p + 1))
+                            }
+                          >
+                            Next
+                          </button>
                         </div>
                       </div>
                     );
@@ -643,45 +1149,104 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="mb-3 flex items-center gap-2">
-        <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='structure'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('structure')}><Folder className="h-4 w-4"/> Structure</button>
-        <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='collections'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('collections')}><ListChecks className="h-4 w-4"/> Collections</button>
-        <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='layout'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('layout')}><Layout className="h-4 w-4"/> Layout</button>
-        <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='feeds'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('feeds')}><Layers className="h-4 w-4"/> Feeds</button>
-        <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='bulk'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('bulk')}><SlidersHorizontal className="h-4 w-4"/> Bulk</button>
+        <button
+          className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'structure' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+          onClick={() => setActiveTab('structure')}
+        >
+          <Folder className="h-4 w-4" /> Structure
+        </button>
+        <button
+          className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'collections' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+          onClick={() => setActiveTab('collections')}
+        >
+          <ListChecks className="h-4 w-4" /> Collections
+        </button>
+        <button
+          className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'layout' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+          onClick={() => setActiveTab('layout')}
+        >
+          <Layout className="h-4 w-4" /> Layout
+        </button>
+        <button
+          className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'feeds' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+          onClick={() => setActiveTab('feeds')}
+        >
+          <Layers className="h-4 w-4" /> Feeds
+        </button>
+        <button
+          className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'bulk' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+          onClick={() => setActiveTab('bulk')}
+        >
+          <SlidersHorizontal className="h-4 w-4" /> Bulk
+        </button>
       </div>
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
         {/* Catalog (left) */}
         <div className="xl:col-span-3 bg-white border border-gray-200 rounded-lg p-3">
           <div className="flex items-center justify-between mb-2">
             <div className="font-semibold text-gray-900">Central Catalog</div>
-            <button className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50" onClick={() => reloadProducts()}>Refresh</button>
+            <button
+              className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50"
+              onClick={() => reloadProducts()}
+            >
+              Refresh
+            </button>
           </div>
           <div className="flex items-center gap-2 mb-3">
             <div className="relative flex-1">
               <Search className="h-4 w-4 absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input className="pl-7 pr-2 py-2 border rounded-md text-sm w-full" placeholder="Search products…" value={query} onChange={(e) => setQuery(e.target.value)} />
+              <input
+                className="pl-7 pr-2 py-2 border rounded-md text-sm w-full"
+                placeholder="Search products…"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
             </div>
-            <select className="px-2 py-2 border rounded-md text-sm" value={shopId} onChange={(e) => setShopId(e.target.value)}>
+            <select
+              className="px-2 py-2 border rounded-md text-sm"
+              value={shopId}
+              onChange={(e) => setShopId(e.target.value)}
+            >
               <option value="">All shops</option>
               {(shopsData?.shops || []).map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
               ))}
             </select>
           </div>
           <div className="grid gap-2 max-h-[60vh] overflow-auto">
             {products.map((p) => (
-              <div key={p.id} className="border rounded-md p-2 hover:bg-gray-50 flex items-center gap-2" draggable onDragStart={(e) => onDragStartProduct(e, p.id)}>
+              <div
+                key={p.id}
+                className="border rounded-md p-2 hover:bg-gray-50 flex items-center gap-2"
+                draggable
+                onDragStart={(e) => onDragStartProduct(e, p.id)}
+              >
                 <div className="h-8 w-8 rounded bg-gray-200 overflow-hidden flex items-center justify-center">
                   <Package className="h-4 w-4 text-gray-600" />
                 </div>
                 <div className="min-w-0">
-                  <div className="text-sm font-medium text-gray-900 truncate">{p.name}</div>
+                  <div className="text-sm font-medium text-gray-900 truncate">
+                    {p.name}
+                  </div>
                   <div className="text-xs text-gray-700">SKU: {p.sku}</div>
                 </div>
-                <button className="ml-auto text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => setSelectedProducts((sp) => (sp.includes(p.id) ? sp : [...sp, p.id]))}>Select</button>
+                <button
+                  className="ml-auto text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                  onClick={() =>
+                    setSelectedProducts((sp) =>
+                      sp.includes(p.id) ? sp : [...sp, p.id]
+                    )
+                  }
+                >
+                  Select
+                </button>
               </div>
             ))}
-            {products.length === 0 && <div className="text-sm text-gray-700">No products match.</div>}
+            {products.length === 0 && (
+              <div className="text-sm text-gray-700">No products match.</div>
+            )}
           </div>
         </div>
 
@@ -689,106 +1254,311 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
         <div className="xl:col-span-6 space-y-4">
           {/* Builder header */}
           <div className="bg-white border border-gray-200 rounded-lg p-3 flex items-center gap-3">
-            <input className="flex-1 border rounded px-2 py-2 text-sm" value={builderName} onChange={(e) => setBuilderName(e.target.value)} placeholder="Webshop name" />
-            <select className="border rounded px-2 py-2 text-sm" value={activeBuildId || ''} onChange={(e) => e.target.value ? loadBuild(e.target.value) : null}>
+            <input
+              className="flex-1 border rounded px-2 py-2 text-sm"
+              value={builderName}
+              onChange={(e) => setBuilderName(e.target.value)}
+              placeholder="Webshop name"
+            />
+            <select
+              className="border rounded px-2 py-2 text-sm"
+              value={activeBuildId || ''}
+              onChange={(e) =>
+                e.target.value ? loadBuild(e.target.value) : null
+              }
+            >
               <option value="">Load build…</option>
               {(buildsData?.builds || []).map((b) => (
-                <option key={b.id} value={b.id}>{b.name}</option>
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
               ))}
             </select>
-            <button className="inline-flex items-center gap-2 px-3 py-2 rounded-md border hover:bg-gray-50" onClick={saveBuild}>
+            <button
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-md border hover:bg-gray-50"
+              onClick={saveBuild}
+            >
               Save
             </button>
-            <button className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-indigo-600 text-white shadow hover:brightness-110" onClick={exportConfig}>
+            <button
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-indigo-600 text-white shadow hover:brightness-110"
+              onClick={exportConfig}
+            >
               <Download className="h-4 w-4" /> Export
             </button>
           </div>
 
           {/* Categories Board */}
-          {activeTab==='structure' && (
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2 font-semibold text-gray-900"><Folder className="h-4 w-4" /> Categories</div>
-              <button className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50" onClick={createCategory}><FolderPlus className="h-3.5 w-3.5" /> New</button>
-            </div>
-            {categories.length === 0 && <div className="text-sm text-gray-700">No builder categories yet. Create your structure and drag products into each list.</div>}
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {categories.map((c) => (
-                <div key={c.id} className="border rounded-md p-2" draggable onDragStart={(e) => onDragStartCategory(e, c.id)} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onDropToCategory(e, c.id)}>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-sm font-semibold text-gray-900 truncate" title={c.name}>{c.name}</div>
-                    <div className="flex items-center gap-2">
-                      <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => renameCategory(c.id)}>Rename</button>
-                      <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => deleteCategory(c.id)}>Delete</button>
-                    </div>
-                  </div>
-                  <div className="min-h-[120px] rounded border border-dashed border-gray-300 p-2">
-                    {c.productIds.length === 0 && (
-                      <div className="text-xs text-gray-600">Drop products here…</div>
-                    )}
-                    <div className="space-y-1">
-                      {c.productIds.map((pid) => {
-                        const p = products.find((x) => x.id === pid);
-                        if (!p) return null;
-                        return (
-                          <div key={pid} className="text-xs px-2 py-1 rounded bg-gray-50 border flex items-center justify-between">
-                            <span className="truncate">{p.name}</span>
-                            <button className="ml-2 text-[10px] px-1.5 py-0.5 rounded border" onClick={() => setCategories((cs) => cs.map((cc) => (cc.id === c.id ? { ...cc, productIds: cc.productIds.filter((id) => id !== pid) } : cc)))}>Remove</button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+          {activeTab === 'structure' && (
+            <div className="bg-white border border-gray-200 rounded-lg p-3">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2 font-semibold text-gray-900">
+                  <Folder className="h-4 w-4" /> Categories
                 </div>
-              ))}
-            </div>
+                <button
+                  className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50"
+                  onClick={createCategory}
+                >
+                  <FolderPlus className="h-3.5 w-3.5" /> New
+                </button>
+              </div>
+              {categories.length === 0 && (
+                <div className="text-sm text-gray-700">
+                  No builder categories yet. Create your structure and drag
+                  products into each list.
+                </div>
+              )}
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {categories.map((c) => (
+                  <div
+                    key={c.id}
+                    className="border rounded-md p-2"
+                    draggable
+                    onDragStart={(e) => onDragStartCategory(e, c.id)}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => onDropToCategory(e, c.id)}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div
+                        className="text-sm font-semibold text-gray-900 truncate"
+                        title={c.name}
+                      >
+                        {c.name}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                          onClick={() => renameCategory(c.id)}
+                        >
+                          Rename
+                        </button>
+                        <button
+                          className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                          onClick={() => deleteCategory(c.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                    <div className="min-h-[120px] rounded border border-dashed border-gray-300 p-2">
+                      {c.productIds.length === 0 && (
+                        <div className="text-xs text-gray-600">
+                          Drop products here…
+                        </div>
+                      )}
+                      <div className="space-y-1">
+                        {c.productIds.map((pid) => {
+                          const p = products.find((x) => x.id === pid);
+                          if (!p) return null;
+                          return (
+                            <div
+                              key={pid}
+                              className="text-xs px-2 py-1 rounded bg-gray-50 border flex items-center justify-between"
+                            >
+                              <span className="truncate">{p.name}</span>
+                              <button
+                                className="ml-2 text-[10px] px-1.5 py-0.5 rounded border"
+                                onClick={() =>
+                                  setCategories((cs) =>
+                                    cs.map((cc) =>
+                                      cc.id === c.id
+                                        ? {
+                                            ...cc,
+                                            productIds: cc.productIds.filter(
+                                              (id) => id !== pid
+                                            ),
+                                          }
+                                        : cc
+                                    )
+                                  )
+                                }
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
-          {activeTab==='layout' && (
+          {activeTab === 'layout' && (
             <div className="bg-white border border-gray-200 rounded-lg p-3">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {/* Palette */}
                 <div className="border rounded p-2">
-                  <div className="text-xs font-semibold text-gray-900 mb-1">Palette</div>
-                  {(['hero','grid','carousel'] as const).map((t) => (
-                    <div key={t} className="border rounded p-2 mb-1 bg-gray-50" draggable onDragStart={(e) => onPaletteDragStart(e, t)}>
+                  <div className="text-xs font-semibold text-gray-900 mb-1">
+                    Palette
+                  </div>
+                  {(['hero', 'grid', 'carousel'] as const).map((t) => (
+                    <div
+                      key={t}
+                      className="border rounded p-2 mb-1 bg-gray-50"
+                      draggable
+                      onDragStart={(e) => onPaletteDragStart(e, t)}
+                    >
                       {t.toUpperCase()}
                     </div>
                   ))}
                 </div>
                 {/* Canvas */}
-                <div className="md:col-span-2 border rounded p-2 min-h-[200px]" onDragOver={(e) => e.preventDefault()} onDrop={(e) => onCanvasDrop(e)}>
-                  {layoutBlocks.length === 0 && <div className="text-sm text-gray-700">Drag blocks here from the palette.</div>}
+                <div
+                  className="md:col-span-2 border rounded p-2 min-h-[200px]"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => onCanvasDrop(e)}
+                >
+                  {layoutBlocks.length === 0 && (
+                    <div className="text-sm text-gray-700">
+                      Drag blocks here from the palette.
+                    </div>
+                  )}
                   <div className="space-y-2">
                     {layoutBlocks.map((b, i) => (
-                      <div key={b.id} className="border rounded p-2 bg-white" draggable onDragStart={(e) => onBlockDragStart(e, b.id)} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onCanvasDrop(e, i)}>
+                      <div
+                        key={b.id}
+                        className="border rounded p-2 bg-white"
+                        draggable
+                        onDragStart={(e) => onBlockDragStart(e, b.id)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => onCanvasDrop(e, i)}
+                      >
                         <div className="flex items-center justify-between">
-                          <div className="text-xs font-semibold text-gray-900">{b.type.toUpperCase()}</div>
+                          <div className="text-xs font-semibold text-gray-900">
+                            {b.type.toUpperCase()}
+                          </div>
                           <div className="flex items-center gap-1">
-                            <button className="text-[11px] px-2 py-0.5 rounded border" onClick={() => setLayoutBlocks((bs) => bs.filter((x) => x.id !== b.id))}>Remove</button>
+                            <button
+                              className="text-[11px] px-2 py-0.5 rounded border"
+                              onClick={() =>
+                                setLayoutBlocks((bs) =>
+                                  bs.filter((x) => x.id !== b.id)
+                                )
+                              }
+                            >
+                              Remove
+                            </button>
                           </div>
                         </div>
                         <div className="mt-2 grid grid-cols-2 gap-2">
-                          <input className="border rounded px-2 py-1 text-xs" value={b.title || ''} onChange={(e) => setLayoutBlocks((bs) => bs.map((x) => x.id===b.id?{...x, title: e.target.value}:x))} placeholder="Title"/>
-                          <select className="border rounded px-2 py-1 text-xs" value={b.source?.type || 'selected'} onChange={(e) => setLayoutBlocks((bs) => bs.map((x) => x.id===b.id?{...x, source:{ type: (e.target.value as 'selected' | 'collection' | 'category')}}:x))}>
+                          <input
+                            className="border rounded px-2 py-1 text-xs"
+                            value={b.title || ''}
+                            onChange={(e) =>
+                              setLayoutBlocks((bs) =>
+                                bs.map((x) =>
+                                  x.id === b.id
+                                    ? { ...x, title: e.target.value }
+                                    : x
+                                )
+                              )
+                            }
+                            placeholder="Title"
+                          />
+                          <select
+                            className="border rounded px-2 py-1 text-xs"
+                            value={b.source?.type || 'selected'}
+                            onChange={(e) =>
+                              setLayoutBlocks((bs) =>
+                                bs.map((x) =>
+                                  x.id === b.id
+                                    ? {
+                                        ...x,
+                                        source: {
+                                          type: e.target.value as
+                                            | 'selected'
+                                            | 'collection'
+                                            | 'category',
+                                        },
+                                      }
+                                    : x
+                                )
+                              )
+                            }
+                          >
                             <option value="selected">Selected</option>
                             <option value="collection">Collection</option>
                             <option value="category">Category</option>
                           </select>
-                          {b.type==='grid' && (
-                            <input type="number" min={2} max={6} className="border rounded px-2 py-1 text-xs" value={b.columns || 3} onChange={(e) => setLayoutBlocks((bs) => bs.map((x) => x.id===b.id?{...x, columns: Number(e.target.value)}:x))} placeholder="Columns"/>
+                          {b.type === 'grid' && (
+                            <input
+                              type="number"
+                              min={2}
+                              max={6}
+                              className="border rounded px-2 py-1 text-xs"
+                              value={b.columns || 3}
+                              onChange={(e) =>
+                                setLayoutBlocks((bs) =>
+                                  bs.map((x) =>
+                                    x.id === b.id
+                                      ? {
+                                          ...x,
+                                          columns: Number(e.target.value),
+                                        }
+                                      : x
+                                  )
+                                )
+                              }
+                              placeholder="Columns"
+                            />
                           )}
-                          {b.source?.type==='collection' && (
-                            <select className="border rounded px-2 py-1 text-xs" value={b.source.id || ''} onChange={(e) => setLayoutBlocks((bs) => bs.map((x) => x.id===b.id?{...x, source:{...x.source!, id: e.target.value}}:x))}>
+                          {b.source?.type === 'collection' && (
+                            <select
+                              className="border rounded px-2 py-1 text-xs"
+                              value={b.source.id || ''}
+                              onChange={(e) =>
+                                setLayoutBlocks((bs) =>
+                                  bs.map((x) =>
+                                    x.id === b.id
+                                      ? {
+                                          ...x,
+                                          source: {
+                                            ...x.source!,
+                                            id: e.target.value,
+                                          },
+                                        }
+                                      : x
+                                  )
+                                )
+                              }
+                            >
                               <option value="">Choose collection…</option>
-                              {collections.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                              {collections.map((c) => (
+                                <option key={c.id} value={c.id}>
+                                  {c.name}
+                                </option>
+                              ))}
                             </select>
                           )}
-                          {b.source?.type==='category' && (
-                            <select className="border rounded px-2 py-1 text-xs" value={b.source.id || ''} onChange={(e) => setLayoutBlocks((bs) => bs.map((x) => x.id===b.id?{...x, source:{...x.source!, id: e.target.value}}:x))}>
+                          {b.source?.type === 'category' && (
+                            <select
+                              className="border rounded px-2 py-1 text-xs"
+                              value={b.source.id || ''}
+                              onChange={(e) =>
+                                setLayoutBlocks((bs) =>
+                                  bs.map((x) =>
+                                    x.id === b.id
+                                      ? {
+                                          ...x,
+                                          source: {
+                                            ...x.source!,
+                                            id: e.target.value,
+                                          },
+                                        }
+                                      : x
+                                  )
+                                )
+                              }
+                            >
                               <option value="">Choose builder category…</option>
-                              {categories.map((bc) => <option key={bc.id} value={bc.id}>{bc.name}</option>)}
+                              {categories.map((bc) => (
+                                <option key={bc.id} value={bc.id}>
+                                  {bc.name}
+                                </option>
+                              ))}
                             </select>
                           )}
                         </div>
@@ -797,17 +1567,35 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
                           {(() => {
                             let list: Product[] = [];
                             if (b.source?.type === 'selected') {
-                              list = products.filter((p) => selectedProducts.includes(p.id));
+                              list = products.filter((p) =>
+                                selectedProducts.includes(p.id)
+                              );
                             } else if (b.source?.type === 'category') {
-                              const cat = categories.find((c) => c.id === b.source?.id);
-                              list = products.filter((p) => (cat?.productIds || []).includes(p.id));
+                              const cat = categories.find(
+                                (c) => c.id === b.source?.id
+                              );
+                              list = products.filter((p) =>
+                                (cat?.productIds || []).includes(p.id)
+                              );
                             } else if (b.source?.type === 'collection') {
-                              const col = collections.find((c) => c.id === b.source?.id);
+                              const col = collections.find(
+                                (c) => c.id === b.source?.id
+                              );
                               if (col) list = matchCollection(col, products);
                             }
-                            return (list.slice(0, b.type==='grid'? (b.columns || 3) * 2 : 3).map((p) => (
-                              <div key={p.id} className="text-[11px] px-2 py-1 rounded bg-gray-50 border truncate">{p.name}</div>
-                            )));
+                            return list
+                              .slice(
+                                0,
+                                b.type === 'grid' ? (b.columns || 3) * 2 : 3
+                              )
+                              .map((p) => (
+                                <div
+                                  key={p.id}
+                                  className="text-[11px] px-2 py-1 rounded bg-gray-50 border truncate"
+                                >
+                                  {p.name}
+                                </div>
+                              ));
                           })()}
                         </div>
                       </div>
@@ -819,97 +1607,266 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
           )}
 
           {/* Tags */}
-          {activeTab==='structure' && (
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2 font-semibold text-gray-900"><Tag className="h-4 w-4" /> Tags</div>
-              <div className="flex items-center gap-2">
-                <input className="border rounded px-2 py-1 text-sm" value={selectedTag} onChange={(e) => setSelectedTag(e.target.value)} placeholder="Add tag" />
-                <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={addTag}>Add</button>
+          {activeTab === 'structure' && (
+            <div className="bg-white border border-gray-200 rounded-lg p-3">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2 font-semibold text-gray-900">
+                  <Tag className="h-4 w-4" /> Tags
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    className="border rounded px-2 py-1 text-sm"
+                    value={selectedTag}
+                    onChange={(e) => setSelectedTag(e.target.value)}
+                    placeholder="Add tag"
+                  />
+                  <button
+                    className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                    onClick={addTag}
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {tags.map((t) => (
+                  <span
+                    key={t}
+                    className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full border bg-gray-50"
+                  >
+                    {t}
+                    <button
+                      onClick={() => removeTag(t)}
+                      className="hover:text-rose-600"
+                      aria-label={`Remove ${t}`}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+                {tags.length === 0 && (
+                  <div className="text-sm text-gray-700">No tags yet.</div>
+                )}
               </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {tags.map((t) => (
-                <span key={t} className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full border bg-gray-50">
-                  {t}
-                  <button onClick={() => removeTag(t)} className="hover:text-rose-600" aria-label={`Remove ${t}`}>×</button>
-                </span>
-              ))}
-              {tags.length === 0 && <div className="text-sm text-gray-700">No tags yet.</div>}
-            </div>
-          </div>
           )}
         </div>
 
         {/* Collections Tab */}
-        {activeTab==='collections' && (
+        {activeTab === 'collections' && (
           <div className="xl:col-span-6 bg-white border border-gray-200 rounded-lg p-3 space-y-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 font-semibold text-gray-900"><ListChecks className="h-4 w-4"/> Collections</div>
-              <button className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50" onClick={addCollection}><PlusCircle className="h-3.5 w-3.5"/> New collection</button>
+              <div className="flex items-center gap-2 font-semibold text-gray-900">
+                <ListChecks className="h-4 w-4" /> Collections
+              </div>
+              <button
+                className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50"
+                onClick={addCollection}
+              >
+                <PlusCircle className="h-3.5 w-3.5" /> New collection
+              </button>
             </div>
-            {collections.length === 0 && <div className="text-sm text-gray-700">No collections yet. Add rules to auto-match products.</div>}
+            {collections.length === 0 && (
+              <div className="text-sm text-gray-700">
+                No collections yet. Add rules to auto-match products.
+              </div>
+            )}
             <div className="grid gap-3 sm:grid-cols-2">
               {collections.map((c) => {
                 const matched = matchCollection(c, products).slice(0, 6);
                 return (
                   <div key={c.id} className="border rounded p-2">
                     <div className="flex items-center justify-between mb-2">
-                      <div className="text-sm font-semibold text-gray-900 truncate">{c.name}</div>
+                      <div className="text-sm font-semibold text-gray-900 truncate">
+                        {c.name}
+                      </div>
                       <div className="flex items-center gap-2">
-                        <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => deleteCollection(c.id)}><Trash2 className="h-3.5 w-3.5"/> Delete</button>
+                        <button
+                          className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                          onClick={() => deleteCollection(c.id)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" /> Delete
+                        </button>
                       </div>
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <select className="border rounded px-2 py-1 text-xs" value={c.logic || 'all'} onChange={(e) => setCollections((cs) => cs.map((x) => x.id===c.id?{...x, logic: e.target.value as Collection['logic']}:x))}>
+                        <select
+                          className="border rounded px-2 py-1 text-xs"
+                          value={c.logic || 'all'}
+                          onChange={(e) =>
+                            setCollections((cs) =>
+                              cs.map((x) =>
+                                x.id === c.id
+                                  ? {
+                                      ...x,
+                                      logic: e.target
+                                        .value as Collection['logic'],
+                                    }
+                                  : x
+                              )
+                            )
+                          }
+                        >
                           <option value="all">Match ALL</option>
                           <option value="any">Match ANY</option>
                         </select>
-                        <select className="border rounded px-2 py-1 text-xs" value={c.sortBy || 'name'} onChange={(e) => setCollections((cs) => cs.map((x) => x.id===c.id?{...x, sortBy: e.target.value as Collection['sortBy']}:x))}>
+                        <select
+                          className="border rounded px-2 py-1 text-xs"
+                          value={c.sortBy || 'name'}
+                          onChange={(e) =>
+                            setCollections((cs) =>
+                              cs.map((x) =>
+                                x.id === c.id
+                                  ? {
+                                      ...x,
+                                      sortBy: e.target
+                                        .value as Collection['sortBy'],
+                                    }
+                                  : x
+                              )
+                            )
+                          }
+                        >
                           <option value="name">Name</option>
                           <option value="price">Price</option>
                           <option value="updatedAt">Updated</option>
                         </select>
-                        <select className="border rounded px-2 py-1 text-xs" value={c.sortOrder || 'asc'} onChange={(e) => setCollections((cs) => cs.map((x) => x.id===c.id?{...x, sortOrder: e.target.value as Collection['sortOrder']}:x))}>
+                        <select
+                          className="border rounded px-2 py-1 text-xs"
+                          value={c.sortOrder || 'asc'}
+                          onChange={(e) =>
+                            setCollections((cs) =>
+                              cs.map((x) =>
+                                x.id === c.id
+                                  ? {
+                                      ...x,
+                                      sortOrder: e.target
+                                        .value as Collection['sortOrder'],
+                                    }
+                                  : x
+                              )
+                            )
+                          }
+                        >
                           <option value="asc">Asc</option>
                           <option value="desc">Desc</option>
                         </select>
-                        <input className="border rounded px-2 py-1 text-xs w-20" type="number" min={0} placeholder="Limit" value={c.limit ?? ''} onChange={(e) => setCollections((cs) => cs.map((x) => x.id===c.id?{...x, limit: e.target.value?Number(e.target.value):undefined}:x))} />
-                        <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => { setPreviewColId(c.id); setPreviewPage(1); }}>Preview</button>
+                        <input
+                          className="border rounded px-2 py-1 text-xs w-20"
+                          type="number"
+                          min={0}
+                          placeholder="Limit"
+                          value={c.limit ?? ''}
+                          onChange={(e) =>
+                            setCollections((cs) =>
+                              cs.map((x) =>
+                                x.id === c.id
+                                  ? {
+                                      ...x,
+                                      limit: e.target.value
+                                        ? Number(e.target.value)
+                                        : undefined,
+                                    }
+                                  : x
+                              )
+                            )
+                          }
+                        />
+                        <button
+                          className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                          onClick={() => {
+                            setPreviewColId(c.id);
+                            setPreviewPage(1);
+                          }}
+                        >
+                          Preview
+                        </button>
                       </div>
                       {c.rules.map((r, idx) => (
                         <div key={idx} className="flex items-center gap-2">
-                          <select className="border rounded px-2 py-1 text-xs" value={r.field} onChange={(e) => updateRule(c.id, idx, { field: e.target.value as Rule['field'] })}>
+                          <select
+                            className="border rounded px-2 py-1 text-xs"
+                            value={r.field}
+                            onChange={(e) =>
+                              updateRule(c.id, idx, {
+                                field: e.target.value as Rule['field'],
+                              })
+                            }
+                          >
                             <option value="name">Name</option>
                             <option value="sku">SKU</option>
                             <option value="price">Price</option>
                             <option value="status">Status</option>
                             <option value="type">Type</option>
-                            <option value="builderCategory">Builder Category</option>
+                            <option value="builderCategory">
+                              Builder Category
+                            </option>
                           </select>
-                          <select className="border rounded px-2 py-1 text-xs" value={r.op} onChange={(e) => updateRule(c.id, idx, { op: e.target.value as Rule['op'] })}>
+                          <select
+                            className="border rounded px-2 py-1 text-xs"
+                            value={r.op}
+                            onChange={(e) =>
+                              updateRule(c.id, idx, {
+                                op: e.target.value as Rule['op'],
+                              })
+                            }
+                          >
                             <option value="contains">contains</option>
                             <option value="equals">equals</option>
                             <option value="lt">&lt;</option>
                             <option value="gt">&gt;</option>
                           </select>
-                          {r.field==='builderCategory' ? (
-                            <select className="flex-1 border rounded px-2 py-1 text-xs" value={r.value} onChange={(e) => updateRule(c.id, idx, { value: e.target.value })}>
+                          {r.field === 'builderCategory' ? (
+                            <select
+                              className="flex-1 border rounded px-2 py-1 text-xs"
+                              value={r.value}
+                              onChange={(e) =>
+                                updateRule(c.id, idx, { value: e.target.value })
+                              }
+                            >
                               <option value="">Choose category…</option>
-                              {categories.map((bc) => <option key={bc.id} value={bc.id}>{bc.name}</option>)}
+                              {categories.map((bc) => (
+                                <option key={bc.id} value={bc.id}>
+                                  {bc.name}
+                                </option>
+                              ))}
                             </select>
                           ) : (
-                            <input className="flex-1 border rounded px-2 py-1 text-xs" value={r.value} onChange={(e) => updateRule(c.id, idx, { value: e.target.value })} placeholder="value"/>
+                            <input
+                              className="flex-1 border rounded px-2 py-1 text-xs"
+                              value={r.value}
+                              onChange={(e) =>
+                                updateRule(c.id, idx, { value: e.target.value })
+                              }
+                              placeholder="value"
+                            />
                           )}
-                          <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => removeRule(c.id, idx)}>Remove</button>
+                          <button
+                            className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                            onClick={() => removeRule(c.id, idx)}
+                          >
+                            Remove
+                          </button>
                         </div>
                       ))}
-                      <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => addRule(c.id)}>Add rule</button>
-                      <div className="text-[11px] text-gray-600">Matched: {matchCollection(c, products).length}</div>
+                      <button
+                        className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                        onClick={() => addRule(c.id)}
+                      >
+                        Add rule
+                      </button>
+                      <div className="text-[11px] text-gray-600">
+                        Matched: {matchCollection(c, products).length}
+                      </div>
                       <div className="grid grid-cols-2 gap-1">
                         {matched.map((p) => (
-                          <div key={p.id} className="text-[11px] px-2 py-1 rounded bg-gray-50 border truncate">{p.name}</div>
+                          <div
+                            key={p.id}
+                            className="text-[11px] px-2 py-1 rounded bg-gray-50 border truncate"
+                          >
+                            {p.name}
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -924,15 +1881,25 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
 
         {/* Config (right) */}
         <div className="xl:col-span-3 bg-white border border-gray-200 rounded-lg p-3">
-          <div className="flex items-center gap-2 font-semibold text-gray-900 mb-2"><Settings className="h-4 w-4" /> Shop Config</div>
+          <div className="flex items-center gap-2 font-semibold text-gray-900 mb-2">
+            <Settings className="h-4 w-4" /> Shop Config
+          </div>
           <div className="space-y-3">
             <div>
               <label className="text-xs text-gray-700">Slug</label>
-              <input className="w-full border rounded px-2 py-2 text-sm" value={builderSlug} onChange={(e) => setBuilderSlug(e.target.value)} />
+              <input
+                className="w-full border rounded px-2 py-2 text-sm"
+                value={builderSlug}
+                onChange={(e) => setBuilderSlug(e.target.value)}
+              />
             </div>
             <div>
               <label className="text-xs text-gray-700">Currency</label>
-              <select className="w-full border rounded px-2 py-2 text-sm" value={currency} onChange={(e) => setCurrency(e.target.value)}>
+              <select
+                className="w-full border rounded px-2 py-2 text-sm"
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+              >
                 <option value="DKK">DKK</option>
                 <option value="EUR">EUR</option>
                 <option value="USD">USD</option>
@@ -940,7 +1907,15 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
             </div>
             <div>
               <label className="text-xs text-gray-700">Inventory policy</label>
-              <select className="w-full border rounded px-2 py-2 text-sm" value={inventoryPolicy} onChange={(e) => setInventoryPolicy(e.target.value as 'sync' | 'snapshot' | 'manual')}>
+              <select
+                className="w-full border rounded px-2 py-2 text-sm"
+                value={inventoryPolicy}
+                onChange={(e) =>
+                  setInventoryPolicy(
+                    e.target.value as 'sync' | 'snapshot' | 'manual'
+                  )
+                }
+              >
                 <option value="snapshot">Snapshot (copy current stock)</option>
                 <option value="sync">Sync (keep in sync)</option>
                 <option value="manual">Manual (no stock sync)</option>
@@ -949,63 +1924,167 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
             <div>
               <label className="text-xs text-gray-700">Selected products</label>
               <div className="max-h-40 overflow-auto border rounded p-2 text-xs bg-gray-50">
-                {selectedProducts.length === 0 && <div className="text-gray-600">None. Use Select on catalog or drag into categories.</div>}
+                {selectedProducts.length === 0 && (
+                  <div className="text-gray-600">
+                    None. Use Select on catalog or drag into categories.
+                  </div>
+                )}
                 {selectedProducts.map((pid) => {
                   const p = products.find((x) => x.id === pid);
                   if (!p) return null;
                   return (
-                    <div key={pid} className="flex items-center justify-between">
+                    <div
+                      key={pid}
+                      className="flex items-center justify-between"
+                    >
                       <span className="truncate">{p.name}</span>
-                      <button className="ml-2 text-[10px] px-1.5 py-0.5 rounded border" onClick={() => setSelectedProducts((sp) => sp.filter((id) => id !== pid))}>Remove</button>
+                      <button
+                        className="ml-2 text-[10px] px-1.5 py-0.5 rounded border"
+                        onClick={() =>
+                          setSelectedProducts((sp) =>
+                            sp.filter((id) => id !== pid)
+                          )
+                        }
+                      >
+                        Remove
+                      </button>
                     </div>
                   );
                 })}
               </div>
             </div>
 
-            <button className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-indigo-600 text-white shadow hover:brightness-110" onClick={exportConfig}>
+            <button
+              className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-indigo-600 text-white shadow hover:brightness-110"
+              onClick={exportConfig}
+            >
               <Download className="h-4 w-4" /> Export configuration
             </button>
-            <div className="text-[11px] text-gray-600">Export produces a JSON model you can import into a new WooCommerce shop via a future import tool.</div>
-            {activeTab==='feeds' && (
+            <div className="text-[11px] text-gray-600">
+              Export produces a JSON model you can import into a new WooCommerce
+              shop via a future import tool.
+            </div>
+            {activeTab === 'feeds' && (
               <div className="mt-4 space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <select className="border rounded px-2 py-1 text-sm" value={feedPlatform} onChange={(e) => setFeedPlatform(e.target.value as 'woocommerce' | 'google' | 'facebook')}>
+                  <select
+                    className="border rounded px-2 py-1 text-sm"
+                    value={feedPlatform}
+                    onChange={(e) =>
+                      setFeedPlatform(
+                        e.target.value as 'woocommerce' | 'google' | 'facebook'
+                      )
+                    }
+                  >
                     <option value="woocommerce">WooCommerce</option>
                     <option value="google">Google Merchant</option>
                     <option value="facebook">Facebook/Meta</option>
                   </select>
-                  <select className="border rounded px-2 py-1 text-sm" value={feedFormat} onChange={(e) => setFeedFormat(e.target.value as 'json' | 'csv')}>
+                  <select
+                    className="border rounded px-2 py-1 text-sm"
+                    value={feedFormat}
+                    onChange={(e) =>
+                      setFeedFormat(e.target.value as 'json' | 'csv')
+                    }
+                  >
                     <option value="json">JSON</option>
                     <option value="csv">CSV</option>
                   </select>
-                  <select className="border rounded px-2 py-1 text-sm" value={feedSource.type} onChange={(e) => setFeedSource({ type: e.target.value as 'selected' | 'category' | 'collection' })}>
+                  <select
+                    className="border rounded px-2 py-1 text-sm"
+                    value={feedSource.type}
+                    onChange={(e) =>
+                      setFeedSource({
+                        type: e.target.value as
+                          | 'selected'
+                          | 'category'
+                          | 'collection',
+                      })
+                    }
+                  >
                     <option value="selected">Selected</option>
                     <option value="category">Builder Category</option>
                     <option value="collection">Collection</option>
                   </select>
-                  {(feedSource.type==='category') && (
-                    <select className="border rounded px-2 py-1 text-sm" value={feedSource.id || ''} onChange={(e) => setFeedSource({ type: 'category', id: e.target.value })}>
+                  {feedSource.type === 'category' && (
+                    <select
+                      className="border rounded px-2 py-1 text-sm"
+                      value={feedSource.id || ''}
+                      onChange={(e) =>
+                        setFeedSource({ type: 'category', id: e.target.value })
+                      }
+                    >
                       <option value="">Choose category…</option>
-                      {categories.map((bc) => <option key={bc.id} value={bc.id}>{bc.name}</option>)}
+                      {categories.map((bc) => (
+                        <option key={bc.id} value={bc.id}>
+                          {bc.name}
+                        </option>
+                      ))}
                     </select>
                   )}
-                  {(feedSource.type==='collection') && (
-                    <select className="border rounded px-2 py-1 text-sm" value={feedSource.id || ''} onChange={(e) => setFeedSource({ type: 'collection', id: e.target.value })}>
+                  {feedSource.type === 'collection' && (
+                    <select
+                      className="border rounded px-2 py-1 text-sm"
+                      value={feedSource.id || ''}
+                      onChange={(e) =>
+                        setFeedSource({
+                          type: 'collection',
+                          id: e.target.value,
+                        })
+                      }
+                    >
                       <option value="">Choose collection…</option>
-                      {collections.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      {collections.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
                     </select>
                   )}
-                  <button className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50" onClick={previewFeed}>Preview</button>
+                  <button
+                    className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50"
+                    onClick={previewFeed}
+                  >
+                    Preview
+                  </button>
                 </div>
                 {/* Mapping editor */}
                 <div className="border rounded p-2">
-                  <div className="text-xs font-semibold text-gray-900 mb-1">Field Mapping</div>
+                  <div className="text-xs font-semibold text-gray-900 mb-1">
+                    Field Mapping
+                  </div>
                   <div className="space-y-1">
                     {feedMapping.map((m, idx) => (
                       <div key={idx} className="flex items-center gap-2">
-                        <input className="border rounded px-2 py-1 text-xs w-40" value={m.target} onChange={(e) => setFeedMapping((mm) => mm.map((x, i) => i===idx?{...x, target: e.target.value}:x))} placeholder="target field" />
-                        <select className="border rounded px-2 py-1 text-xs" value={m.source} onChange={(e) => setFeedMapping((mm) => mm.map((x, i) => i===idx?{...x, source: e.target.value as MappingRow['source']}:x))}>
+                        <input
+                          className="border rounded px-2 py-1 text-xs w-40"
+                          value={m.target}
+                          onChange={(e) =>
+                            setFeedMapping((mm) =>
+                              mm.map((x, i) =>
+                                i === idx ? { ...x, target: e.target.value } : x
+                              )
+                            )
+                          }
+                          placeholder="target field"
+                        />
+                        <select
+                          className="border rounded px-2 py-1 text-xs"
+                          value={m.source}
+                          onChange={(e) =>
+                            setFeedMapping((mm) =>
+                              mm.map((x, i) =>
+                                i === idx
+                                  ? {
+                                      ...x,
+                                      source: e.target
+                                        .value as MappingRow['source'],
+                                    }
+                                  : x
+                              )
+                            )
+                          }
+                        >
                           <option value="name">name</option>
                           <option value="sku">sku</option>
                           <option value="basePrice">price</option>
@@ -1015,30 +2094,98 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
                           <option value="categories">categories</option>
                           <option value="tags">tags</option>
                         </select>
-                        <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => setFeedMapping((mm) => mm.filter((_, i) => i!==idx))}>Remove</button>
+                        <button
+                          className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                          onClick={() =>
+                            setFeedMapping((mm) =>
+                              mm.filter((_, i) => i !== idx)
+                            )
+                          }
+                        >
+                          Remove
+                        </button>
                       </div>
                     ))}
                     <div className="flex items-center gap-2 mt-1">
-                      <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => setFeedMapping((mm) => [...mm, { target: 'new_field', source: 'name' }])}>Add mapping</button>
-                      <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => setFeedMapping([{ target: 'id', source: 'sku' }, { target: 'title', source: 'name' }, { target: 'price', source: 'basePrice' }])}>Preset: Woo basic</button>
-                      <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => setFeedMapping([{ target: 'id', source: 'sku' }, { target: 'title', source: 'name' }, { target: 'price', source: 'basePrice' }, { target: 'image_link', source: 'image' }, { target: 'google_product_category', source: 'categories' }])}>Preset: Google basic</button>
+                      <button
+                        className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                        onClick={() =>
+                          setFeedMapping((mm) => [
+                            ...mm,
+                            { target: 'new_field', source: 'name' },
+                          ])
+                        }
+                      >
+                        Add mapping
+                      </button>
+                      <button
+                        className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                        onClick={() =>
+                          setFeedMapping([
+                            { target: 'id', source: 'sku' },
+                            { target: 'title', source: 'name' },
+                            { target: 'price', source: 'basePrice' },
+                          ])
+                        }
+                      >
+                        Preset: Woo basic
+                      </button>
+                      <button
+                        className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                        onClick={() =>
+                          setFeedMapping([
+                            { target: 'id', source: 'sku' },
+                            { target: 'title', source: 'name' },
+                            { target: 'price', source: 'basePrice' },
+                            { target: 'image_link', source: 'image' },
+                            {
+                              target: 'google_product_category',
+                              source: 'categories',
+                            },
+                          ])
+                        }
+                      >
+                        Preset: Google basic
+                      </button>
                     </div>
                   </div>
                 </div>
-                <textarea className="w-full h-40 font-mono text-xs border rounded p-2" value={feedPreview} onChange={()=>{}}/>
+                <textarea
+                  className="w-full h-40 font-mono text-xs border rounded p-2"
+                  value={feedPreview}
+                  onChange={() => {}}
+                />
               </div>
             )}
-            {activeTab==='bulk' && (
+            {activeTab === 'bulk' && (
               <div className="mt-4 space-y-2">
                 <div className="grid grid-cols-1 gap-2">
-                  <input className="border rounded px-2 py-2 text-sm" placeholder="Title prefix" value={titlePrefix} onChange={(e) => setTitlePrefix(e.target.value)} />
-                  <input className="border rounded px-2 py-2 text-sm" placeholder="Title suffix" value={titleSuffix} onChange={(e) => setTitleSuffix(e.target.value)} />
+                  <input
+                    className="border rounded px-2 py-2 text-sm"
+                    placeholder="Title prefix"
+                    value={titlePrefix}
+                    onChange={(e) => setTitlePrefix(e.target.value)}
+                  />
+                  <input
+                    className="border rounded px-2 py-2 text-sm"
+                    placeholder="Title suffix"
+                    value={titleSuffix}
+                    onChange={(e) => setTitleSuffix(e.target.value)}
+                  />
                   <div className="flex items-center gap-2">
                     <label className="text-sm text-gray-800">Price +/-%</label>
-                    <input type="number" className="border rounded px-2 py-2 text-sm w-24" value={pricePercent} onChange={(e) => setPricePercent(Number(e.target.value))} />
+                    <input
+                      type="number"
+                      className="border rounded px-2 py-2 text-sm w-24"
+                      value={pricePercent}
+                      onChange={(e) => setPricePercent(Number(e.target.value))}
+                    />
                   </div>
                 </div>
-                <div className="text-[11px] text-gray-600">Transforms stored in build config; apply during export/import/feed gen.</div>
+                <div className="text-[11px] text-gray-600">
+                  Transforms stored in build config; apply during
+                  export/import/feed gen.
+                </div>
               </div>
             )}
           </div>
@@ -1047,40 +2194,96 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
       {/* Collections Preview Modal */}
       {previewColId && (
         <div className="fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setPreviewColId(null)} />
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setPreviewColId(null)}
+          />
           <div className="absolute inset-0 p-6 flex items-center justify-center">
             <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg border border-gray-200">
               <div className="p-3 border-b flex items-center justify-between">
-                <div className="text-sm font-semibold text-gray-900">Collection preview</div>
-                <button className="text-sm px-2 py-1 rounded border hover:bg-gray-50" onClick={() => setPreviewColId(null)}>Close</button>
+                <div className="text-sm font-semibold text-gray-900">
+                  Collection preview
+                </div>
+                <button
+                  className="text-sm px-2 py-1 rounded border hover:bg-gray-50"
+                  onClick={() => setPreviewColId(null)}
+                >
+                  Close
+                </button>
               </div>
               <div className="p-3 space-y-2">
                 {(() => {
                   const c = collections.find((x) => x.id === previewColId);
-                  if (!c) return <div className="text-sm text-gray-700">Not found</div>;
+                  if (!c)
+                    return (
+                      <div className="text-sm text-gray-700">Not found</div>
+                    );
                   const all = matchCollection(c, products);
                   const pageSize = 30;
-                  const totalPages = Math.max(1, Math.ceil(all.length / pageSize));
+                  const totalPages = Math.max(
+                    1,
+                    Math.ceil(all.length / pageSize)
+                  );
                   const page = Math.min(previewPage, totalPages);
-                  const slice = all.slice((page - 1) * pageSize, page * pageSize);
+                  const slice = all.slice(
+                    (page - 1) * pageSize,
+                    page * pageSize
+                  );
                   const addAllToSelected = () => {
-                    setSelectedProducts((prev) => Array.from(new Set([...prev, ...all.map((p) => p.id)])));
+                    setSelectedProducts((prev) =>
+                      Array.from(new Set([...prev, ...all.map((p) => p.id)]))
+                    );
                   };
                   const addAllToCategory = () => {
                     if (!previewTargetCat) return;
-                    setCategories((cs) => cs.map((cc) => cc.id === previewTargetCat ? { ...cc, productIds: Array.from(new Set([...(cc.productIds || []), ...all.map((p) => p.id)])) } : cc));
+                    setCategories((cs) =>
+                      cs.map((cc) =>
+                        cc.id === previewTargetCat
+                          ? {
+                              ...cc,
+                              productIds: Array.from(
+                                new Set([
+                                  ...(cc.productIds || []),
+                                  ...all.map((p) => p.id),
+                                ])
+                              ),
+                            }
+                          : cc
+                      )
+                    );
                   };
                   return (
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <select className="border rounded px-2 py-1 text-xs" value={previewTargetCat} onChange={(e) => setPreviewTargetCat(e.target.value)}>
+                        <select
+                          className="border rounded px-2 py-1 text-xs"
+                          value={previewTargetCat}
+                          onChange={(e) => setPreviewTargetCat(e.target.value)}
+                        >
                           <option value="">Choose builder category…</option>
-                          {categories.map((bc) => <option key={bc.id} value={bc.id}>{bc.name}</option>)}
+                          {categories.map((bc) => (
+                            <option key={bc.id} value={bc.id}>
+                              {bc.name}
+                            </option>
+                          ))}
                         </select>
-                        <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={addAllToSelected}>Add all to Selected</button>
-                        <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={addAllToCategory} disabled={!previewTargetCat}>Add all to Category</button>
+                        <button
+                          className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                          onClick={addAllToSelected}
+                        >
+                          Add all to Selected
+                        </button>
+                        <button
+                          className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                          onClick={addAllToCategory}
+                          disabled={!previewTargetCat}
+                        >
+                          Add all to Category
+                        </button>
                       </div>
-                      <div className="text-xs text-gray-700 mb-2">Matched {all.length} products</div>
+                      <div className="text-xs text-gray-700 mb-2">
+                        Matched {all.length} products
+                      </div>
                       <div className="max-h-72 overflow-auto border rounded">
                         <table className="min-w-full text-xs">
                           <thead className="bg-gray-50">
@@ -1096,7 +2299,9 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
                               <tr key={p.id} className="border-t">
                                 <td className="px-2 py-1 truncate">{p.name}</td>
                                 <td className="px-2 py-1">{p.sku}</td>
-                                <td className="px-2 py-1">{p.basePrice ?? '-'}</td>
+                                <td className="px-2 py-1">
+                                  {p.basePrice ?? '-'}
+                                </td>
                                 <td className="px-2 py-1">{p.status ?? '-'}</td>
                               </tr>
                             ))}
@@ -1104,9 +2309,27 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
                         </table>
                       </div>
                       <div className="mt-2 flex items-center justify-between">
-                        <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" disabled={page<=1} onClick={() => setPreviewPage((p) => Math.max(1, p-1))}>Prev</button>
-                        <div className="text-xs text-gray-700">Page {page} / {totalPages}</div>
-                        <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" disabled={page>=totalPages} onClick={() => setPreviewPage((p) => Math.min(totalPages, p+1))}>Next</button>
+                        <button
+                          className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                          disabled={page <= 1}
+                          onClick={() =>
+                            setPreviewPage((p) => Math.max(1, p - 1))
+                          }
+                        >
+                          Prev
+                        </button>
+                        <div className="text-xs text-gray-700">
+                          Page {page} / {totalPages}
+                        </div>
+                        <button
+                          className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                          disabled={page >= totalPages}
+                          onClick={() =>
+                            setPreviewPage((p) => Math.min(totalPages, p + 1))
+                          }
+                        >
+                          Next
+                        </button>
                       </div>
                     </div>
                   );

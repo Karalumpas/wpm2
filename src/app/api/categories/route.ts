@@ -13,7 +13,9 @@ export async function GET(request: NextRequest) {
     const sp = request.nextUrl.searchParams;
     const shopId = sp.get('shopId') || undefined;
     const q = sp.get('q') || undefined;
-    const limit = sp.get('limit') ? Math.min(2000, Math.max(1, Number(sp.get('limit')))) : undefined;
+    const limit = sp.get('limit')
+      ? Math.min(2000, Math.max(1, Number(sp.get('limit'))))
+      : undefined;
 
     let whereClause:
       | ReturnType<typeof eq>
@@ -30,7 +32,10 @@ export async function GET(request: NextRequest) {
       whereClause = eq(categories.shopId, shopId);
     } else if (q) {
       const pattern = `%${q}%`;
-      whereClause = or(ilike(categories.name, pattern), ilike(categories.slug, pattern));
+      whereClause = or(
+        ilike(categories.name, pattern),
+        ilike(categories.slug, pattern)
+      );
     } else {
       whereClause = undefined;
     }
@@ -73,24 +78,36 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const data = createCategorySchema.parse(body);
 
-    const slug = (data.slug && data.slug.trim().length > 0)
-      ? data.slug
-      : data.name
-          .toLowerCase()
-          .trim()
-          .replace(/[^a-z0-9\s-]/g, '')
-          .replace(/\s+/g, '-')
-          .replace(/-+/g, '-');
+    const slug =
+      data.slug && data.slug.trim().length > 0
+        ? data.slug
+        : data.name
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-');
 
     // Check unique constraint (name + parentId)
     const parentValue: string | null = data.parentId ?? null;
     const conflict = await db
       .select({ id: categories.id })
       .from(categories)
-      .where(and(eq(categories.name, data.name), eq(categories.parentId, parentValue)))
+      .where(
+        and(
+          eq(categories.name, data.name),
+          eq(categories.parentId, parentValue)
+        )
+      )
       .limit(1);
     if (conflict.length) {
-      return NextResponse.json({ error: 'A category with this name already exists under the same parent.' }, { status: 400 });
+      return NextResponse.json(
+        {
+          error:
+            'A category with this name already exists under the same parent.',
+        },
+        { status: 400 }
+      );
     }
 
     const [created] = await db
@@ -103,7 +120,10 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
-    return NextResponse.json({ success: true, category: created }, { status: 201 });
+    return NextResponse.json(
+      { success: true, category: created },
+      { status: 201 }
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Invalid request';
     return NextResponse.json({ error: message }, { status: 400 });

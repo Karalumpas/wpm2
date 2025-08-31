@@ -7,8 +7,13 @@ type Params = { params: Promise<{ id: string }> };
 
 export async function GET(_req: NextRequest, { params }: Params) {
   const { id } = await params;
-  const rows = await db.select().from(shopBuilds).where(eq(shopBuilds.id, id)).limit(1);
-  if (!rows.length) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  const rows = await db
+    .select()
+    .from(shopBuilds)
+    .where(eq(shopBuilds.id, id))
+    .limit(1);
+  if (!rows.length)
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ build: rows[0] });
 }
 
@@ -36,4 +41,3 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
   await db.delete(shopBuilds).where(eq(shopBuilds.id, id));
   return NextResponse.json({ success: true });
 }
-

@@ -16,32 +16,55 @@ export async function PUT(request: NextRequest, { params }: Params) {
     const slug = data.slug
       ? data.slug
       : data.name
-      ? data.name
-          .toLowerCase()
-          .trim()
-          .replace(/[^a-z0-9\s-]/g, '')
-          .replace(/\s+/g, '-')
-          .replace(/-+/g, '-')
-      : undefined;
+        ? data.name
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+        : undefined;
 
     // Prevent self‑parenting
     if (data.parentId && data.parentId === id) {
-      return NextResponse.json({ error: 'A category cannot be its own parent.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'A category cannot be its own parent.' },
+        { status: 400 }
+      );
     }
 
     // Enforce unique (name + parentId) if name/parent changed
     if (data.name !== undefined || data.parentId !== undefined) {
-      const current = await db.select().from(categories).where(eq(categories.id, id)).limit(1);
-      if (!current.length) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-      const nextParent = (data.parentId !== undefined ? data.parentId : (current[0].parentId as string | null)) ?? null;
+      const current = await db
+        .select()
+        .from(categories)
+        .where(eq(categories.id, id))
+        .limit(1);
+      if (!current.length)
+        return NextResponse.json({ error: 'Not found' }, { status: 404 });
+      const nextParent =
+        (data.parentId !== undefined
+          ? data.parentId
+          : (current[0].parentId as string | null)) ?? null;
       const nextName = data.name !== undefined ? data.name : current[0].name;
       const conflict = await db
         .select({ id: categories.id })
         .from(categories)
-        .where(and(eq(categories.name, nextName), eq(categories.parentId, nextParent), sql`id <> ${id}`))
+        .where(
+          and(
+            eq(categories.name, nextName),
+            eq(categories.parentId, nextParent),
+            sql`id <> ${id}`
+          )
+        )
         .limit(1);
       if (conflict.length) {
-        return NextResponse.json({ error: 'A category with this name already exists under the same parent.' }, { status: 400 });
+        return NextResponse.json(
+          {
+            error:
+              'A category with this name already exists under the same parent.',
+          },
+          { status: 400 }
+        );
       }
 
       // Prevent cycles: ensure nextParent is not a descendant of id
@@ -52,9 +75,16 @@ export async function PUT(request: NextRequest, { params }: Params) {
           if (visited.has(cursor)) break; // safety
           visited.add(cursor);
           if (cursor === id) {
-            return NextResponse.json({ error: 'Invalid parent: would create a cycle.' }, { status: 400 });
+            return NextResponse.json(
+              { error: 'Invalid parent: would create a cycle.' },
+              { status: 400 }
+            );
           }
-          const row = await db.select({ pid: categories.parentId }).from(categories).where(eq(categories.id, cursor)).limit(1);
+          const row = await db
+            .select({ pid: categories.parentId })
+            .from(categories)
+            .where(eq(categories.id, cursor))
+            .limit(1);
           cursor = (row[0]?.pid as string | null) ?? null;
         }
       }
@@ -95,7 +125,12 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
       .where(eq(productCategories.categoryId, id));
     const countUsed = Number(refs[0]?.c || 0);
     if (countUsed > 0 && !moveToCategoryId) {
-      return NextResponse.json({ error: `Category used by ${countUsed} products. Provide moveToCategoryId to migrate products before delete.` }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: `Category used by ${countUsed} products. Provide moveToCategoryId to migrate products before delete.`,
+        },
+        { status: 400 }
+      );
     }
     if (countUsed > 0 && moveToCategoryId) {
       // Move associations, avoiding duplicates
@@ -104,11 +139,17 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
         SELECT product_id, ${moveToCategoryId}::uuid FROM product_categories WHERE category_id = ${id}::uuid
         ON CONFLICT (product_id, category_id) DO NOTHING
       `);
-      await db.execute(sql`DELETE FROM product_categories WHERE category_id = ${id}::uuid`);
+      await db.execute(
+        sql`DELETE FROM product_categories WHERE category_id = ${id}::uuid`
+      );
     }
 
     // Reparent children to this category's parent (or null)
-    const parentRow = await db.select({ parentId: categories.parentId }).from(categories).where(eq(categories.id, id)).limit(1);
+    const parentRow = await db
+      .select({ parentId: categories.parentId })
+      .from(categories)
+      .where(eq(categories.id, id))
+      .limit(1);
     const parentId = parentRow[0]?.parentId ?? null;
     await db
       .update(categories)

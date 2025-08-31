@@ -14,9 +14,16 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
     if (data.name) {
       // Unique name
-      const exists = await db.select({ id: brands.id }).from(brands).where(eq(brands.name, data.name)).limit(1);
+      const exists = await db
+        .select({ id: brands.id })
+        .from(brands)
+        .where(eq(brands.name, data.name))
+        .limit(1);
       if (exists.length && exists[0].id !== id) {
-        return NextResponse.json({ error: 'A brand with this name already exists.' }, { status: 400 });
+        return NextResponse.json(
+          { error: 'A brand with this name already exists.' },
+          { status: 400 }
+        );
       }
     }
 
@@ -49,7 +56,12 @@ export async function DELETE(request: NextRequest, { params }: Params) {
       .where(eq(productBrands.brandId, id));
     const countUsed = Number(refs[0]?.c || 0);
     if (countUsed > 0 && !moveToBrandId) {
-      return NextResponse.json({ error: `Brand used by ${countUsed} products. Provide moveToBrandId to migrate products before delete.` }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: `Brand used by ${countUsed} products. Provide moveToBrandId to migrate products before delete.`,
+        },
+        { status: 400 }
+      );
     }
     if (countUsed > 0 && moveToBrandId) {
       await db.execute(sql`
@@ -57,7 +69,9 @@ export async function DELETE(request: NextRequest, { params }: Params) {
         SELECT product_id, ${moveToBrandId}::uuid FROM product_brands WHERE brand_id = ${id}::uuid
         ON CONFLICT (product_id, brand_id) DO NOTHING
       `);
-      await db.execute(sql`DELETE FROM product_brands WHERE brand_id = ${id}::uuid`);
+      await db.execute(
+        sql`DELETE FROM product_brands WHERE brand_id = ${id}::uuid`
+      );
     }
 
     await db.delete(brands).where(eq(brands.id, id));

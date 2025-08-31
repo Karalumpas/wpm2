@@ -12,7 +12,9 @@ export async function GET(request: NextRequest) {
   try {
     const sp = request.nextUrl.searchParams;
     const q = sp.get('q') || undefined;
-    const limit = sp.get('limit') ? Math.min(2000, Math.max(1, Number(sp.get('limit')))) : undefined;
+    const limit = sp.get('limit')
+      ? Math.min(2000, Math.max(1, Number(sp.get('limit'))))
+      : undefined;
     const whereClause = q ? ilike(brands.name, `%${q}%`) : undefined;
     // Get brands with product counts
     const brandsWithCounts = await db
@@ -51,13 +53,26 @@ export async function POST(request: NextRequest) {
     const data = createBrandSchema.parse(body);
 
     // Unique name
-    const existing = await db.select({ id: brands.id }).from(brands).where(eq(brands.name, data.name)).limit(1);
+    const existing = await db
+      .select({ id: brands.id })
+      .from(brands)
+      .where(eq(brands.name, data.name))
+      .limit(1);
     if (existing.length) {
-      return NextResponse.json({ error: 'A brand with this name already exists.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'A brand with this name already exists.' },
+        { status: 400 }
+      );
     }
 
-    const [created] = await db.insert(brands).values({ name: data.name }).returning();
-    return NextResponse.json({ success: true, brand: created }, { status: 201 });
+    const [created] = await db
+      .insert(brands)
+      .values({ name: data.name })
+      .returning();
+    return NextResponse.json(
+      { success: true, brand: created },
+      { status: 201 }
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Invalid request';
     return NextResponse.json({ error: message }, { status: 400 });

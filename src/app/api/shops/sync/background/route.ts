@@ -77,11 +77,15 @@ export async function PATCH(request: NextRequest) {
     else if (action === 'cancel') job = backgroundSyncQueue.cancel(jobId);
     else return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
 
-    if (!job) return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+    if (!job)
+      return NextResponse.json({ error: 'Job not found' }, { status: 404 });
     return NextResponse.json(job);
   } catch (error) {
     console.error('Control job error:', error);
-    return NextResponse.json({ error: 'Failed to control job' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to control job' },
+      { status: 500 }
+    );
   }
 }
 
@@ -90,12 +94,20 @@ export async function DELETE(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
     const jobId: string | undefined = body?.jobId;
-    if (!jobId) return NextResponse.json({ error: 'Missing jobId' }, { status: 400 });
+    if (!jobId)
+      return NextResponse.json({ error: 'Missing jobId' }, { status: 400 });
     const ok = backgroundSyncQueue.remove(jobId);
-    if (!ok) return NextResponse.json({ error: 'Cannot remove (not found or running)' }, { status: 400 });
+    if (!ok)
+      return NextResponse.json(
+        { error: 'Cannot remove (not found or running)' },
+        { status: 400 }
+      );
     return NextResponse.json({ removed: true });
   } catch (error) {
     console.error('Remove job error:', error);
-    return NextResponse.json({ error: 'Failed to remove job' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to remove job' },
+      { status: 500 }
+    );
   }
 }

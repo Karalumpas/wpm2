@@ -66,7 +66,9 @@ export function useSyncJobs(jobId?: string) {
   };
 }
 
-export async function startBackgroundSync(shopId?: string): Promise<{ accepted: boolean; jobs: string[] } | { error: string } > {
+export async function startBackgroundSync(
+  shopId?: string
+): Promise<{ accepted: boolean; jobs: string[] } | { error: string }> {
   const res = await fetch('/api/shops/sync/background', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -79,7 +81,10 @@ export async function startBackgroundSync(shopId?: string): Promise<{ accepted: 
   }
 }
 
-export async function controlSyncJob(jobId: string, action: 'pause' | 'resume' | 'cancel'): Promise<SyncJob | { error: string }> {
+export async function controlSyncJob(
+  jobId: string,
+  action: 'pause' | 'resume' | 'cancel'
+): Promise<SyncJob | { error: string }> {
   const res = await fetch('/api/shops/sync/background', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
@@ -92,7 +97,9 @@ export async function controlSyncJob(jobId: string, action: 'pause' | 'resume' |
   }
 }
 
-export async function removeSyncJob(jobId: string): Promise<{ removed: boolean } | { error: string }> {
+export async function removeSyncJob(
+  jobId: string
+): Promise<{ removed: boolean } | { error: string }> {
   const res = await fetch('/api/shops/sync/background', {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },

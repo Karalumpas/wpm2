@@ -30,14 +30,17 @@ class BackgroundSyncQueue {
   private queue: SyncJob[] = [];
   private jobs = new Map<string, SyncJob>();
   private processing = false;
-  private controllers = new Map<string, {
-    paused: boolean;
-    cancelled: boolean;
-    waiters: Array<() => void>;
-    isPaused: () => boolean;
-    isCancelled: () => boolean;
-    waitIfPaused: () => Promise<void>;
-  }>();
+  private controllers = new Map<
+    string,
+    {
+      paused: boolean;
+      cancelled: boolean;
+      waiters: Array<() => void>;
+      isPaused: () => boolean;
+      isCancelled: () => boolean;
+      waitIfPaused: () => Promise<void>;
+    }
+  >();
 
   enqueue(shopId: string): SyncJob {
     const id = `${shopId}:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`;
@@ -52,13 +55,19 @@ class BackgroundSyncQueue {
     // Best-effort fetch of shop name for UI
     void (async () => {
       try {
-        const rows = await db.select({ name: shops.name }).from(shops).where(eq(shops.id, shopId)).limit(1);
+        const rows = await db
+          .select({ name: shops.name })
+          .from(shops)
+          .where(eq(shops.id, shopId))
+          .limit(1);
         if (rows.length) {
           job.shopName = rows[0].name;
         }
       } catch {}
     })();
-    job.logs.push(`[${new Date().toLocaleTimeString()}] Job oprettet for shop ${shopId}`);
+    job.logs.push(
+      `[${new Date().toLocaleTimeString()}] Job oprettet for shop ${shopId}`
+    );
     this.queue.push(job);
     this.jobs.set(id, job);
     this.kick();
@@ -91,7 +100,9 @@ class BackgroundSyncQueue {
     try {
       job.status = 'running';
       job.startedAt = new Date();
-      job.logs.push(`[${new Date().toLocaleTimeString()}] Starter synkronisering…`);
+      job.logs.push(
+        `[${new Date().toLocaleTimeString()}] Starter synkronisering…`
+      );
 
       // Ensure shop exists (will throw if missing)
       const found = await db
@@ -103,7 +114,8 @@ class BackgroundSyncQueue {
         throw new Error(`Shop not found: ${job.shopId}`);
       }
 
-      const service: WooCommerceProductSyncService = await createSyncServiceForShop(job.shopId);
+      const service: WooCommerceProductSyncService =
+        await createSyncServiceForShop(job.shopId);
 
       // Attach job controller for pause/cancel support
       const controller = this.ensureController(job.id);
@@ -112,7 +124,9 @@ class BackgroundSyncQueue {
         isCancelled: () => controller.cancelled,
         waitIfPaused: async () => {
           if (!controller.paused) return;
-          await new Promise<void>((resolve) => controller.waiters.push(resolve));
+          await new Promise<void>((resolve) =>
+            controller.waiters.push(resolve)
+          );
         },
       });
       if (controller.paused) {
@@ -138,12 +152,16 @@ class BackgroundSyncQueue {
       job.finishedAt = new Date();
       job.message = result.message;
       job.details = result.details;
-      job.logs.push(`[${new Date().toLocaleTimeString()}] Færdig: ${result.message}`);
+      job.logs.push(
+        `[${new Date().toLocaleTimeString()}] Færdig: ${result.message}`
+      );
     } catch (e) {
       job.status = 'failed';
       job.finishedAt = new Date();
       job.error = e instanceof Error ? e.message : 'Unknown error';
-      job.logs.push(`[${new Date().toLocaleTimeString()}] Fejlede: ${job.error}`);
+      job.logs.push(
+        `[${new Date().toLocaleTimeString()}] Fejlede: ${job.error}`
+      );
     } finally {
       // Keep processing remaining jobs
       setImmediate(() => this.processNext());
@@ -157,8 +175,12 @@ class BackgroundSyncQueue {
         paused: false,
         cancelled: false,
         waiters: [],
-        isPaused: function () { return this.paused; },
-        isCancelled: function () { return this.cancelled; },
+        isPaused: function () {
+          return this.paused;
+        },
+        isCancelled: function () {
+          return this.cancelled;
+        },
         waitIfPaused: async function () {
           if (!this.paused) return;
           await new Promise<void>((resolve) => this.waiters.push(resolve));
@@ -180,7 +202,9 @@ class BackgroundSyncQueue {
       // queued: mark paused; will start as paused
       this.ensureController(jobId).paused = true;
       job.status = 'paused';
-      job.logs.push(`[${new Date().toLocaleTimeString()}] Job i kø sat på pause`);
+      job.logs.push(
+        `[${new Date().toLocaleTimeString()}] Job i kø sat på pause`
+      );
     }
     return job;
   }
@@ -207,7 +231,9 @@ class BackgroundSyncQueue {
     c.cancelled = true;
     // Ensure we release pause to let worker observe cancellation
     if (c.paused) this.resume(jobId);
-    job.logs.push(`[${new Date().toLocaleTimeString()}] Stopper job (anmoder om annullering)`);
+    job.logs.push(
+      `[${new Date().toLocaleTimeString()}] Stopper job (anmoder om annullering)`
+    );
     return job;
   }
 

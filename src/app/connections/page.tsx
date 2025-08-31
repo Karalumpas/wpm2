@@ -541,6 +541,9 @@ function ShopCard({ shop, onUpdate }: ShopCardProps) {
                 style={{ width: `${syncProgress}%` }}
               ></div>
             </div>
+            {syncJobId && (
+              <div className="mt-1 text-xs text-gray-500">Job: {syncJobId}</div>
+            )}
           </div>
         )}
 

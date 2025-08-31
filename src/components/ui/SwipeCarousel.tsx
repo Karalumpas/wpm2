@@ -54,12 +54,12 @@ export default function SwipeCarousel({
     if (!draggable || startX.current === null) return;
     dx.current = e.clientX - startX.current;
     setDrag(dx.current);
+    if (Math.abs(dx.current) > 3) {
+      // Avoid page scroll on horizontal swipes
+      e.preventDefault();
+    }
   }
-  function onPointerUp(e: React.PointerEvent) {
-    if (!draggable) return;
-    try {
-      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-    } catch {}
+  function finishPointer() {
     const dist = dx.current;
     setIsDragging(false);
     setDrag(0);
@@ -67,6 +67,17 @@ export default function SwipeCarousel({
     if (Math.abs(dist) > threshold) {
       setActive(clamp(active + (dist < 0 ? 1 : -1)));
     }
+  }
+  function onPointerUp(e: React.PointerEvent) {
+    if (!draggable) return;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
+    finishPointer();
+  }
+  function onPointerCancel() {
+    if (!draggable) return;
+    finishPointer();
   }
 
   // Keyboard support
@@ -91,11 +102,12 @@ export default function SwipeCarousel({
   return (
     <div
       ref={containerRef}
-      className={`relative overflow-hidden bg-gray-100 ${aspectClass} ${className}`}
+      className={`relative overflow-hidden bg-gray-100 ${aspectClass} ${className} touch-pan-y select-none`}
       tabIndex={0}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
+      onPointerCancel={onPointerCancel}
       role="group"
       aria-label="Billedgalleri"
     >

@@ -301,8 +301,8 @@ function ShopCard({ shop, onUpdate }: ShopCardProps) {
   };
 
   const syncProducts = async () => {
+    let handedOff = false;
     try {
-      let handedOff = false;
       setSyncing(true);
       setSyncResult(null);
       setSyncLogs([]);

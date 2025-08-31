@@ -77,6 +77,13 @@ export default function ShopBuilderClient() {
   const [feedPlatform, setFeedPlatform] = useState<'woocommerce' | 'google' | 'facebook'>('woocommerce');
   const [feedFormat, setFeedFormat] = useState<'json' | 'csv'>('json');
   const [feedPreview, setFeedPreview] = useState<string>('');
+  const [feedSource, setFeedSource] = useState<{ type: 'selected' | 'category' | 'collection'; id?: string }>({ type: 'selected' });
+  type MappingRow = { target: string; source: keyof Product | 'categories' | 'tags' };
+  const [feedMapping, setFeedMapping] = useState<MappingRow[]>([
+    { target: 'id', source: 'sku' },
+    { target: 'title', source: 'name' },
+    { target: 'price', source: 'basePrice' },
+  ]);
   const [titlePrefix, setTitlePrefix] = useState('');
   const [titleSuffix, setTitleSuffix] = useState('');
   const [pricePercent, setPricePercent] = useState<number>(0);
@@ -274,12 +281,31 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
     a.click();
   }
   async function previewFeed() {
-    const res = await fetch(`/api/shop-builder/feeds/preview?format=${feedFormat}&platform=${feedPlatform}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ config }) });
-    if (feedFormat === 'csv') {
-      setFeedPreview(await res.text());
-    } else {
-      setFeedPreview(JSON.stringify(await res.json(), null, 2));
+    // Build item set from chosen source
+    let list: Product[] = [];
+    if (feedSource.type === 'selected') {
+      list = products.filter((p) => selectedProducts.includes(p.id));
+    } else if (feedSource.type === 'category') {
+      const cat = categories.find((c) => c.id === feedSource.id);
+      list = products.filter((p) => (cat?.productIds || []).includes(p.id));
+    } else if (feedSource.type === 'collection') {
+      const col = collections.find((c) => c.id === feedSource.id);
+      if (col) list = matchCollection(col, products);
     }
+    const items = list.map((p) => ({
+      id: p.id,
+      sku: p.sku,
+      name: p.name,
+      basePrice: p.basePrice,
+      image: p.featuredImage,
+      status: p.status,
+      type: p.type,
+      categories: categories.filter((c) => c.productIds.includes(p.id)).map((c) => c.name),
+      tags,
+    }));
+    const mapping = feedMapping.map((m) => ({ target: m.target, source: m.source }));
+    const res = await fetch(`/api/shop-builder/feeds/preview?format=${feedFormat}&platform=${feedPlatform}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ config, items, mapping }) });
+    setFeedPreview(feedFormat === 'csv' ? await res.text() : JSON.stringify(await res.json(), null, 2));
   }
 
   // Layout DnD handlers
@@ -643,8 +669,8 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
             </button>
             <div className="text-[11px] text-gray-600">Export produces a JSON model you can import into a new WooCommerce shop via a future import tool.</div>
             {activeTab==='feeds' && (
-              <div className="mt-4">
-                <div className="flex items-center gap-2 mb-2">
+              <div className="mt-4 space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <select className="border rounded px-2 py-1 text-sm" value={feedPlatform} onChange={(e) => setFeedPlatform(e.target.value as any)}>
                     <option value="woocommerce">WooCommerce</option>
                     <option value="google">Google Merchant</option>
@@ -654,7 +680,51 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
                     <option value="json">JSON</option>
                     <option value="csv">CSV</option>
                   </select>
+                  <select className="border rounded px-2 py-1 text-sm" value={feedSource.type} onChange={(e) => setFeedSource({ type: e.target.value as any })}>
+                    <option value="selected">Selected</option>
+                    <option value="category">Builder Category</option>
+                    <option value="collection">Collection</option>
+                  </select>
+                  {(feedSource.type==='category') && (
+                    <select className="border rounded px-2 py-1 text-sm" value={feedSource.id || ''} onChange={(e) => setFeedSource({ type: 'category', id: e.target.value })}>
+                      <option value="">Choose category…</option>
+                      {categories.map((bc) => <option key={bc.id} value={bc.id}>{bc.name}</option>)}
+                    </select>
+                  )}
+                  {(feedSource.type==='collection') && (
+                    <select className="border rounded px-2 py-1 text-sm" value={feedSource.id || ''} onChange={(e) => setFeedSource({ type: 'collection', id: e.target.value })}>
+                      <option value="">Choose collection…</option>
+                      {collections.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </select>
+                  )}
                   <button className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50" onClick={previewFeed}>Preview</button>
+                </div>
+                {/* Mapping editor */}
+                <div className="border rounded p-2">
+                  <div className="text-xs font-semibold text-gray-900 mb-1">Field Mapping</div>
+                  <div className="space-y-1">
+                    {feedMapping.map((m, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <input className="border rounded px-2 py-1 text-xs w-40" value={m.target} onChange={(e) => setFeedMapping((mm) => mm.map((x, i) => i===idx?{...x, target: e.target.value}:x))} placeholder="target field" />
+                        <select className="border rounded px-2 py-1 text-xs" value={m.source} onChange={(e) => setFeedMapping((mm) => mm.map((x, i) => i===idx?{...x, source: e.target.value as any}:x))}>
+                          <option value="name">name</option>
+                          <option value="sku">sku</option>
+                          <option value="basePrice">price</option>
+                          <option value="image">image</option>
+                          <option value="status">status</option>
+                          <option value="type">type</option>
+                          <option value="categories">categories</option>
+                          <option value="tags">tags</option>
+                        </select>
+                        <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => setFeedMapping((mm) => mm.filter((_, i) => i!==idx))}>Remove</button>
+                      </div>
+                    ))}
+                    <div className="flex items-center gap-2 mt-1">
+                      <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => setFeedMapping((mm) => [...mm, { target: 'new_field', source: 'name' }])}>Add mapping</button>
+                      <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => setFeedMapping([{ target: 'id', source: 'sku' }, { target: 'title', source: 'name' }, { target: 'price', source: 'basePrice' }])}>Preset: Woo basic</button>
+                      <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => setFeedMapping([{ target: 'id', source: 'sku' }, { target: 'title', source: 'name' }, { target: 'price', source: 'basePrice' }, { target: 'image_link', source: 'image' }, { target: 'google_product_category', source: 'categories' }])}>Preset: Google basic</button>
+                    </div>
+                  </div>
                 </div>
                 <textarea className="w-full h-40 font-mono text-xs border rounded p-2" value={feedPreview} onChange={()=>{}}/>
               </div>

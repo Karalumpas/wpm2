@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 function toCsv(headers: string[], rows: string[][]): string {
-  const esc = (s: string) => '"' + s.replace(/"/g, '""') + '"';
+  const esc = (s: string) => '"' + (s ?? '').toString().replace(/"/g, '""') + '"';
   return [headers.map(esc).join(','), ...rows.map((r) => r.map(esc).join(','))].join('\n');
 }
+
+type MappingRow = { target: string; source: string };
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,23 +13,40 @@ export async function POST(request: NextRequest) {
     const format = (sp.get('format') || 'json').toLowerCase();
     const platform = (sp.get('platform') || 'woocommerce').toLowerCase();
     const body = await request.json();
-    const cfg = body?.config || body;
 
-    const categories: Array<{ name: string; productIds: string[] }> = cfg.categories || [];
-    const tags: string[] = cfg.tags || [];
-    const productIds: string[] = cfg.products || [];
+    // Accept either config-only (legacy) or explicit items+mapping
+    const cfg = body?.config || {};
+    const items: Array<Record<string, unknown>> = body?.items || [];
+    const mapping: MappingRow[] = body?.mapping || [];
 
-    // Map to a flat list with metadata (category list & tags)
-    const rows = productIds.map((id: string) => ({
-      id,
-      sku: id, // placeholder: real SKU can be joined by client if provided
-      name: id,
-      categories: categories.filter((c) => (c.productIds || []).includes(id)).map((c) => c.name),
-      tags,
-    }));
+    let rows: Array<Record<string, unknown>> = [];
+    if (items.length && mapping.length) {
+      // Map provided items via mapping rows
+      rows = items.map((it) => {
+        const out: Record<string, unknown> = {};
+        for (const m of mapping) {
+          const val = (it as any)[m.source];
+          out[m.target] = Array.isArray(val) ? val.join('|') : val;
+        }
+        return out;
+      });
+    } else {
+      // Fallback legacy behavior using config only
+      const categories: Array<{ name: string; productIds: string[] }> = cfg.categories || [];
+      const tags: string[] = cfg.tags || [];
+      const productIds: string[] = cfg.products || [];
+      rows = productIds.map((id: string) => ({
+        id,
+        sku: id,
+        name: id,
+        categories: categories.filter((c) => (c.productIds || []).includes(id)).map((c) => c.name),
+        tags,
+      }));
+    }
 
     if (format === 'csv') {
-      const csv = toCsv(['id', 'sku', 'name', 'categories', 'tags'], rows.map((r) => [r.id, r.sku, r.name, r.categories.join('|'), r.tags.join('|')]));
+      const headers = mapping.length ? mapping.map((m) => m.target) : Object.keys(rows[0] || {});
+      const csv = toCsv(headers, rows.map((r) => headers.map((h) => (r as any)[h] ?? '')));
       return new NextResponse(csv, { status: 200, headers: { 'Content-Type': 'text/csv' } });
     }
     return NextResponse.json({ platform, items: rows });
@@ -35,4 +54,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to build preview' }, { status: 400 });
   }
 }
-

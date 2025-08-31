@@ -49,7 +49,10 @@ export function MainLayout({ children }: MainLayoutProps) {
   const profileRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     function onClick(e: MouseEvent) {
-      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(e.target as Node)
+      ) {
         setProfileOpen(false);
       }
     }
@@ -82,8 +85,16 @@ export function MainLayout({ children }: MainLayoutProps) {
       </div>
 
       {/* Desktop sidebar */}
-      <div className={cn('hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col transition-[width]', sidebarCollapsed ? 'lg:w-16' : 'lg:w-64')}>
-        <Sidebar collapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed((c) => !c)} />
+      <div
+        className={cn(
+          'hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col transition-[width]',
+          sidebarCollapsed ? 'lg:w-16' : 'lg:w-64'
+        )}
+      >
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed((c) => !c)}
+        />
       </div>
 
       {/* Main content */}
@@ -117,9 +128,24 @@ export function MainLayout({ children }: MainLayoutProps) {
                     </button>
                     {profileOpen && (
                       <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50">
-                        <Link href="/profile" className="block px-3 py-2 text-sm text-gray-800 hover:bg-gray-50">Profile</Link>
-                        <Link href="/settings" className="block px-3 py-2 text-sm text-gray-800 hover:bg-gray-50">Settings</Link>
-                        <button onClick={() => signOut({ callbackUrl: '/login' })} className="block w-full text-left px-3 py-2 text-sm text-gray-800 hover:bg-gray-50">Log out</button>
+                        <Link
+                          href="/profile"
+                          className="block px-3 py-2 text-sm text-gray-800 hover:bg-gray-50"
+                        >
+                          Profile
+                        </Link>
+                        <Link
+                          href="/settings"
+                          className="block px-3 py-2 text-sm text-gray-800 hover:bg-gray-50"
+                        >
+                          Settings
+                        </Link>
+                        <button
+                          onClick={() => signOut({ callbackUrl: '/login' })}
+                          className="block w-full text-left px-3 py-2 text-sm text-gray-800 hover:bg-gray-50"
+                        >
+                          Log out
+                        </button>
                       </div>
                     )}
                   </div>
@@ -138,7 +164,13 @@ export function MainLayout({ children }: MainLayoutProps) {
   );
 }
 
-function Sidebar({ collapsed, onToggleCollapse }: { collapsed: boolean; onToggleCollapse: () => void }) {
+function Sidebar({
+  collapsed,
+  onToggleCollapse,
+}: {
+  collapsed: boolean;
+  onToggleCollapse: () => void;
+}) {
   const pathname = usePathname();
   const { data: session } = useSession();
 
@@ -149,7 +181,9 @@ function Sidebar({ collapsed, onToggleCollapse }: { collapsed: boolean; onToggle
           <div className="flex items-center">
             <Package className="h-7 w-7 text-indigo-600" />
             {!collapsed && (
-              <span className="ml-2 text-xl font-bold text-gray-900">WPM v2</span>
+              <span className="ml-2 text-xl font-bold text-gray-900">
+                WPM v2
+              </span>
             )}
           </div>
           <button
@@ -179,7 +213,9 @@ function Sidebar({ collapsed, onToggleCollapse }: { collapsed: boolean; onToggle
               >
                 <Icon
                   className={cn(
-                    collapsed ? 'h-5 w-5 flex-shrink-0' : 'mr-3 h-5 w-5 flex-shrink-0',
+                    collapsed
+                      ? 'h-5 w-5 flex-shrink-0'
+                      : 'mr-3 h-5 w-5 flex-shrink-0',
                     isActive
                       ? 'text-indigo-500'
                       : 'text-gray-400 group-hover:text-gray-500'

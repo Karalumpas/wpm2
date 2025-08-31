@@ -193,7 +193,6 @@ If you are upgrading from a version without MinIO-normalized variant images:
 
 1. Ensure `.env.local` has a valid `ENCRYPTION_KEY` and MinIO variables.
 2. Run a background sync for each shop to normalize images:
-
    - `POST /api/shops/sync/background` with `{ "shopId": "<id>" }`.
    - Poll `GET /api/shops/sync/background?jobId=<jobId>` for progress.
 

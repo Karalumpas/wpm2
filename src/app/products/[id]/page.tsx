@@ -67,7 +67,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
       // Strip querystring to avoid duplicates from WP size params, etc.
       const base = `${url.protocol}//${url.host}${url.pathname}`;
       // For MinIO, dedupe by object path (bucket/object)
-      if (/:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//.test(base)) return base.toLowerCase();
+      if (/:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//.test(base))
+        return base.toLowerCase();
       return base.toLowerCase();
     } catch {
       return u;
@@ -101,7 +102,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
               <CopyButton value={product.sku} label="Kopiér SKU" />
               <span className="hidden sm:inline">•</span>
               <span className="hidden sm:inline">
-                Sidst opdateret {product.updatedAt ? formatDateTime(product.updatedAt) : '-'}
+                Sidst opdateret{' '}
+                {product.updatedAt ? formatDateTime(product.updatedAt) : '-'}
               </span>
             </div>
           </div>

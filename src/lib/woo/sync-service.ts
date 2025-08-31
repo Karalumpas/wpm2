@@ -605,7 +605,10 @@ export class WooCommerceProductSyncService {
       const normalized: string[] = [];
       for (const u of unique) {
         try {
-          const synced = await imageSyncService.downloadImageToMinIO(u, this.shopId);
+          const synced = await imageSyncService.downloadImageToMinIO(
+            u,
+            this.shopId
+          );
           normalized.push(synced?.centralUrl || u);
         } catch {
           normalized.push(u);
@@ -615,7 +618,7 @@ export class WooCommerceProductSyncService {
       await db
         .update(products)
         .set({
-          galleryImages: (normalized as unknown) as string[],
+          galleryImages: normalized as unknown as string[],
           updatedAt: new Date(),
         })
         .where(eq(products.id, productId));
@@ -1244,4 +1247,3 @@ export async function createSyncServiceForShop(
 
   return new WooCommerceProductSyncService(shopId, client, shop[0].userId);
 }
-

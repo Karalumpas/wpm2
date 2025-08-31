@@ -284,7 +284,9 @@ export function ProductsToolbar({
               className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white hover:bg-gray-50 inline-flex items-center gap-2 lg:hidden"
               aria-expanded={showFilters}
             >
-              <ChevronDown className={`h-4 w-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${showFilters ? 'rotate-180' : ''}`}
+              />
               Filters
             </button>
             {/* View mode toggle */}
@@ -320,7 +322,10 @@ export function ProductsToolbar({
             {params.status && (
               <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs border bg-blue-50 text-blue-700">
                 Status: {params.status}
-                <button onClick={() => onParamsUpdate({ status: undefined, page: 1 })} aria-label="Clear status">
+                <button
+                  onClick={() => onParamsUpdate({ status: undefined, page: 1 })}
+                  aria-label="Clear status"
+                >
                   <X className="w-3 h-3" />
                 </button>
               </span>
@@ -328,7 +333,10 @@ export function ProductsToolbar({
             {params.type && (
               <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs border bg-purple-50 text-purple-700">
                 Type: {params.type}
-                <button onClick={() => onParamsUpdate({ type: undefined, page: 1 })} aria-label="Clear type">
+                <button
+                  onClick={() => onParamsUpdate({ type: undefined, page: 1 })}
+                  aria-label="Clear type"
+                >
                   <X className="w-3 h-3" />
                 </button>
               </span>
@@ -336,7 +344,10 @@ export function ProductsToolbar({
             {(params.brandIds?.length || 0) > 0 && (
               <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs border bg-emerald-50 text-emerald-700">
                 Brands: {params.brandIds!.length}
-                <button onClick={() => onParamsUpdate({ brandIds: [], page: 1 })} aria-label="Clear brands">
+                <button
+                  onClick={() => onParamsUpdate({ brandIds: [], page: 1 })}
+                  aria-label="Clear brands"
+                >
                   <X className="w-3 h-3" />
                 </button>
               </span>
@@ -344,7 +355,10 @@ export function ProductsToolbar({
             {(params.categoryIds?.length || 0) > 0 && (
               <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs border bg-amber-50 text-amber-700">
                 Categories: {params.categoryIds!.length}
-                <button onClick={() => onParamsUpdate({ categoryIds: [], page: 1 })} aria-label="Clear categories">
+                <button
+                  onClick={() => onParamsUpdate({ categoryIds: [], page: 1 })}
+                  aria-label="Clear categories"
+                >
                   <X className="w-3 h-3" />
                 </button>
               </span>
@@ -352,7 +366,10 @@ export function ProductsToolbar({
             {(params.shopIds?.length || 0) > 0 && (
               <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs border bg-indigo-50 text-indigo-700">
                 Shops: {params.shopIds!.length}
-                <button onClick={() => onParamsUpdate({ shopIds: [], page: 1 })} aria-label="Clear shops">
+                <button
+                  onClick={() => onParamsUpdate({ shopIds: [], page: 1 })}
+                  aria-label="Clear shops"
+                >
                   <X className="w-3 h-3" />
                 </button>
               </span>
@@ -361,7 +378,9 @@ export function ProductsToolbar({
         )}
 
         {/* Filters Row */}
-        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 ${showFilters ? '' : 'hidden lg:grid'}`}>
+        <div
+          className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 ${showFilters ? '' : 'hidden lg:grid'}`}
+        >
           {/* Status Filter */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">Status</label>

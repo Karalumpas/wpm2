@@ -500,7 +500,7 @@ export class WooCommerceProductSyncService {
             for (const variation of variations) {
               await this.checkControl();
               try {
-                const syncData = this.mapVariationToSyncData(
+                const syncData = await this.mapVariationToSyncData(
                   variation,
                   product.id
                 );
@@ -601,14 +601,36 @@ export class WooCommerceProductSyncService {
       }
       const unique = uniqueByName;
       if (unique.length === 0) return;
+      // Normalize gallery images to central storage (MinIO)
+      const normalized: string[] = [];
+      for (const u of unique) {
+        try {
+          const synced = await imageSyncService.downloadImageToMinIO(u, this.shopId);
+          normalized.push(synced?.centralUrl || u);
+        } catch {
+          normalized.push(u);
+        }
+      }
 
       await db
         .update(products)
         .set({
-          galleryImages: unique as unknown as string[],
+          galleryImages: (normalized as unknown) as string[],
           updatedAt: new Date(),
         })
         .where(eq(products.id, productId));
+
+      // Register central images for this product so they appear in media_files
+      try {
+        await imageSyncService.registerCentralImagesForProduct(
+          productId,
+          this.userId,
+          undefined,
+          normalized
+        );
+      } catch (err) {
+        console.warn('Failed to register backfilled gallery images', err);
+      }
     } catch (e) {
       // Non-fatal; log and continue
       console.warn('ensureGalleryFromVariantImages failed for', productId, e);
@@ -722,10 +744,10 @@ export class WooCommerceProductSyncService {
     };
   }
 
-  private mapVariationToSyncData(
+  private async mapVariationToSyncData(
     variation: WooCommerceProductVariation,
     productId: string
-  ): VariationSyncData {
+  ): Promise<VariationSyncData> {
     // Helper function to convert empty strings to undefined for numeric fields
     const parseNumeric = (
       value: string | number | null | undefined
@@ -734,6 +756,21 @@ export class WooCommerceProductSyncService {
         return undefined;
       return value.toString();
     };
+
+    // Normalize variant image to central storage (MinIO) when available
+    let normalizedImage: string | undefined = variation.image?.src;
+    try {
+      if (variation.image?.src) {
+        const synced = await imageSyncService.downloadImageToMinIO(
+          variation.image.src,
+          this.shopId
+        );
+        if (synced?.centralUrl) normalizedImage = synced.centralUrl;
+      }
+    } catch (err) {
+      // non-fatal; keep original URL
+      console.warn('Variant image normalization failed:', err);
+    }
 
     return {
       wooCommerceId: variation.id.toString(),
@@ -758,7 +795,7 @@ export class WooCommerceProductSyncService {
         width: variation.dimensions.width || '',
         height: variation.dimensions.height || '',
       },
-      image: variation.image?.src,
+      image: normalizedImage,
     };
   }
 
@@ -1207,3 +1244,4 @@ export async function createSyncServiceForShop(
 
   return new WooCommerceProductSyncService(shopId, client, shop[0].userId);
 }
+

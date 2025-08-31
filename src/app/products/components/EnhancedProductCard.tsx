@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import SwipeCarousel from '@/components/ui/SwipeCarousel';
 import { ProductListItem } from '@/types/product';
 import { useSettings } from '@/hooks/useSettings';
 import { formatPrice } from '@/lib/utils/currency';
@@ -64,28 +65,13 @@ export function EnhancedProductCard({ product }: Props) {
       {/* Image carousel */}
       <div className="relative aspect-square overflow-hidden rounded-t-xl bg-gray-100">
         {images.length > 0 ? (
-          <div
-            className="absolute inset-0"
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={onPointerUp}
-          >
-            <Image
-              key={images[idx]}
-              src={images[idx]}
-              alt={product.name}
-              fill
-              className="object-cover select-none"
-              sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              draggable={false}
-            />
-          </div>
+          <SwipeCarousel images={images} alt={product.name} index={idx} onIndexChange={setIdx} priority />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-gray-400">No Image</div>
         )}
 
         {/* Controls */}
-        {images.length > 1 && (
+        {false && images.length > 1 && (
           <>
             <button
               onClick={() => setIdx((i) => clampIdx(i - 1))}

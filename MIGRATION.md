@@ -8,6 +8,7 @@ This document highlights changes that may require action when upgrading.
 - If a product has no gallery, variant images (deduped by filename) are used to backfill the product gallery, and are registered in `media_files`.
 
 ### What you need to do
+
 1. Ensure `.env.local` has a valid base64 32‑byte `ENCRYPTION_KEY` and MinIO variables.
 2. Run a background sync for each shop to normalize images:
    - `POST /api/shops/sync/background` with `{ "shopId": "<id>" }`

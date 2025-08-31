@@ -2,13 +2,17 @@
 
 import useSWR from 'swr';
 import { useEffect, useMemo, useState } from 'react';
-import { Search, FolderPlus, Download, Settings, Package, Folder, Tag } from 'lucide-react';
+import { Search, FolderPlus, Download, Settings, Package, Folder, Tag, Layout, ListChecks, SlidersHorizontal, Layers, Trash2, PlusCircle } from 'lucide-react';
 
 type Product = {
   id: string;
   name: string;
   sku: string;
+  basePrice?: string | null;
+  status?: string;
+  type?: string;
   featuredImage?: string | null;
+  updatedAt?: string;
 };
 
 type ApiProducts = {
@@ -16,7 +20,11 @@ type ApiProducts = {
     id: string;
     name: string;
     sku: string;
+    basePrice?: string | null;
+    status?: string;
+    type?: string;
     featuredImage?: string | null;
+    updatedAt?: string;
   }>;
 };
 
@@ -29,6 +37,9 @@ const fetcher = async (url: string) => {
 };
 
 type BuilderCategory = { id: string; name: string; productIds: string[] };
+type Rule = { field: 'name' | 'sku' | 'price' | 'status' | 'type' | 'builderCategory'; op: 'contains' | 'equals' | 'lt' | 'gt'; value: string };
+type Collection = { id: string; name: string; rules: Rule[]; logic?: 'all' | 'any'; limit?: number; sortBy?: 'name' | 'price' | 'updatedAt'; sortOrder?: 'asc' | 'desc' };
+type LayoutBlock = { id: string; type: 'hero' | 'grid' | 'carousel'; title?: string; source?: { type: 'collection' | 'category' | 'selected'; id?: string }; columns?: number };
 
 export default function ShopBuilderClient() {
   // Catalog
@@ -39,7 +50,16 @@ export default function ShopBuilderClient() {
     `/api/products?limit=60${query ? `&search=${encodeURIComponent(query)}` : ''}${shopId ? `&shopIds=${shopId}` : ''}`,
     fetcher
   );
-  const products: Product[] = (productsData?.items || []).map((p) => ({ id: p.id, name: p.name, sku: p.sku, featuredImage: (p as any).featuredImage }));
+  const products: Product[] = (productsData?.items || []).map((p) => ({
+    id: p.id,
+    name: p.name,
+    sku: p.sku,
+    basePrice: (p as unknown as Partial<Product>).basePrice ?? null,
+    status: (p as unknown as Partial<Product>).status,
+    type: (p as unknown as Partial<Product>).type,
+    featuredImage: (p as unknown as Partial<Product>).featuredImage,
+    updatedAt: (p as unknown as Partial<Product>).updatedAt,
+  }));
 
   // Builder State
   const [builderName, setBuilderName] = useState('New Webshop');
@@ -50,6 +70,19 @@ export default function ShopBuilderClient() {
   const [tags, setTags] = useState<string[]>([]);
   const [selectedTag, setSelectedTag] = useState('');
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  // Advanced tabs and features
+  const [activeTab, setActiveTab] = useState<'structure' | 'collections' | 'layout' | 'feeds' | 'bulk'>('structure');
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [layoutBlocks, setLayoutBlocks] = useState<LayoutBlock[]>([]);
+  const [feedPlatform, setFeedPlatform] = useState<'woocommerce' | 'google' | 'facebook'>('woocommerce');
+  const [feedFormat, setFeedFormat] = useState<'json' | 'csv'>('json');
+  const [feedPreview, setFeedPreview] = useState<string>('');
+  const [titlePrefix, setTitlePrefix] = useState('');
+  const [titleSuffix, setTitleSuffix] = useState('');
+  const [pricePercent, setPricePercent] = useState<number>(0);
+  // Collections preview modal
+  const [previewColId, setPreviewColId] = useState<string | null>(null);
+  const [previewPage, setPreviewPage] = useState(1);
   // Persistence
   const { data: buildsData, mutate: reloadBuilds } = useSWR<{ builds: Array<{ id: string; name: string; slug: string }> }>(
     '/api/shop-builder/builds', fetcher
@@ -143,6 +176,72 @@ export default function ShopBuilderClient() {
     setTags((ts) => ts.filter((t) => t !== tag));
   }
 
+  // Collections
+  function addCollection() {
+    const name = prompt('Collection name')?.trim();
+    if (!name) return;
+    setCollections((cs) => [...cs, { id: crypto.randomUUID(), name, rules: [] }]);
+  }
+  function addRule(colId: string) {
+    setCollections((cs) => cs.map((c) => (c.id === colId ? { ...c, rules: [...c.rules, { field: 'name', op: 'contains', value: '' }] } : c)));
+  }
+  function updateRule(colId: string, idx: number, patch: Partial<Rule>) {
+    setCollections((cs) => cs.map((c) => (c.id === colId ? { ...c, rules: c.rules.map((r, i) => (i === idx ? { ...r, ...patch } : r)) } : c)));
+  }
+  function removeRule(colId: string, idx: number) {
+    setCollections((cs) => cs.map((c) => (c.id === colId ? { ...c, rules: c.rules.filter((_, i) => i !== idx) } : c)));
+  }
+  function deleteCollection(colId: string) {
+    if (!confirm('Delete this collection?')) return;
+    setCollections((cs) => cs.filter((c) => c.id !== colId));
+  }
+function matchCollection(c: Collection, ps: Product[]): Product[] {
+  let matched = ps.filter((p) => {
+    const evalRule = (r: Rule): boolean => {
+      const val = r.field === 'name' ? p.name : r.field === 'sku' ? p.sku : r.field === 'price' ? (p.basePrice ? parseFloat(String(p.basePrice)) : NaN) : r.field === 'status' ? (p.status || '') : r.field === 'type' ? (p.type || '') : '';
+      if (r.field === 'builderCategory') {
+        const cat = categories.find((cc) => cc.id === r.value);
+        return cat ? cat.productIds.includes(p.id) : false;
+      }
+      if (r.field === 'price') {
+        const num = typeof val === 'number' ? val : Number(val);
+        if (Number.isNaN(num)) return false;
+        const v = Number(r.value);
+        if (r.op === 'lt') return num < v;
+        if (r.op === 'gt') return num > v;
+        if (r.op === 'equals') return num === v;
+        return false;
+      }
+      const s = String(val).toLowerCase();
+      const needle = r.value.toLowerCase();
+      if (r.op === 'contains') return s.includes(needle);
+      if (r.op === 'equals') return s === needle;
+      return false;
+    };
+    if (!c.logic || c.logic === 'all') return c.rules.every(evalRule);
+    return c.rules.some(evalRule);
+  });
+  if (c.sortBy) {
+    const dir = c.sortOrder === 'asc' ? 1 : -1;
+    matched = matched.slice().sort((a, b) => {
+      const by = c.sortBy!;
+      if (by === 'price') {
+        const av = a.basePrice ? Number(a.basePrice) : 0;
+        const bv = b.basePrice ? Number(b.basePrice) : 0;
+        return (av - bv) * dir;
+      }
+      if (by === 'updatedAt') {
+        const av = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+        const bv = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+        return (av - bv) * dir;
+      }
+      return a.name.localeCompare(b.name) * dir;
+    });
+  }
+  if (c.limit && c.limit > 0) return matched.slice(0, c.limit);
+  return matched;
+}
+
   const config = useMemo(() => {
     return {
       name: builderName,
@@ -151,12 +250,15 @@ export default function ShopBuilderClient() {
       inventoryPolicy,
       categories: categories.map((c) => ({ name: c.name, productIds: c.productIds })),
       tags,
+      collections,
+      layout: layoutBlocks,
+      transforms: { titlePrefix, titleSuffix, pricePercent },
       products: Array.from(
         new Set([...selectedProducts, ...categories.flatMap((c) => c.productIds)])
       ),
       sourceShopId: shopId || null,
     };
-  }, [builderName, builderSlug, currency, inventoryPolicy, categories, tags, selectedProducts, shopId]);
+  }, [builderName, builderSlug, currency, inventoryPolicy, categories, tags, selectedProducts, shopId, collections, layoutBlocks, titlePrefix, titleSuffix, pricePercent]);
 
   async function exportConfig() {
     const res = await fetch('/api/shop-builder/export', {
@@ -170,9 +272,24 @@ export default function ShopBuilderClient() {
     a.download = `${builderSlug || 'shop-build'}.json`;
     a.click();
   }
+  async function previewFeed() {
+    const res = await fetch(`/api/shop-builder/feeds/preview?format=${feedFormat}&platform=${feedPlatform}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ config }) });
+    if (feedFormat === 'csv') {
+      setFeedPreview(await res.text());
+    } else {
+      setFeedPreview(JSON.stringify(await res.json(), null, 2));
+    }
+  }
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
+      <div className="mb-3 flex items-center gap-2">
+        <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='structure'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('structure')}><Folder className="h-4 w-4"/> Structure</button>
+        <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='collections'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('collections')}><ListChecks className="h-4 w-4"/> Collections</button>
+        <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='layout'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('layout')}><Layout className="h-4 w-4"/> Layout</button>
+        <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='feeds'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('feeds')}><Layers className="h-4 w-4"/> Feeds</button>
+        <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='bulk'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('bulk')}><SlidersHorizontal className="h-4 w-4"/> Bulk</button>
+      </div>
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
         {/* Catalog (left) */}
         <div className="xl:col-span-3 bg-white border border-gray-200 rounded-lg p-3">
@@ -229,6 +346,7 @@ export default function ShopBuilderClient() {
           </div>
 
           {/* Categories Board */}
+          {activeTab==='structure' && (
           <div className="bg-white border border-gray-200 rounded-lg p-3">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2 font-semibold text-gray-900"><Folder className="h-4 w-4" /> Categories</div>
@@ -266,8 +384,10 @@ export default function ShopBuilderClient() {
               ))}
             </div>
           </div>
+          )}
 
           {/* Tags */}
+          {activeTab==='structure' && (
           <div className="bg-white border border-gray-200 rounded-lg p-3">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2 font-semibold text-gray-900"><Tag className="h-4 w-4" /> Tags</div>
@@ -286,7 +406,89 @@ export default function ShopBuilderClient() {
               {tags.length === 0 && <div className="text-sm text-gray-700">No tags yet.</div>}
             </div>
           </div>
+          )}
         </div>
+
+        {/* Collections Tab */}
+        {activeTab==='collections' && (
+          <div className="xl:col-span-6 bg-white border border-gray-200 rounded-lg p-3 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 font-semibold text-gray-900"><ListChecks className="h-4 w-4"/> Collections</div>
+              <button className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50" onClick={addCollection}><PlusCircle className="h-3.5 w-3.5"/> New collection</button>
+            </div>
+            {collections.length === 0 && <div className="text-sm text-gray-700">No collections yet. Add rules to auto-match products.</div>}
+            <div className="grid gap-3 sm:grid-cols-2">
+              {collections.map((c) => {
+                const matched = matchCollection(c, products).slice(0, 6);
+                return (
+                  <div key={c.id} className="border rounded p-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-sm font-semibold text-gray-900 truncate">{c.name}</div>
+                      <div className="flex items-center gap-2">
+                        <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => deleteCollection(c.id)}><Trash2 className="h-3.5 w-3.5"/> Delete</button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <select className="border rounded px-2 py-1 text-xs" value={c.logic || 'all'} onChange={(e) => setCollections((cs) => cs.map((x) => x.id===c.id?{...x, logic: e.target.value as Collection['logic']}:x))}>
+                          <option value="all">Match ALL</option>
+                          <option value="any">Match ANY</option>
+                        </select>
+                        <select className="border rounded px-2 py-1 text-xs" value={c.sortBy || 'name'} onChange={(e) => setCollections((cs) => cs.map((x) => x.id===c.id?{...x, sortBy: e.target.value as Collection['sortBy']}:x))}>
+                          <option value="name">Name</option>
+                          <option value="price">Price</option>
+                          <option value="updatedAt">Updated</option>
+                        </select>
+                        <select className="border rounded px-2 py-1 text-xs" value={c.sortOrder || 'asc'} onChange={(e) => setCollections((cs) => cs.map((x) => x.id===c.id?{...x, sortOrder: e.target.value as Collection['sortOrder']}:x))}>
+                          <option value="asc">Asc</option>
+                          <option value="desc">Desc</option>
+                        </select>
+                        <input className="border rounded px-2 py-1 text-xs w-20" type="number" min={0} placeholder="Limit" value={c.limit ?? ''} onChange={(e) => setCollections((cs) => cs.map((x) => x.id===c.id?{...x, limit: e.target.value?Number(e.target.value):undefined}:x))} />
+                        <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => { setPreviewColId(c.id); setPreviewPage(1); }}>Preview</button>
+                      </div>
+                      {c.rules.map((r, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <select className="border rounded px-2 py-1 text-xs" value={r.field} onChange={(e) => updateRule(c.id, idx, { field: e.target.value as Rule['field'] })}>
+                            <option value="name">Name</option>
+                            <option value="sku">SKU</option>
+                            <option value="price">Price</option>
+                            <option value="status">Status</option>
+                            <option value="type">Type</option>
+                            <option value="builderCategory">Builder Category</option>
+                          </select>
+                          <select className="border rounded px-2 py-1 text-xs" value={r.op} onChange={(e) => updateRule(c.id, idx, { op: e.target.value as Rule['op'] })}>
+                            <option value="contains">contains</option>
+                            <option value="equals">equals</option>
+                            <option value="lt">&lt;</option>
+                            <option value="gt">&gt;</option>
+                          </select>
+                          {r.field==='builderCategory' ? (
+                            <select className="flex-1 border rounded px-2 py-1 text-xs" value={r.value} onChange={(e) => updateRule(c.id, idx, { value: e.target.value })}>
+                              <option value="">Choose category…</option>
+                              {categories.map((bc) => <option key={bc.id} value={bc.id}>{bc.name}</option>)}
+                            </select>
+                          ) : (
+                            <input className="flex-1 border rounded px-2 py-1 text-xs" value={r.value} onChange={(e) => updateRule(c.id, idx, { value: e.target.value })} placeholder="value"/>
+                          )}
+                          <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => removeRule(c.id, idx)}>Remove</button>
+                        </div>
+                      ))}
+                      <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => addRule(c.id)}>Add rule</button>
+                      <div className="text-[11px] text-gray-600">Matched: {matchCollection(c, products).length}</div>
+                      <div className="grid grid-cols-2 gap-1">
+                        {matched.map((p) => (
+                          <div key={p.id} className="text-[11px] px-2 py-1 rounded bg-gray-50 border truncate">{p.name}</div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Feeds / Bulk right column panels will still show Config on the right */}
 
         {/* Config (right) */}
         <div className="xl:col-span-3 bg-white border border-gray-200 rounded-lg p-3">
@@ -333,9 +535,96 @@ export default function ShopBuilderClient() {
               <Download className="h-4 w-4" /> Export configuration
             </button>
             <div className="text-[11px] text-gray-600">Export produces a JSON model you can import into a new WooCommerce shop via a future import tool.</div>
+            {activeTab==='feeds' && (
+              <div className="mt-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <select className="border rounded px-2 py-1 text-sm" value={feedPlatform} onChange={(e) => setFeedPlatform(e.target.value as any)}>
+                    <option value="woocommerce">WooCommerce</option>
+                    <option value="google">Google Merchant</option>
+                    <option value="facebook">Facebook/Meta</option>
+                  </select>
+                  <select className="border rounded px-2 py-1 text-sm" value={feedFormat} onChange={(e) => setFeedFormat(e.target.value as any)}>
+                    <option value="json">JSON</option>
+                    <option value="csv">CSV</option>
+                  </select>
+                  <button className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50" onClick={previewFeed}>Preview</button>
+                </div>
+                <textarea className="w-full h-40 font-mono text-xs border rounded p-2" value={feedPreview} onChange={()=>{}}/>
+              </div>
+            )}
+            {activeTab==='bulk' && (
+              <div className="mt-4 space-y-2">
+                <div className="grid grid-cols-1 gap-2">
+                  <input className="border rounded px-2 py-2 text-sm" placeholder="Title prefix" value={titlePrefix} onChange={(e) => setTitlePrefix(e.target.value)} />
+                  <input className="border rounded px-2 py-2 text-sm" placeholder="Title suffix" value={titleSuffix} onChange={(e) => setTitleSuffix(e.target.value)} />
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-gray-800">Price +/-%</label>
+                    <input type="number" className="border rounded px-2 py-2 text-sm w-24" value={pricePercent} onChange={(e) => setPricePercent(Number(e.target.value))} />
+                  </div>
+                </div>
+                <div className="text-[11px] text-gray-600">Transforms stored in build config; apply during export/import/feed gen.</div>
+              </div>
+            )}
           </div>
         </div>
       </div>
+      {/* Collections Preview Modal */}
+      {previewColId && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setPreviewColId(null)} />
+          <div className="absolute inset-0 p-6 flex items-center justify-center">
+            <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg border border-gray-200">
+              <div className="p-3 border-b flex items-center justify-between">
+                <div className="text-sm font-semibold text-gray-900">Collection preview</div>
+                <button className="text-sm px-2 py-1 rounded border hover:bg-gray-50" onClick={() => setPreviewColId(null)}>Close</button>
+              </div>
+              <div className="p-3">
+                {(() => {
+                  const c = collections.find((x) => x.id === previewColId);
+                  if (!c) return <div className="text-sm text-gray-700">Not found</div>;
+                  const all = matchCollection(c, products);
+                  const pageSize = 30;
+                  const totalPages = Math.max(1, Math.ceil(all.length / pageSize));
+                  const page = Math.min(previewPage, totalPages);
+                  const slice = all.slice((page - 1) * pageSize, page * pageSize);
+                  return (
+                    <div>
+                      <div className="text-xs text-gray-700 mb-2">Matched {all.length} products</div>
+                      <div className="max-h-72 overflow-auto border rounded">
+                        <table className="min-w-full text-xs">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th className="text-left px-2 py-1">Name</th>
+                              <th className="text-left px-2 py-1">SKU</th>
+                              <th className="text-left px-2 py-1">Price</th>
+                              <th className="text-left px-2 py-1">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {slice.map((p) => (
+                              <tr key={p.id} className="border-t">
+                                <td className="px-2 py-1 truncate">{p.name}</td>
+                                <td className="px-2 py-1">{p.sku}</td>
+                                <td className="px-2 py-1">{p.basePrice ?? '-'}</td>
+                                <td className="px-2 py-1">{p.status ?? '-'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className="mt-2 flex items-center justify-between">
+                        <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" disabled={page<=1} onClick={() => setPreviewPage((p) => Math.max(1, p-1))}>Prev</button>
+                        <div className="text-xs text-gray-700">Page {page} / {totalPages}</div>
+                        <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" disabled={page>=totalPages} onClick={() => setPreviewPage((p) => Math.min(totalPages, p+1))}>Next</button>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

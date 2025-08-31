@@ -2,13 +2,13 @@ import { notFound } from 'next/navigation';
 import { db } from '@/db';
 import { products } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { ProductEditPageWithVersionSelector } from './ProductEditPageWithVersionSelector';
+import ImprovedProductEditor from '../components/ImprovedProductEditor';
 
 type PageProps = {
   params: Promise<{ id: string }>;
 };
 
-export default async function EditProductPage({ params }: PageProps) {
+export default async function ImprovedEditProductPage({ params }: PageProps) {
   const { id } = await params;
 
   const [product] = await db
@@ -40,7 +40,5 @@ export default async function EditProductPage({ params }: PageProps) {
     shortDescription: product.shortDescription ?? null,
   } as const;
 
-  return (
-    <ProductEditPageWithVersionSelector initial={initial} />
-  );
+  return <ImprovedProductEditor initial={initial} />;
 }

@@ -7,13 +7,13 @@ import {
   categories,
 } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { ProductDetailPageWithVersionSelector } from './components/ProductDetailPageWithVersionSelector';
+import ImprovedProductDetails from './components/ImprovedProductDetails';
 
 type PageProps = {
   params: Promise<{ id: string }>;
 };
 
-export default async function ProductDetailPage({ params }: PageProps) {
+export default async function ImprovedProductDetailPage({ params }: PageProps) {
   const { id } = await params;
 
   const [product] = await db
@@ -80,12 +80,40 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const allThumbs = Array.from(deduped.values());
 
   return (
-    <ProductDetailPageWithVersionSelector
-      product={product}
-      categories={cats}
-      variants={vars}
+    <ImprovedProductDetails
+      product={{
+        id: product.id,
+        sku: product.sku,
+        name: product.name,
+        status: product.status,
+        type: product.type,
+        basePrice: product.basePrice ? String(product.basePrice) : null,
+        regularPrice: product.regularPrice ? String(product.regularPrice) : null,
+        salePrice: product.salePrice ? String(product.salePrice) : null,
+        stockStatus: product.stockStatus || undefined,
+        dimensions: product.dimensions,
+        description: product.description,
+        shortDescription: product.shortDescription,
+        featuredImage: product.featuredImage,
+        galleryImages: product.galleryImages,
+        updatedAt: product.updatedAt?.toISOString(),
+        createdAt: product.createdAt?.toISOString(),
+        lastSyncedAt: product.lastSyncedAt?.toISOString() || null,
+      }}
+      categories={cats.map(c => ({
+        id: c.id!,
+        name: c.name!,
+        slug: c.slug,
+      }))}
+      variants={vars.map(v => ({
+        id: v.id,
+        sku: v.sku,
+        image: v.image,
+        price: v.price ? String(v.price) : null,
+        stockStatus: v.stockStatus,
+        attributes: v.attributes,
+      }))}
       allImages={allThumbs}
     />
   );
 }
-

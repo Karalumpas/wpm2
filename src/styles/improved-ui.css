@@ -1,0 +1,263 @@
+/* Enhanced UI Styles for Improved Product Pages */
+
+/* Input field styling for improved forms */
+.input-field {
+  @apply w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all duration-200 text-gray-900 placeholder-gray-500;
+}
+
+.input-field:focus {
+  @apply bg-white shadow-sm;
+}
+
+.input-field:disabled {
+  @apply bg-gray-50 text-gray-500 cursor-not-allowed;
+}
+
+/* Error state for input fields */
+.input-field.error {
+  @apply border-red-300 focus:ring-red-500 focus:border-red-500;
+}
+
+/* Gradient button styles */
+.btn-gradient-primary {
+  @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-gradient-secondary {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200;
+}
+
+/* Card styles with enhanced shadows */
+.card-enhanced {
+  @apply bg-white rounded-2xl shadow-sm border border-gray-200/50 overflow-hidden;
+}
+
+.card-enhanced:hover {
+  @apply shadow-lg shadow-blue-500/10 border-blue-200;
+}
+
+/* Status badge animations */
+.status-badge {
+  @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border font-medium text-sm transition-all duration-200;
+}
+
+.status-badge.published {
+  @apply bg-emerald-100 text-emerald-700 border-emerald-200;
+}
+
+.status-badge.draft {
+  @apply bg-amber-100 text-amber-700 border-amber-200;
+}
+
+.status-badge.private {
+  @apply bg-gray-100 text-gray-700 border-gray-200;
+}
+
+/* Type badges */
+.type-badge {
+  @apply inline-flex items-center px-3 py-1.5 rounded-lg font-medium text-sm;
+}
+
+.type-badge.simple {
+  @apply bg-blue-100 text-blue-700 border-blue-200;
+}
+
+.type-badge.variable {
+  @apply bg-purple-100 text-purple-700 border-purple-200;
+}
+
+.type-badge.grouped {
+  @apply bg-orange-100 text-orange-700 border-orange-200;
+}
+
+/* Stock status badges */
+.stock-badge {
+  @apply inline-flex items-center gap-2 rounded-lg border font-medium transition-all duration-200;
+}
+
+.stock-badge.normal {
+  @apply px-3 py-1.5 text-sm;
+}
+
+.stock-badge.large {
+  @apply px-4 py-2 text-base;
+}
+
+.stock-badge.instock {
+  @apply bg-emerald-100 text-emerald-700 border-emerald-200;
+}
+
+.stock-badge.outofstock {
+  @apply bg-red-100 text-red-700 border-red-200;
+}
+
+.stock-badge.onbackorder {
+  @apply bg-amber-100 text-amber-700 border-amber-200;
+}
+
+/* Animated loading states */
+.loading-skeleton {
+  @apply animate-pulse bg-gray-200 rounded;
+}
+
+.loading-spinner {
+  @apply animate-spin rounded-full border-2 border-transparent;
+}
+
+.loading-spinner.primary {
+  @apply border-blue-600 border-t-transparent;
+}
+
+.loading-spinner.white {
+  @apply border-white border-t-transparent;
+}
+
+/* Enhanced hover effects */
+.hover-lift {
+  @apply transition-all duration-200 hover:-translate-y-1 hover:shadow-lg;
+}
+
+.hover-glow {
+  @apply transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25;
+}
+
+/* Gradient backgrounds */
+.bg-gradient-primary {
+  @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50;
+}
+
+.bg-gradient-card {
+  @apply bg-gradient-to-r from-blue-50 to-indigo-50;
+}
+
+/* Animation keyframes */
+@keyframes slide-in-from-bottom {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: slide-in-from-bottom 0.2s ease-out;
+}
+
+.slide-in-from-bottom-2 {
+  animation: slide-in-from-bottom 0.2s ease-out;
+}
+
+/* Tab navigation styles */
+.tab-button {
+  @apply w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-left font-medium;
+}
+
+.tab-button.active {
+  @apply bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg;
+}
+
+.tab-button.inactive {
+  @apply text-gray-600 hover:bg-white hover:text-gray-900 hover:shadow-sm border border-transparent hover:border-gray-200;
+}
+
+/* Form field containers */
+.form-field {
+  @apply space-y-2;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700;
+}
+
+.form-help {
+  @apply text-xs text-gray-500 mt-1;
+}
+
+.form-error {
+  @apply flex items-center gap-2 text-red-600 text-sm mt-1;
+}
+
+/* Stats card styles */
+.stats-card {
+  @apply bg-white rounded-2xl p-6 shadow-sm border transition-all duration-200;
+}
+
+.stats-card.blue {
+  @apply border-blue-100/50;
+}
+
+.stats-card.emerald {
+  @apply border-emerald-100/50;
+}
+
+.stats-card.amber {
+  @apply border-amber-100/50;
+}
+
+.stats-card.purple {
+  @apply border-purple-100/50;
+}
+
+/* Icon containers */
+.icon-container {
+  @apply p-3 rounded-xl;
+}
+
+.icon-container.blue {
+  @apply bg-blue-100;
+}
+
+.icon-container.emerald {
+  @apply bg-emerald-100;
+}
+
+.icon-container.amber {
+  @apply bg-amber-100;
+}
+
+.icon-container.purple {
+  @apply bg-purple-100;
+}
+
+/* Version selector styles */
+.version-selector {
+  @apply fixed bottom-6 right-6 z-50;
+}
+
+.version-selector-toggle {
+  @apply bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 group;
+}
+
+.version-selector-panel {
+  @apply absolute bottom-16 right-0 bg-white rounded-2xl shadow-xl border border-gray-200 p-4 min-w-72 animate-in slide-in-from-bottom-2;
+}
+
+.version-option {
+  @apply w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 text-left border-2;
+}
+
+.version-option.active {
+  @apply bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 text-blue-900;
+}
+
+.version-option.inactive {
+  @apply hover:bg-gray-50 border-transparent;
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+  .input-field {
+    @apply px-3 py-2;
+  }
+  
+  .btn-gradient-primary {
+    @apply px-4 py-2 text-sm;
+  }
+  
+  .stats-card {
+    @apply p-4;
+  }
+}

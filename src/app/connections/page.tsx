@@ -302,11 +302,14 @@ function ShopCard({ shop, onUpdate }: ShopCardProps) {
 
   const syncProducts = async () => {
     try {
+      let handedOff = false;
       setSyncing(true);
       setSyncResult(null);
       setSyncLogs([]);
       setSyncProgress(0);
       setShowSyncLogs(true);
+      setSyncJobId(null);
+      progressSeenRef.current = 0;
 
       addSyncLog('🚀 Starting product synchronization...');
       setSyncProgress(10);
@@ -314,7 +317,7 @@ function ShopCard({ shop, onUpdate }: ShopCardProps) {
       addSyncLog('📡 Sending sync request to API...');
       setSyncProgress(20);
 
-      const response = await fetch('/api/shops/sync', {
+      const response = await fetch('/api/shops/sync/background', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -337,6 +340,96 @@ function ShopCard({ shop, onUpdate }: ShopCardProps) {
       setSyncProgress(40);
 
       const result = await response.json();
+      if (
+        result &&
+        result.accepted &&
+        Array.isArray(result.jobs) &&
+        result.jobs[0]
+      ) {
+        const jobId = result.jobs[0] as string;
+        setSyncJobId(jobId);
+        addSyncLog(`✅ Job enqueued: ${jobId}`);
+        const poll = async () => {
+          try {
+            const res = await fetch(
+              `/api/shops/sync/background?jobId=${encodeURIComponent(jobId)}`
+            );
+            if (!res.ok) return;
+            const job = await res.json();
+            const progress = Array.isArray(job.progress) ? job.progress : [];
+            if (progress.length > progressSeenRef.current) {
+              const newItems = progress.slice(progressSeenRef.current);
+              newItems.forEach(
+                (p: {
+                  stage: string;
+                  current: number;
+                  total: number;
+                  message: string;
+                }) =>
+                  addSyncLog(
+                    `[${p.stage}] ${p.current}/${p.total} - ${p.message}`
+                  )
+              );
+              progressSeenRef.current = progress.length;
+            }
+            if (progress.length > 0) {
+              const last = progress[progress.length - 1];
+              const pct = Math.max(
+                0,
+                Math.min(
+                  99,
+                  Math.round(
+                    (Number(last.current) /
+                      Math.max(Number(last.total) || 1, 1)) *
+                      100
+                  )
+                )
+              );
+              setSyncProgress(pct);
+            }
+            if (job.status === 'completed' || job.status === 'failed') {
+              if (pollTimerRef.current) {
+                clearInterval(pollTimerRef.current);
+                pollTimerRef.current = null;
+              }
+              setSyncProgress(100);
+              const details = job.details || {};
+              const errors = Array.isArray(details.errors)
+                ? details.errors
+                : [];
+              setSyncResult({
+                success: job.status === 'completed',
+                message:
+                  job.message ||
+                  (job.status === 'completed'
+                    ? 'Sync completed'
+                    : job.error || 'Sync failed'),
+                details: {
+                  productsCreated: Number(details.productsCreated || 0),
+                  productsUpdated: Number(details.productsUpdated || 0),
+                  categoriesCreated: Number(details.categoriesCreated || 0),
+                  categoriesUpdated: Number(details.categoriesUpdated || 0),
+                  variationsCreated: Number(details.variationsCreated || 0),
+                  variationsUpdated: Number(details.variationsUpdated || 0),
+                  errors,
+                },
+              });
+              if (job.status === 'completed')
+                addSyncLog('✅ Synchronization completed');
+              else
+                addSyncLog(
+                  `❌ Synchronization failed: ${job.error || 'Unknown error'}`
+                );
+              setSyncing(false);
+              setShouldUpdateOnClose(true);
+            }
+          } catch {}
+        };
+        await poll();
+        pollTimerRef.current = setInterval(poll, 2000);
+        handedOff = true;
+        return;
+      }
       console.log('Sync result:', result); // Debug log
 
       addSyncLog('✅ Response parsed successfully');
@@ -389,7 +482,7 @@ function ShopCard({ shop, onUpdate }: ShopCardProps) {
       });
       setSyncProgress(100);
     } finally {
-      setSyncing(false);
+      if (!handedOff) setSyncing(false);
     }
   };
 

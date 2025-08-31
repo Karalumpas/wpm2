@@ -9,7 +9,10 @@ type Props = {
 };
 
 export default function InteractiveGallery({ images, alt }: Props) {
-  const unique = useMemo(() => Array.from(new Set(images)).filter(Boolean), [images]);
+  const unique = useMemo(
+    () => Array.from(new Set(images)).filter(Boolean),
+    [images]
+  );
   const [index, setIndex] = useState(0);
   // lightbox removed
 
@@ -51,7 +54,12 @@ export default function InteractiveGallery({ images, alt }: Props) {
 
       {/* Thumbnails */}
       {unique.length > 1 && (
-        <ThumbRow images={unique} activeIndex={index} onPick={(i) => setIndex(i)} alt={alt} />
+        <ThumbRow
+          images={unique}
+          activeIndex={index}
+          onPick={(i) => setIndex(i)}
+          alt={alt}
+        />
       )}
 
       {/* Lightbox removed */}
@@ -62,11 +70,31 @@ export default function InteractiveGallery({ images, alt }: Props) {
 function EmptyImagePlaceholder() {
   return (
     <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-      <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 17V7a2 2 0 00-2-2H7" />
+      <svg
+        className="w-16 h-16"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M3 7v10a2 2 0 002 2h14"
+        />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M21 17V7a2 2 0 00-2-2H7"
+        />
         <circle cx="9" cy="9" r="2" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 15l-5-5L5 21" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M21 15l-5-5L5 21"
+        />
       </svg>
     </div>
   );
@@ -84,10 +112,15 @@ function ThumbRow({
   alt: string;
 }) {
   const scroller = useRef<HTMLDivElement>(null);
-  const scrollBy = (delta: number) => scroller.current?.scrollBy({ left: delta, behavior: 'smooth' });
+  const scrollBy = (delta: number) =>
+    scroller.current?.scrollBy({ left: delta, behavior: 'smooth' });
 
   return (
-    <div className="relative border-t" role="region" aria-label="Produktbilleder, miniaturer">
+    <div
+      className="relative border-t"
+      role="region"
+      aria-label="Produktbilleder, miniaturer"
+    >
       <div className="flex items-center">
         <button
           onClick={() => scrollBy(-240)}
@@ -107,14 +140,20 @@ function ThumbRow({
               key={`${src}-${i}`}
               onClick={() => onPick(i)}
               className={`relative w-16 h-16 rounded-lg overflow-hidden border flex-shrink-0 snap-start focus:outline-none ${
-                i === activeIndex ? 'ring-2 ring-indigo-500 border-indigo-300' : 'border-gray-200'
+                i === activeIndex
+                  ? 'ring-2 ring-indigo-500 border-indigo-300'
+                  : 'border-gray-200'
               }`}
               title={`Billede ${i + 1}`}
               role="option"
               aria-selected={i === activeIndex}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt={`${alt} ${i + 1}`} className="w-full h-full object-cover" />
+              <img
+                src={src}
+                alt={`${alt} ${i + 1}`}
+                className="w-full h-full object-cover"
+              />
             </button>
           ))}
         </div>
@@ -129,4 +168,3 @@ function ThumbRow({
     </div>
   );
 }
-

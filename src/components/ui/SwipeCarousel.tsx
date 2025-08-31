@@ -24,11 +24,16 @@ export default function SwipeCarousel({
   priority = false,
   className = '',
 }: SwipeCarouselProps) {
-  const slides = useMemo(() => Array.from(new Set(images)).filter(Boolean), [images]);
+  const slides = useMemo(
+    () => Array.from(new Set(images)).filter(Boolean),
+    [images]
+  );
   const [internalIdx, setInternalIdx] = useState(0);
   const active = index ?? internalIdx;
-  const setActive = (i: number) => (onIndexChange ? onIndexChange(i) : setInternalIdx(i));
-  const clamp = (n: number) => (slides.length ? (n + slides.length) % slides.length : 0);
+  const setActive = (i: number) =>
+    onIndexChange ? onIndexChange(i) : setInternalIdx(i);
+  const clamp = (n: number) =>
+    slides.length ? (n + slides.length) % slides.length : 0;
 
   // Drag state
   const startX = useRef<number | null>(null);
@@ -52,7 +57,9 @@ export default function SwipeCarousel({
   }
   function onPointerUp(e: React.PointerEvent) {
     if (!draggable) return;
-    try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
     const dist = dx.current;
     setIsDragging(false);
     setDrag(0);
@@ -101,7 +108,10 @@ export default function SwipeCarousel({
         }}
       >
         {slides.map((src, i) => (
-          <div key={`${src}-${i}`} className="relative shrink-0 grow-0 basis-full">
+          <div
+            key={`${src}-${i}`}
+            className="relative shrink-0 grow-0 basis-full"
+          >
             <Image
               src={src}
               alt={`${alt} ${i + 1}`}
@@ -125,7 +135,9 @@ export default function SwipeCarousel({
               aria-label={`Gå til billede ${i + 1}`}
               aria-current={i === active}
               className={`h-2 w-2 rounded-full transition border border-white/40 ${
-                i === active ? 'bg-white shadow' : 'bg-white/30 hover:bg-white/50'
+                i === active
+                  ? 'bg-white shadow'
+                  : 'bg-white/30 hover:bg-white/50'
               }`}
             />
           ))}
@@ -140,9 +152,19 @@ export default function SwipeCarousel({
             className="absolute left-3 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-black/40 hover:bg-black/60 text-white/90 flex items-center justify-center border border-white/10 backdrop-blur transition"
             aria-label="Forrige billede"
           >
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              viewBox="0 0 24 24"
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <circle cx="12" cy="12" r="11" className="opacity-0" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M14 7l-5 5 5 5" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M14 7l-5 5 5 5"
+              />
             </svg>
           </button>
           <button
@@ -150,9 +172,19 @@ export default function SwipeCarousel({
             className="absolute right-3 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-black/40 hover:bg-black/60 text-white/90 flex items-center justify-center border border-white/10 backdrop-blur transition"
             aria-label="Næste billede"
           >
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              viewBox="0 0 24 24"
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <circle cx="12" cy="12" r="11" className="opacity-0" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10 7l5 5-5 5" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10 7l5 5-5 5"
+              />
             </svg>
           </button>
         </>

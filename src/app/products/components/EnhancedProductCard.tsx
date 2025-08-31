@@ -24,7 +24,8 @@ export function EnhancedProductCard({ product }: Props) {
   }, [product.featuredImage, product.images?.join(',')]);
 
   const [idx, setIdx] = useState(0);
-  const clampIdx = (n: number) => (images.length ? (n + images.length) % images.length : 0);
+  const clampIdx = (n: number) =>
+    images.length ? (n + images.length) % images.length : 0;
 
   // Swipe support
   const startRef = useRef<{ x: number; y: number } | null>(null);
@@ -38,7 +39,10 @@ export function EnhancedProductCard({ product }: Props) {
   }
   function onPointerMove(e: React.PointerEvent) {
     if (!startRef.current) return;
-    deltaRef.current = { x: e.clientX - startRef.current.x, y: e.clientY - startRef.current.y };
+    deltaRef.current = {
+      x: e.clientX - startRef.current.x,
+      y: e.clientY - startRef.current.y,
+    };
   }
   function onPointerUp(e: React.PointerEvent) {
     try {
@@ -65,9 +69,17 @@ export function EnhancedProductCard({ product }: Props) {
       {/* Image carousel */}
       <div className="relative aspect-square overflow-hidden rounded-t-xl bg-gray-100">
         {images.length > 0 ? (
-          <SwipeCarousel images={images} alt={product.name} index={idx} onIndexChange={setIdx} priority />
+          <SwipeCarousel
+            images={images}
+            alt={product.name}
+            index={idx}
+            onIndexChange={setIdx}
+            priority
+          />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-gray-400">No Image</div>
+          <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+            No Image
+          </div>
         )}
 
         {/* Controls */}
@@ -104,19 +116,35 @@ export function EnhancedProductCard({ product }: Props) {
       <div className="p-4 space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="font-semibold text-gray-900 leading-snug line-clamp-2">{product.name}</h3>
-            <div className="text-xs text-gray-500 mt-0.5">SKU: {product.sku}</div>
+            <h3 className="font-semibold text-gray-900 leading-snug line-clamp-2">
+              {product.name}
+            </h3>
+            <div className="text-xs text-gray-500 mt-0.5">
+              SKU: {product.sku}
+            </div>
           </div>
-          <span className={`px-2 py-1 text-[11px] rounded-full border ${statusClass}`}>{product.status}</span>
+          <span
+            className={`px-2 py-1 text-[11px] rounded-full border ${statusClass}`}
+          >
+            {product.status}
+          </span>
         </div>
 
         <div className="flex items-center justify-between">
           <div className="text-lg font-semibold text-gray-900">{price}</div>
           <div className="flex items-center gap-2">
-            <Link href={`/products/${product.id}/edit`} className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50" title="Edit">
+            <Link
+              href={`/products/${product.id}/edit`}
+              className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50"
+              title="Edit"
+            >
               <Pencil className="w-3.5 h-3.5" /> Edit
             </Link>
-            <Link href={`/products/${product.id}`} className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50" title="Open">
+            <Link
+              href={`/products/${product.id}`}
+              className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50"
+              title="Open"
+            >
               <ExternalLink className="w-3.5 h-3.5" /> View
             </Link>
           </div>
@@ -152,4 +180,3 @@ export function EnhancedProductCard({ product }: Props) {
     </div>
   );
 }
-

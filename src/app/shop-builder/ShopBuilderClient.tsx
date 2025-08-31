@@ -148,7 +148,7 @@ export default function ShopBuilderClient() {
   const [showCatalog, setShowCatalog] = useState(true);
   const [showBuilder, setShowBuilder] = useState(true);
   const [productWindows, setProductWindows] = useState<Array<{ id: string; pos: { x: number; y: number } }>>([]);
-  const [windowsScaleWithCanvas, setWindowsScaleWithCanvas] = useState(false);
+  // All windows are scaled with the canvas
 
   // Infinite canvas pan/zoom
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -195,9 +195,7 @@ export default function ShopBuilderClient() {
         const x = e.clientX;
         const y = e.clientY;
         let pos = { x: x - 160, y: y - 40 };
-        if (windowsScaleWithCanvas) {
-          const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-          const point = { x: x - rect.left, y: y - rect.top };
+        ;
           const worldX = (point.x - pan.x) / scale;
           const worldY = (point.y - pan.y) / scale;
           pos = { x: worldX - 160 / scale, y: worldY - 40 / scale };
@@ -613,7 +611,6 @@ export default function ShopBuilderClient() {
             const worldX = (point.x - pan.x) / scale;
             const worldY = (point.y - pan.y) / scale;
             setPan({ x: point.x - worldX * nextScale, y: point.y - worldY * nextScale });
-            // @ts-expect-error setScale exists below
             setScale(nextScale);
           }}
         >
@@ -630,7 +627,7 @@ export default function ShopBuilderClient() {
               backgroundSize: '24px 24px',
             }}
           >
-            {windowsScaleWithCanvas && (
+            {true && (
               <>
                 {showBuilder && (
                   <DraggableWindow
@@ -732,14 +729,12 @@ export default function ShopBuilderClient() {
           )}
           <button
             className="text-xs px-2 py-1 rounded border bg-white hover:bg-gray-50"
-            onClick={() => setWindowsScaleWithCanvas((v) => !v)}
             title="Toggle whether windows scale with canvas"
           >
-            {windowsScaleWithCanvas ? 'Windows: Scaled' : 'Windows: Fixed'}
           </button>
         </div>
 
-        {(!windowsScaleWithCanvas) && showBuilder && (
+        {false && showBuilder && (
           <DraggableWindow
             id="builder"
             title="Shop Builder"
@@ -1060,7 +1055,7 @@ export default function ShopBuilderClient() {
           </DraggableWindow>
         )}
 
-        {(!windowsScaleWithCanvas) && showCatalog && (
+        {false && showCatalog && (
           <DraggableWindow
             id="catalog"
             title="Central Catalog"
@@ -1136,7 +1131,7 @@ export default function ShopBuilderClient() {
           </DraggableWindow>
         )}
 
-        {(!windowsScaleWithCanvas) && productWindows.map((w) => (
+        {false && productWindows.map((w) => (
           <DraggableWindow
             key={w.id}
             id={`product-${w.id}`}
@@ -2503,3 +2498,7 @@ export default function ShopBuilderClient() {
     </div>
   );
 }
+
+
+
+

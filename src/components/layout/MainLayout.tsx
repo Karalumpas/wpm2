@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { useSession, signOut } from 'next-auth/react';
+import SyncCenter from '@/components/sync/SyncCenter';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
@@ -111,6 +112,8 @@ export function MainLayout({ children }: MainLayoutProps) {
 
         {/* Page content */}
         <main className="py-6">{children}</main>
+        {/* Global sync overlay + CTA */}
+        <SyncCenter />
       </div>
     </div>
   );

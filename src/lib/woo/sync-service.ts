@@ -28,6 +28,11 @@ export class WooCommerceProductSyncService {
   private progressCallback?: (progress: SyncProgress) => void;
   private debugMode: boolean = false; // Set to false to disable debug in production
   private debugLogs: string[] = []; // Separate debug logs from errors
+  private controller?: {
+    isPaused: () => boolean;
+    isCancelled: () => boolean;
+    waitIfPaused: () => Promise<void>;
+  };
 
   constructor(
     shopId: string,
@@ -37,6 +42,24 @@ export class WooCommerceProductSyncService {
     this.shopId = shopId;
     this.client = client;
     this.userId = userId;
+  }
+
+  setController(controller: {
+    isPaused: () => boolean;
+    isCancelled: () => boolean;
+    waitIfPaused: () => Promise<void>;
+  }) {
+    this.controller = controller;
+  }
+
+  private async checkControl() {
+    if (!this.controller) return;
+    if (this.controller.isCancelled()) {
+      throw new Error('Sync cancelled by user');
+    }
+    if (this.controller.isPaused()) {
+      await this.controller.waitIfPaused();
+    }
   }
 
   setProgressCallback(callback: (progress: SyncProgress) => void) {
@@ -92,6 +115,7 @@ export class WooCommerceProductSyncService {
         // Don't fail the entire sync if MinIO is not available
       }
 
+      await this.checkControl();
       // Step 1: Sync Categories
       this.updateProgress(
         'categories',
@@ -104,6 +128,7 @@ export class WooCommerceProductSyncService {
       result.details!.categoriesUpdated = categoryResult.updated;
       result.details!.errors.push(...categoryResult.errors);
 
+      await this.checkControl();
       // Step 2: Sync Products
       this.updateProgress(
         'products',
@@ -116,6 +141,7 @@ export class WooCommerceProductSyncService {
       result.details!.productsUpdated = productResult.updated;
       result.details!.errors.push(...productResult.errors);
 
+      await this.checkControl();
       // Step 3: Sync Variations
       this.updateProgress(
         'variations',
@@ -128,6 +154,7 @@ export class WooCommerceProductSyncService {
       result.details!.variationsUpdated = variationResult.updated;
       result.details!.errors.push(...variationResult.errors);
 
+      await this.checkControl();
       // Backfill galleries for products missing a gallery using variant images
       this.updateProgress(
         'products',
@@ -178,6 +205,7 @@ export class WooCommerceProductSyncService {
       const allCategories: WooCommerceCategoryDetailed[] = [];
 
       while (hasMore) {
+        await this.checkControl();
         try {
           const response = (await this.client.get(
             `/products/categories?page=${page}&per_page=${perPage}&hide_empty=false`
@@ -217,6 +245,7 @@ export class WooCommerceProductSyncService {
 
       // Sync root categories first
       for (const [index, category] of rootCategories.entries()) {
+        await this.checkControl();
         this.updateProgress(
           'categories',
           index + 1,
@@ -246,6 +275,7 @@ export class WooCommerceProductSyncService {
 
       // Sync child categories
       for (const [index, category] of childCategories.entries()) {
+        await this.checkControl();
         this.updateProgress(
           'categories',
           rootCategories.length + index + 1,
@@ -307,6 +337,7 @@ export class WooCommerceProductSyncService {
       const allProducts: WooCommerceProduct[] = [];
 
       while (hasMore) {
+        await this.checkControl();
         try {
           const response = (await this.client.get(
             `/products?page=${page}&per_page=${perPage}`
@@ -342,6 +373,7 @@ export class WooCommerceProductSyncService {
 
       // Process each product
       for (const [index, product] of allProducts.entries()) {
+        await this.checkControl();
         this.updateProgress(
           'products',
           index + 1,
@@ -442,6 +474,7 @@ export class WooCommerceProductSyncService {
         );
 
       for (const [productIndex, product] of variableProducts.entries()) {
+        await this.checkControl();
         if (!product.wooCommerceId) continue;
 
         this.updateProgress(
@@ -457,6 +490,7 @@ export class WooCommerceProductSyncService {
           const perPage = 100;
           let hasMore = true;
           while (hasMore) {
+            await this.checkControl();
             const variations = (await this.client.get(
               `/products/${product.wooCommerceId}/variations?page=${vpage}&per_page=${perPage}`
             )) as WooCommerceProductVariation[];
@@ -464,6 +498,7 @@ export class WooCommerceProductSyncService {
             vpage++;
 
             for (const variation of variations) {
+              await this.checkControl();
               try {
                 const syncData = this.mapVariationToSyncData(
                   variation,
@@ -511,6 +546,7 @@ export class WooCommerceProductSyncService {
     productId: string
   ): Promise<void> {
     try {
+      await this.checkControl();
       const prodRows = await db
         .select()
         .from(products)
@@ -555,6 +591,7 @@ export class WooCommerceProductSyncService {
       const seen = new Set<string>();
       const uniqueByName: string[] = [];
       for (const u of variantImages) {
+        await this.checkControl();
         const name = fileName(u);
         if (!name) continue;
         if (featuredName && name === featuredName) continue;
@@ -581,12 +618,14 @@ export class WooCommerceProductSyncService {
   // Backfill for all products in this shop that lack gallery images
   private async backfillMissingGalleriesForShop(): Promise<void> {
     try {
+      await this.checkControl();
       const shopProducts = await db
         .select({ id: products.id, galleryImages: products.galleryImages })
         .from(products)
         .where(eq(products.shopId, this.shopId));
 
       for (const p of shopProducts) {
+        await this.checkControl();
         const gallery: unknown = (p as unknown as { galleryImages?: unknown })
           .galleryImages;
         if (!Array.isArray(gallery) || gallery.length === 0) {

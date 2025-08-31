@@ -57,3 +57,45 @@ export async function GET(request: NextRequest) {
   }
   return NextResponse.json({ jobs: backgroundSyncQueue.list() });
 }
+
+// PATCH: control a job (pause/resume/cancel)
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const jobId: string | undefined = body?.jobId;
+    const action: 'pause' | 'resume' | 'cancel' | undefined = body?.action;
+    if (!jobId || !action) {
+      return NextResponse.json(
+        { error: 'Missing jobId or action' },
+        { status: 400 }
+      );
+    }
+
+    let job;
+    if (action === 'pause') job = backgroundSyncQueue.pause(jobId);
+    else if (action === 'resume') job = backgroundSyncQueue.resume(jobId);
+    else if (action === 'cancel') job = backgroundSyncQueue.cancel(jobId);
+    else return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+
+    if (!job) return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+    return NextResponse.json(job);
+  } catch (error) {
+    console.error('Control job error:', error);
+    return NextResponse.json({ error: 'Failed to control job' }, { status: 500 });
+  }
+}
+
+// DELETE: remove a job from the list
+export async function DELETE(request: NextRequest) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const jobId: string | undefined = body?.jobId;
+    if (!jobId) return NextResponse.json({ error: 'Missing jobId' }, { status: 400 });
+    const ok = backgroundSyncQueue.remove(jobId);
+    if (!ok) return NextResponse.json({ error: 'Cannot remove (not found or running)' }, { status: 400 });
+    return NextResponse.json({ removed: true });
+  } catch (error) {
+    console.error('Remove job error:', error);
+    return NextResponse.json({ error: 'Failed to remove job' }, { status: 500 });
+  }
+}

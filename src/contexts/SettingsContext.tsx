@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useCallback } from 'react';
+import { createContext, useContext, useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 import { UserSettings } from '@/types/settings';
 
@@ -10,6 +10,9 @@ const DEFAULT_SETTINGS: UserSettings = {
   currencyPosition: 'right_space',
   productsPerPage: 24,
   defaultViewMode: 'grid',
+  theme: 'ocean',
+  font: 'sans',
+  largeText: false,
 };
 
 interface SettingsContextType {
@@ -38,7 +41,7 @@ async function settingsFetcher(): Promise<UserSettings> {
     }
 
     const data = await response.json();
-    return data;
+    return { ...DEFAULT_SETTINGS, ...data } as UserSettings;
   } catch (err) {
     // Silently handle all errors and use defaults
     console.warn('Failed to fetch settings, using defaults:', err);
@@ -106,6 +109,19 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     updateSettings,
     refetch,
   };
+
+  // Apply theme + font to document root
+  useEffect(() => {
+    const s = settings || DEFAULT_SETTINGS;
+    const root = document.documentElement;
+    // theme
+    root.setAttribute('data-theme', s.theme || 'ocean');
+    // font
+    root.setAttribute('data-font', s.font || 'sans');
+    // text scale
+    if (s.largeText) root.classList.add('text-scale-lg');
+    else root.classList.remove('text-scale-lg');
+  }, [settings]);
 
   return (
     <SettingsContext.Provider value={contextValue}>

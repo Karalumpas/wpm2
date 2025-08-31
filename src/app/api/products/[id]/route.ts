@@ -5,13 +5,14 @@ import { eq } from 'drizzle-orm';
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const [p] = await db
       .select()
       .from(products)
-      .where(eq(products.id, params.id))
+      .where(eq(products.id, id))
       .limit(1);
     if (!p) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     return NextResponse.json(p);
@@ -23,10 +24,11 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await req.json();
+    const { id } = await params;
     await db
       .update(products)
       .set({
@@ -44,7 +46,7 @@ export async function PUT(
         dimensions: body.dimensions ?? undefined,
         updatedAt: new Date(),
       })
-      .where(eq(products.id, params.id));
+      .where(eq(products.id, id));
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('PUT product error:', error);

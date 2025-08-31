@@ -2,7 +2,11 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0f172a; /* slate-900 */
+  --surface: #ffffff;
+  --border: #e5e7eb; /* gray-200 */
+  --primary: #4f46e5; /* indigo-600 */
+  --primary-contrast: #ffffff;
 }
 
 @theme inline {
@@ -12,11 +16,50 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Themes */
+[data-theme='ocean'] {
+  --background: #f8fafc; /* slate-50 */
+  --foreground: #0f172a; /* slate-900 */
+  --surface: #ffffff;
+  --border: #e2e8f0; /* slate-200 */
+  --primary: #2563eb; /* blue-600 */
+  --primary-contrast: #ffffff;
+}
+
+[data-theme='sunset'] {
+  --background: #fff7ed; /* orange-50 */
+  --foreground: #3f1d0f; /* warm brown */
+  --surface: #ffffff;
+  --border: #ffedd5; /* orange-100 */
+  --primary: #ea580c; /* orange-600 */
+  --primary-contrast: #ffffff;
+}
+
+[data-theme='forest'] {
+  --background: #f0fdf4; /* green-50 */
+  --foreground: #052e16; /* emerald-950 */
+  --surface: #ffffff;
+  --border: #dcfce7; /* green-100 */
+  --primary: #16a34a; /* green-600 */
+  --primary-contrast: #ffffff;
+}
+
+[data-theme='royal'] {
+  --background: #f5f3ff; /* violet-50 */
+  --foreground: #1e1b4b; /* indigo-950 */
+  --surface: #ffffff;
+  --border: #ede9fe; /* violet-100 */
+  --primary: #7c3aed; /* violet-600 */
+  --primary-contrast: #ffffff;
+}
+
+[data-theme='neutral'] {
+  --background: #fafafa; /* zinc-50 */
+  --foreground: #18181b; /* zinc-900 */
+  --surface: #ffffff;
+  --border: #e4e4e7; /* zinc-200 */
+  --primary: #3f3f46; /* zinc-600 */
+  --primary-contrast: #ffffff;
 }
 
 /* Custom scrollbar styles */
@@ -55,5 +98,25 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Apply surface + border styles generally */
+.card {
+  background-color: var(--surface);
+  border-color: var(--border);
+}
+
+/* Global link and primary button helpers (opt-in) */
+a { color: var(--primary); }
+.btn-primary {
+  background: var(--primary);
+  color: var(--primary-contrast);
+}
+
+/* Fonts via data attribute */
+[data-font='sans'] { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; }
+[data-font='serif'] { font-family: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif; }
+[data-font='mono'] { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; }
+
+/* Large text option (scales base font slightly) */
+.text-scale-lg { font-size: 17px; }

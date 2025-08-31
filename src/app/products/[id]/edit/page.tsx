@@ -6,11 +6,11 @@ import { eq } from 'drizzle-orm';
 import ProductEditor from '../components/ProductEditor';
 
 type PageProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function EditProductPage({ params }: PageProps) {
-  const id = params.id;
+  const { id } = await params;
 
   const [product] = await db
     .select()

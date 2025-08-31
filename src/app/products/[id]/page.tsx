@@ -18,11 +18,11 @@ import ProductImages from './components/ProductImages';
 import VariantsTable from './variants/VariantsTable';
 
 type PageProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function ProductDetailPage({ params }: PageProps) {
-  const id = params.id;
+  const { id } = await params;
 
   const [product] = await db
     .select()

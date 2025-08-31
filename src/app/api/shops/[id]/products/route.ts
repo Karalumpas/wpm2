@@ -5,10 +5,10 @@ import { eq } from 'drizzle-orm';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const shopId = params.id;
+    const { id: shopId } = await params;
 
     // Delete product categories first (due to foreign key)
     await db

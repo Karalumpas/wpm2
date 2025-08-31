@@ -14,6 +14,9 @@ const updateSettingsSchema = z.object({
     .optional(),
   productsPerPage: z.number().min(1).max(100).optional(),
   defaultViewMode: z.enum(['grid', 'list']).optional(),
+  theme: z.enum(['ocean', 'sunset', 'forest', 'royal', 'neutral']).optional(),
+  font: z.enum(['sans', 'serif', 'mono']).optional(),
+  largeText: z.boolean().optional(),
 });
 
 /**
@@ -35,6 +38,9 @@ export async function GET() {
       currencyPosition: 'right_space' as const,
       productsPerPage: 25,
       defaultViewMode: 'grid' as const,
+      theme: 'ocean' as const,
+      font: 'sans' as const,
+      largeText: false,
     };
 
     return NextResponse.json(defaultSettings);
@@ -75,6 +81,9 @@ export async function PUT(request: NextRequest) {
       currencyPosition: validatedData.currencyPosition || 'right_space',
       productsPerPage: validatedData.productsPerPage || 25,
       defaultViewMode: validatedData.defaultViewMode || 'grid',
+      theme: validatedData.theme || 'ocean',
+      font: validatedData.font || 'sans',
+      largeText: validatedData.largeText ?? false,
     };
 
     return NextResponse.json(updatedSettings);

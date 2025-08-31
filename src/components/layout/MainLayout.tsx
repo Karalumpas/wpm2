@@ -18,7 +18,7 @@ import {
   Camera,
   User,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import SyncCenter from '@/components/sync/SyncCenter';
 
@@ -41,7 +41,24 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const { data: session } = useSession();
+
+  // close profile menu on outside click
+  const profileRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    function onClick(e: MouseEvent) {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(e.target as Node)
+      ) {
+        setProfileOpen(false);
+      }
+    }
+    window.addEventListener('click', onClick);
+    return () => window.removeEventListener('click', onClick);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -68,12 +85,20 @@ export function MainLayout({ children }: MainLayoutProps) {
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <Sidebar />
+      <div
+        className={cn(
+          'hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col transition-[width]',
+          sidebarCollapsed ? 'lg:w-16' : 'lg:w-64'
+        )}
+      >
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed((c) => !c)}
+        />
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className={cn(sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64')}>
         {/* Top bar */}
         <div className="sticky top-0 z-10 bg-white shadow">
           <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
@@ -90,18 +115,39 @@ export function MainLayout({ children }: MainLayoutProps) {
                   WooCommerce Product Manager
                 </h1>
               </div>
-              <div className="ml-4 flex items-center md:ml-6">
+              <div className="ml-4 flex items-center md:ml-6" ref={profileRef}>
                 {session?.user && (
-                  <div className="flex items-center space-x-4">
-                    <span className="text-sm text-gray-700">
-                      {session.user.email}
-                    </span>
+                  <div className="relative">
                     <button
-                      onClick={() => signOut({ callbackUrl: '/login' })}
-                      className="text-sm text-gray-500 hover:text-gray-700"
+                      onClick={() => setProfileOpen((o) => !o)}
+                      className="inline-flex items-center justify-center w-9 h-9 rounded-full border bg-white hover:bg-gray-50"
+                      aria-haspopup="menu"
+                      aria-expanded={profileOpen}
                     >
-                      Log out
+                      <User className="h-5 w-5 text-gray-700" />
                     </button>
+                    {profileOpen && (
+                      <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50">
+                        <Link
+                          href="/profile"
+                          className="block px-3 py-2 text-sm text-gray-800 hover:bg-gray-50"
+                        >
+                          Profile
+                        </Link>
+                        <Link
+                          href="/settings"
+                          className="block px-3 py-2 text-sm text-gray-800 hover:bg-gray-50"
+                        >
+                          Settings
+                        </Link>
+                        <button
+                          onClick={() => signOut({ callbackUrl: '/login' })}
+                          className="block w-full text-left px-3 py-2 text-sm text-gray-800 hover:bg-gray-50"
+                        >
+                          Log out
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -118,18 +164,37 @@ export function MainLayout({ children }: MainLayoutProps) {
   );
 }
 
-function Sidebar() {
+function Sidebar({
+  collapsed,
+  onToggleCollapse,
+}: {
+  collapsed: boolean;
+  onToggleCollapse: () => void;
+}) {
   const pathname = usePathname();
   const { data: session } = useSession();
 
   return (
     <div className="flex flex-1 flex-col min-h-0 bg-white border-r border-gray-200">
       <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
-        <div className="flex items-center flex-shrink-0 px-4">
-          <Package className="h-8 w-8 text-indigo-600" />
-          <span className="ml-2 text-xl font-bold text-gray-900">WPM v2</span>
+        <div className="flex items-center justify-between flex-shrink-0 px-3">
+          <div className="flex items-center">
+            <Package className="h-7 w-7 text-indigo-600" />
+            {!collapsed && (
+              <span className="ml-2 text-xl font-bold text-gray-900">
+                WPM v2
+              </span>
+            )}
+          </div>
+          <button
+            className="hidden lg:inline-flex items-center justify-center w-8 h-8 rounded-md border bg-white hover:bg-gray-50"
+            onClick={onToggleCollapse}
+            title={collapsed ? 'Expand menu' : 'Collapse menu'}
+          >
+            {collapsed ? '»' : '«'}
+          </button>
         </div>
-        <nav className="mt-8 flex-1 space-y-1 px-2">
+        <nav className="mt-6 flex-1 space-y-1 px-2">
           {navigation.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -144,32 +209,23 @@ function Sidebar() {
                     ? 'bg-indigo-100 text-indigo-900'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 )}
+                title={collapsed ? item.name : undefined}
               >
                 <Icon
                   className={cn(
-                    'mr-3 h-5 w-5 flex-shrink-0',
+                    collapsed
+                      ? 'h-5 w-5 flex-shrink-0'
+                      : 'mr-3 h-5 w-5 flex-shrink-0',
                     isActive
                       ? 'text-indigo-500'
                       : 'text-gray-400 group-hover:text-gray-500'
                   )}
                 />
-                {item.name}
+                {!collapsed && item.name}
               </Link>
             );
           })}
         </nav>
-
-        <div className="flex-shrink-0 border-t border-gray-200">
-          <Link
-            href="/profile"
-            className="flex items-center px-4 py-4 hover:bg-gray-50"
-          >
-            <User className="h-5 w-5 text-gray-400" />
-            <span className="ml-3 text-sm font-medium text-gray-700">
-              {session?.user?.email ?? 'Profile'}
-            </span>
-          </Link>
-        </div>
       </div>
     </div>
   );

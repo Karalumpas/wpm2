@@ -14,7 +14,8 @@ import {
   formatDimensions,
   formatPrice,
 } from '@/lib/formatters';
-import ProductImages from './components/ProductImages';
+import InteractiveGallery from './components/InteractiveGallery';
+import CopyButton from './components/CopyButton';
 import VariantsTable from './variants/VariantsTable';
 
 type PageProps = {
@@ -55,23 +56,59 @@ export default async function ProductDetailPage({ params }: PageProps) {
     ? (product.galleryImages as unknown as string[])
     : [];
 
-  const allThumbs = Array.from(
-    new Set([...(featured ? [featured] : []), ...gallery])
-  );
+  // Include variant images in gallery (unique and normalized)
+  const variantImages: string[] = vars
+    .map((v) => (v.image ? String(v.image) : ''))
+    .filter(Boolean);
+
+  function normalizeUrl(u: string): string {
+    try {
+      const url = new URL(u);
+      // Strip querystring to avoid duplicates from WP size params, etc.
+      const base = `${url.protocol}//${url.host}${url.pathname}`;
+      // For MinIO, dedupe by object path (bucket/object)
+      if (/:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//.test(base))
+        return base.toLowerCase();
+      return base.toLowerCase();
+    } catch {
+      return u;
+    }
+  }
+
+  const deduped = new Map<string, string>();
+  const pushUnique = (src?: string) => {
+    if (!src) return;
+    const key = normalizeUrl(src);
+    if (!deduped.has(key)) deduped.set(key, src);
+  };
+
+  pushUnique(featured);
+  gallery.forEach((g) => pushUnique(g));
+  variantImages.forEach((v) => pushUnique(v));
+
+  const allThumbs = Array.from(deduped.values());
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
               {product.name}
             </h1>
-            <p className="mt-1 text-gray-500">SKU: {product.sku}</p>
+            <div className="mt-1 flex items-center gap-3 text-sm text-slate-500">
+              <span className="font-mono">SKU: {product.sku}</span>
+              <CopyButton value={product.sku} label="Kopiér SKU" />
+              <span className="hidden sm:inline">•</span>
+              <span className="hidden sm:inline">
+                Sidst opdateret{' '}
+                {product.updatedAt ? formatDateTime(product.updatedAt) : '-'}
+              </span>
+            </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <StatusBadge status={product.status} />
             <TypeBadge type={product.type} />
           </div>
@@ -79,14 +116,14 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
         {/* Content */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left: Images */}
-          <div className="lg:col-span-6">
-            <ProductImages images={allThumbs} alt={product.name} />
+          {/* Left: Interactive gallery */}
+          <div className="lg:col-span-7">
+            <InteractiveGallery images={allThumbs} alt={product.name} />
           </div>
 
           {/* Right: Details */}
-          <div className="lg:col-span-6 space-y-6">
-            <div className="bg-white rounded-xl shadow-sm border p-6">
+          <div className="lg:col-span-5 space-y-6">
+            <div className="lg:sticky lg:top-6 bg-white rounded-xl shadow-sm border p-6">
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-2xl font-bold text-blue-600">
                   {product.basePrice ? formatPrice(product.basePrice) : '-'}

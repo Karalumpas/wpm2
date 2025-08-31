@@ -169,6 +169,31 @@ npm run type-check
 - Centralized object storage for product images (MinIO)
 - AI-powered photo indexing, search, and albums (PhotoPrism)
 - Featured and gallery images for products
+- Variant images are normalized to MinIO during sync and used to backfill product galleries when missing (deduped by filename)
+- Unified, modern image slider on product list and product details with drag-follow swipe, circular arrow controls, and dots
 - RESTful API endpoints for media operations
 
 More details: see `PHOTOPRISM_MINIO_INTEGRATION.md`.
+
+## Image Slider UX
+
+- The product list cards and product details page share the same slider component.
+- Cursor/finger drag moves the image with your motion and snaps on release.
+- Details page no longer opens a lightbox; this prevents gesture conflicts and keeps swipe fluid.
+
+## Sync + Images
+
+- During Woo sync, product images are rehosted to MinIO.
+- Variation images are also rehosted to MinIO and saved on each variant.
+- If a product lacks a gallery, variant images (deduped) are backfilled as the gallery and registered in `media_files`.
+
+## Upgrading
+
+If you are upgrading from a version without MinIO-normalized variant images:
+
+1. Ensure `.env.local` has a valid `ENCRYPTION_KEY` and MinIO variables.
+2. Run a background sync for each shop to normalize images:
+   - `POST /api/shops/sync/background` with `{ "shopId": "<id>" }`.
+   - Poll `GET /api/shops/sync/background?jobId=<jobId>` for progress.
+
+3. Verify product galleries now include variant images where appropriate.

@@ -24,7 +24,8 @@ export default function DraggableWindow({
   children,
   onClose,
   className,
-}: DraggableWindowProps) {
+  scale = 1,
+}: DraggableWindowProps & { scale?: number }) {
   const [pos, setPos] = useState<Pos>(initialPos);
   const [collapsed, setCollapsed] = useState(false);
   const draggingRef = useRef<{
@@ -68,8 +69,9 @@ export default function DraggableWindow({
   function onPointerMoveHeader(e: React.PointerEvent<HTMLDivElement>) {
     if (!draggingRef.current) return;
     const { dx, dy, startX, startY } = draggingRef.current;
-    const nx = dx + (e.clientX - startX);
-    const ny = dy + (e.clientY - startY);
+    const factor = scale || 1;
+    const nx = dx + (e.clientX - startX) / factor;
+    const ny = dy + (e.clientY - startY) / factor;
     setPos({ x: nx, y: ny });
   }
 
@@ -83,7 +85,7 @@ export default function DraggableWindow({
 
   return (
     <div
-      className={`fixed z-40 shadow-lg border border-gray-200 rounded-lg bg-white ${className || ''}`}
+      className={`absolute z-40 shadow-lg border border-gray-200 rounded-lg bg-white ${className || ''}`}
       style={{
         left: pos.x,
         top: pos.y,

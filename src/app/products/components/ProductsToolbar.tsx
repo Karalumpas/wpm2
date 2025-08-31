@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Grid, List, RotateCcw } from 'lucide-react';
+import { Search, Grid, List, RotateCcw, ChevronDown, X } from 'lucide-react';
 import { ProcessedSearchParams } from '../params';
 import { MultiSelectFilter } from './MultiSelectFilter';
 
@@ -40,6 +40,7 @@ export function ProductsToolbar({
   onPageChange,
 }: ProductsToolbarProps) {
   const [searchValue, setSearchValue] = useState(params.search || '');
+  const [showFilters, setShowFilters] = useState(false);
 
   // Filter options state
   const [brands, setBrands] = useState<FilterOption[]>([]);
@@ -174,7 +175,7 @@ export function ProductsToolbar({
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl shadow-sm overflow-hidden">
+    <div className="bg-white/70 backdrop-blur border border-gray-200 rounded-xl shadow-sm overflow-hidden">
       {/* Top Section: Pagination Controls */}
       {pagination && pagination.totalPages > 1 && (
         <div className="bg-white border-b border-blue-100 px-6 py-4">
@@ -257,11 +258,11 @@ export function ProductsToolbar({
       )}
 
       {/* Main Toolbar Section */}
-      <div className="p-6 space-y-6">
+      <div className="p-4 md:p-6 space-y-4 md:space-y-6">
         {/* Search and Actions Row */}
-        <div className="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
+        <div className="flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
           {/* Search */}
-          <div className="flex-1 max-w-md">
+          <div className="flex-1 max-w-2xl">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
@@ -269,18 +270,29 @@ export function ProductsToolbar({
                 placeholder="Search products..."
                 value={searchValue}
                 onChange={handleSearchChange}
-                className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 disabled={isLoading}
               />
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {/* Filters toggle (mobile/compact) */}
+            <button
+              onClick={() => setShowFilters((s) => !s)}
+              className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white hover:bg-gray-50 inline-flex items-center gap-2 lg:hidden"
+              aria-expanded={showFilters}
+            >
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${showFilters ? 'rotate-180' : ''}`}
+              />
+              Filters
+            </button>
             {/* View mode toggle */}
             <button
               onClick={toggleViewMode}
-              className="p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 disabled:opacity-50 rounded-lg border-2 border-gray-300 hover:border-blue-300 transition-colors"
+              className="p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 disabled:opacity-50 rounded-lg border border-gray-300 hover:border-blue-300 transition-colors"
               disabled={isLoading}
               title={`Switch to ${params.viewMode === 'grid' ? 'list' : 'grid'} view`}
             >
@@ -294,7 +306,7 @@ export function ProductsToolbar({
             {/* Reset button */}
             <button
               onClick={onReset}
-              className="px-4 py-3 text-gray-600 hover:text-red-600 hover:bg-red-50 disabled:opacity-50 rounded-lg border-2 border-gray-300 hover:border-red-300 transition-colors flex items-center gap-2"
+              className="px-3 py-2 text-gray-600 hover:text-red-600 hover:bg-red-50 disabled:opacity-50 rounded-lg border border-gray-300 hover:border-red-300 transition-colors flex items-center gap-2"
               disabled={isLoading}
               title="Reset all filters"
             >
@@ -304,8 +316,71 @@ export function ProductsToolbar({
           </div>
         </div>
 
+        {/* Active filters chips */}
+        {hasActiveFilters && (
+          <div className="flex flex-wrap gap-2">
+            {params.status && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs border bg-blue-50 text-blue-700">
+                Status: {params.status}
+                <button
+                  onClick={() => onParamsUpdate({ status: undefined, page: 1 })}
+                  aria-label="Clear status"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {params.type && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs border bg-purple-50 text-purple-700">
+                Type: {params.type}
+                <button
+                  onClick={() => onParamsUpdate({ type: undefined, page: 1 })}
+                  aria-label="Clear type"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {(params.brandIds?.length || 0) > 0 && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs border bg-emerald-50 text-emerald-700">
+                Brands: {params.brandIds!.length}
+                <button
+                  onClick={() => onParamsUpdate({ brandIds: [], page: 1 })}
+                  aria-label="Clear brands"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {(params.categoryIds?.length || 0) > 0 && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs border bg-amber-50 text-amber-700">
+                Categories: {params.categoryIds!.length}
+                <button
+                  onClick={() => onParamsUpdate({ categoryIds: [], page: 1 })}
+                  aria-label="Clear categories"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {(params.shopIds?.length || 0) > 0 && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs border bg-indigo-50 text-indigo-700">
+                Shops: {params.shopIds!.length}
+                <button
+                  onClick={() => onParamsUpdate({ shopIds: [], page: 1 })}
+                  aria-label="Clear shops"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Filters Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div
+          className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 ${showFilters ? '' : 'hidden lg:grid'}`}
+        >
           {/* Status Filter */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">Status</label>

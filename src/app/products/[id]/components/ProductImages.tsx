@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import ThumbsSlider from './ThumbsSlider';
 
 export default function ProductImages({
@@ -13,12 +13,45 @@ export default function ProductImages({
 }) {
   const unique = useMemo(() => Array.from(new Set(images)), [images]);
   const [active, setActive] = useState(0);
+  const clamp = (n: number) =>
+    unique.length ? (n + unique.length) % unique.length : 0;
+  // Swipe support
+  const startRef = useRef<{ x: number; y: number } | null>(null);
+  const deltaRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const threshold = 40;
+  function onPointerDown(e: React.PointerEvent) {
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    startRef.current = { x: e.clientX, y: e.clientY };
+    deltaRef.current = { x: 0, y: 0 };
+  }
+  function onPointerMove(e: React.PointerEvent) {
+    if (!startRef.current) return;
+    deltaRef.current = {
+      x: e.clientX - startRef.current.x,
+      y: e.clientY - startRef.current.y,
+    };
+  }
+  function onPointerUp(e: React.PointerEvent) {
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
+    const dx = deltaRef.current.x;
+    if (Math.abs(dx) > threshold)
+      setActive((i) => clamp(i + (dx < 0 ? 1 : -1)));
+    startRef.current = null;
+    deltaRef.current = { x: 0, y: 0 };
+  }
 
   const main = unique[active] || unique[0] || '';
 
   return (
     <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-      <div className="relative aspect-square bg-gray-100">
+      <div
+        className="relative aspect-square bg-gray-100"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+      >
         {main ? (
           <Image
             src={main}
@@ -26,6 +59,7 @@ export default function ProductImages({
             fill
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 50vw"
+            draggable={false}
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-gray-400">
@@ -53,6 +87,31 @@ export default function ProductImages({
             altBase={alt}
             onSelect={(i) => setActive(i)}
           />
+          {unique.length > 1 && (
+            <div className="flex items-center justify-between mt-3">
+              <button
+                onClick={() => setActive((i) => clamp(i - 1))}
+                className="px-3 py-1.5 text-xs rounded border hover:bg-gray-50"
+              >
+                Prev
+              </button>
+              <div className="flex gap-1">
+                {unique.map((_, i) => (
+                  <span
+                    key={i}
+                    onClick={() => setActive(i)}
+                    className={`h-1.5 w-4 rounded-full cursor-pointer ${i === active ? 'bg-gray-800' : 'bg-gray-300'}`}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={() => setActive((i) => clamp(i + 1))}
+                className="px-3 py-1.5 text-xs rounded border hover:bg-gray-50"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

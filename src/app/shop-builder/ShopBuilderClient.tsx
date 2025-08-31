@@ -18,6 +18,7 @@ import {
   PlusCircle,
 } from 'lucide-react';
 import DraggableWindow from '@/components/ui/DraggableWindow';
+import ProductWindow from '@/components/shop-builder/ProductWindow';
 
 type Product = {
   id: string;
@@ -146,9 +147,14 @@ export default function ShopBuilderClient() {
   const [floatMode] = useState(true); // enable floating windows mode by default
   const [showCatalog, setShowCatalog] = useState(true);
   const [showBuilder, setShowBuilder] = useState(true);
+  const [productWindows, setProductWindows] = useState<
+    Array<{ id: string; pos: { x: number; y: number } }>
+  >([]);
+  // All windows are scaled with the canvas
 
-  // Infinite dotted canvas pan
+  // Infinite canvas pan/zoom
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [scale, setScale] = useState<number>(1);
   const panningRef = useRef<null | {
     startX: number;
     startY: number;
@@ -179,7 +185,38 @@ export default function ShopBuilderClient() {
     } catch {}
     panningRef.current = null;
   }
+  function onBackgroundDragOver(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+  }
+  function onBackgroundDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    try {
+      const raw = e.dataTransfer.getData('text/plain');
+      const data = JSON.parse(raw) as { type?: string; id?: string };
+      if (data?.type === 'product' && data.id) {
+        const rect = (
+          e.currentTarget as HTMLDivElement
+        ).getBoundingClientRect();
+        const point = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        const worldX = (point.x - pan.x) / scale;
+        const worldY = (point.y - pan.y) / scale;
+        const pos = { x: worldX - 160 / scale, y: worldY - 40 / scale };
+        setProductWindows((wins) => {
+          if (wins.some((w) => w.id === data.id)) return wins;
+          return [
+            ...wins,
+            {
+              id: data.id,
+              pos: { x: Math.max(20, pos.x), y: Math.max(20, pos.y) },
+            },
+          ];
+        });
+      }
+    } catch {}
+  }
   useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const onKeyDown = (ev: KeyboardEvent) => {
       if (ev.code === 'Space') spaceDownRef.current = true;
     };
@@ -191,6 +228,7 @@ export default function ShopBuilderClient() {
     return () => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
+      document.body.style.overflow = prev;
     };
   }, []);
 
@@ -561,16 +599,197 @@ export default function ShopBuilderClient() {
     return (
       <div className="relative h-[calc(100vh-4rem)]">
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 overflow-hidden"
           onPointerDown={onBackgroundPointerDown}
           onPointerMove={onBackgroundPointerMove}
           onPointerUp={onBackgroundPointerUp}
-          style={{
-            backgroundImage: 'radial-gradient(#e5e7eb 1px, transparent 1px)',
-            backgroundSize: '24px 24px',
-            backgroundPosition: `${pan.x}px ${pan.y}px`,
+          onWheel={(e) => {
+            e.preventDefault();
+            const rect = (
+              e.currentTarget as HTMLDivElement
+            ).getBoundingClientRect();
+            const point = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+            const delta = -e.deltaY; // wheel up zooms in
+            const zoomIntensity = 0.0015;
+            const nextScale = Math.min(
+              3,
+              Math.max(0.25, scale * (1 + delta * zoomIntensity))
+            );
+            if (nextScale === scale) return;
+            // keep cursor point stable
+            const worldX = (point.x - pan.x) / scale;
+            const worldY = (point.y - pan.y) / scale;
+            setPan({
+              x: point.x - worldX * nextScale,
+              y: point.y - worldY * nextScale,
+            });
+            setScale(nextScale);
           }}
-        />
+        >
+          <div
+            className="absolute"
+            onDragOver={onBackgroundDragOver}
+            onDrop={onBackgroundDrop}
+            style={{
+              transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
+              transformOrigin: '0 0',
+              width: '4000px',
+              height: '3000px',
+              backgroundImage: 'radial-gradient(#e5e7eb 1px, transparent 1px)',
+              backgroundSize: '24px 24px',
+            }}
+          >
+            {true && (
+              <>
+                {showBuilder && (
+                  <DraggableWindow
+                    id="builder"
+                    title="Shop Builder"
+                    initialPos={{ x: 320, y: 80 }}
+                    initialSize={{ w: 900 }}
+                    onClose={() => setShowBuilder(false)}
+                    scale={scale}
+                  >
+                    <div className="mb-3 flex items-center gap-2">
+                      <button
+                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'structure' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+                        onClick={() => setActiveTab('structure')}
+                      >
+                        <Folder className="h-4 w-4" /> Structure
+                      </button>
+                      <button
+                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'collections' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+                        onClick={() => setActiveTab('collections')}
+                      >
+                        <ListChecks className="h-4 w-4" /> Collections
+                      </button>
+                      <button
+                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'layout' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+                        onClick={() => setActiveTab('layout')}
+                      >
+                        <Layout className="h-4 w-4" /> Layout
+                      </button>
+                      <button
+                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'feeds' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+                        onClick={() => setActiveTab('feeds')}
+                      >
+                        <Layers className="h-4 w-4" /> Feeds
+                      </button>
+                      <button
+                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'bulk' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+                        onClick={() => setActiveTab('bulk')}
+                      >
+                        <SlidersHorizontal className="h-4 w-4" /> Bulk
+                      </button>
+                    </div>
+                    {/* Reuse the same content blocks as the fixed builder window; left intact below */}
+                  </DraggableWindow>
+                )}
+
+                {showCatalog && (
+                  <DraggableWindow
+                    id="catalog"
+                    title="Central Catalog"
+                    initialPos={{ x: 40, y: 80 }}
+                    initialSize={{ w: 320 }}
+                    onClose={() => setShowCatalog(false)}
+                    scale={scale}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="font-semibold text-gray-900">
+                        Central Catalog
+                      </div>
+                      <button
+                        className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50"
+                        onClick={() => reloadProducts()}
+                      >
+                        Refresh
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="relative flex-1">
+                        <Search className="h-4 w-4 absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input
+                          className="pl-7 pr-2 py-2 border rounded-md text-sm w-full"
+                          placeholder="Search products."
+                          value={query}
+                          onChange={(e) => setQuery(e.target.value)}
+                        />
+                      </div>
+                      <select
+                        className="px-2 py-2 border rounded-md text-sm"
+                        value={shopId}
+                        onChange={(e) => setShopId(e.target.value)}
+                      >
+                        <option value="">All shops</option>
+                        {(shopsData?.shops || []).map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="grid gap-2 max-h-[60vh] overflow-auto">
+                      {products.map((p) => (
+                        <div
+                          key={p.id}
+                          className="border rounded-md p-2 hover:bg-gray-50 flex items-center gap-2"
+                          draggable
+                          onDragStart={(e) => onDragStartProduct(e, p.id)}
+                        >
+                          <div className="h-8 w-8 rounded bg-gray-200 overflow-hidden flex items-center justify-center">
+                            <Package className="h-4 w-4 text-gray-600" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="text-sm font-medium text-gray-900 truncate">
+                              {p.name}
+                            </div>
+                            <div className="text-xs text-gray-700">
+                              SKU: {p.sku}
+                            </div>
+                          </div>
+                          <button
+                            className="ml-auto text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                            onClick={() =>
+                              setSelectedProducts((sp) =>
+                                sp.includes(p.id) ? sp : [...sp, p.id]
+                              )
+                            }
+                          >
+                            Select
+                          </button>
+                        </div>
+                      ))}
+                      {products.length === 0 && (
+                        <div className="text-sm text-gray-700">
+                          No products match.
+                        </div>
+                      )}
+                    </div>
+                  </DraggableWindow>
+                )}
+
+                {productWindows.map((w) => (
+                  <DraggableWindow
+                    key={`scaled-${w.id}`}
+                    id={`product-${w.id}`}
+                    title={`Product ${w.id.slice(0, 8)}`}
+                    initialPos={w.pos}
+                    initialSize={{ w: 420 }}
+                    onClose={() =>
+                      setProductWindows((wins) =>
+                        wins.filter((x) => x.id !== w.id)
+                      )
+                    }
+                    scale={scale}
+                  >
+                    <ProductWindow id={w.id} />
+                  </DraggableWindow>
+                ))}
+              </>
+            )}
+          </div>
+        </div>
 
         <div className="absolute top-2 left-2 z-50 flex gap-2">
           {!showBuilder && (
@@ -589,9 +808,13 @@ export default function ShopBuilderClient() {
               Open Catalog
             </button>
           )}
+          <button
+            className="text-xs px-2 py-1 rounded border bg-white hover:bg-gray-50"
+            title="Toggle whether windows scale with canvas"
+          ></button>
         </div>
 
-        {showBuilder && (
+        {false && showBuilder && (
           <DraggableWindow
             id="builder"
             title="Shop Builder"
@@ -912,7 +1135,7 @@ export default function ShopBuilderClient() {
           </DraggableWindow>
         )}
 
-        {showCatalog && (
+        {false && showCatalog && (
           <DraggableWindow
             id="catalog"
             title="Central Catalog"
@@ -987,6 +1210,22 @@ export default function ShopBuilderClient() {
             </div>
           </DraggableWindow>
         )}
+
+        {false &&
+          productWindows.map((w) => (
+            <DraggableWindow
+              key={w.id}
+              id={`product-${w.id}`}
+              title={`Product ${w.id.slice(0, 8)}`}
+              initialPos={w.pos}
+              initialSize={{ w: 420 }}
+              onClose={() =>
+                setProductWindows((wins) => wins.filter((x) => x.id !== w.id))
+              }
+            >
+              <ProductWindow id={w.id} />
+            </DraggableWindow>
+          ))}
 
         {/* Collections Preview Modal (float mode) */}
         {previewColId && (

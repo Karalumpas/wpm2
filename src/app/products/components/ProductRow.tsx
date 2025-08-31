@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Product, ProductListItem } from '@/types/product';
+import { ShopLinksButton } from './ShopLinksButton';
+import { Copy } from 'lucide-react';
 import { useSettings } from '@/hooks/useSettings';
 import { formatPrice } from '@/lib/utils/currency';
 
@@ -21,16 +23,16 @@ export function ProductRow({ product }: ProductRowProps) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 px-4 py-3 hover:bg-gray-50 transition-colors">
-      {/* Image */}
-      <div className="lg:col-span-1">
-        <div className="w-12 h-12 relative bg-gray-100 rounded overflow-hidden">
+      {/* Image + mini gallery */}
+      <div className="lg:col-span-2">
+        <div className="w-20 h-20 relative bg-gray-100 rounded overflow-hidden">
           {featuredImage ? (
             <Image
               src={featuredImage}
               alt={product.name}
               fill
               className="object-cover"
-              sizes="48px"
+              sizes="80px"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -47,7 +49,7 @@ export function ProductRow({ product }: ProductRowProps) {
       </div>
 
       {/* Product Info */}
-      <div className="lg:col-span-4 space-y-1">
+      <div className="lg:col-span-4 space-y-1 min-w-0">
         <div>
           <Link
             href={`/products/${product.id}`}
@@ -61,6 +63,10 @@ export function ProductRow({ product }: ProductRowProps) {
             Featured
           </span>
         )}
+        {/* Shop links inline on wide screens */}
+        <div className="hidden xl:block pt-1">
+          <ShopLinksButton product={product} />
+        </div>
       </div>
 
       {/* SKU */}
@@ -93,7 +99,7 @@ export function ProductRow({ product }: ProductRowProps) {
       </div>
 
       {/* Actions */}
-      <div className="lg:col-span-2 flex gap-2">
+      <div className="lg:col-span-3 flex flex-wrap gap-2 items-center">
         <Link
           href={`/products/${product.id}/edit`}
           className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -106,6 +112,18 @@ export function ProductRow({ product }: ProductRowProps) {
         >
           View
         </Link>
+        {/* Shop links visible on smaller screens here */}
+        <div className="xl:hidden">
+          <ShopLinksButton product={product} />
+        </div>
+        {/* Utilities */}
+        <button
+          onClick={() => navigator.clipboard.writeText(product.sku)}
+          className="px-2 py-1 text-xs border border-gray-300 text-gray-700 rounded hover:bg-gray-50 inline-flex items-center gap-1"
+          title="Copy SKU"
+        >
+          <Copy className="w-3.5 h-3.5" /> SKU
+        </button>
       </div>
     </div>
   );

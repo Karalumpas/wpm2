@@ -540,9 +540,29 @@ export class WooCommerceProductSyncService {
       const featured: string | null =
         (product as unknown as { featuredImage?: string | null })
           .featuredImage || null;
-      const unique = Array.from(
-        new Set(variantImages.filter((u) => !featured || u !== featured))
-      );
+
+      // Deduplicate by filename (case-insensitive) and exclude featured filename
+      const fileName = (u: string): string => {
+        try {
+          const url = new URL(u);
+          return (url.pathname.split('/').pop() || '').toLowerCase();
+        } catch {
+          const path = u.split('?')[0].split('#')[0];
+          return (path.split('/').pop() || '').toLowerCase();
+        }
+      };
+      const featuredName = featured ? fileName(featured) : null;
+      const seen = new Set<string>();
+      const uniqueByName: string[] = [];
+      for (const u of variantImages) {
+        const name = fileName(u);
+        if (!name) continue;
+        if (featuredName && name === featuredName) continue;
+        if (seen.has(name)) continue;
+        seen.add(name);
+        uniqueByName.push(u);
+      }
+      const unique = uniqueByName;
       if (unique.length === 0) return;
 
       await db

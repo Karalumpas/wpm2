@@ -192,14 +192,11 @@ export default function ShopBuilderClient() {
       const raw = e.dataTransfer.getData('text/plain');
       const data = JSON.parse(raw) as { type?: string; id?: string };
       if (data?.type === 'product' && data.id) {
-        const x = e.clientX;
-        const y = e.clientY;
-        let pos = { x: x - 160, y: y - 40 };
-        ;
-          const worldX = (point.x - pan.x) / scale;
-          const worldY = (point.y - pan.y) / scale;
-          pos = { x: worldX - 160 / scale, y: worldY - 40 / scale };
-        }
+        const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+        const point = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        const worldX = (point.x - pan.x) / scale;
+        const worldY = (point.y - pan.y) / scale;
+        const pos = { x: worldX - 160 / scale, y: worldY - 40 / scale };
         setProductWindows((wins) => {
           if (wins.some((w) => w.id === data.id)) return wins;
           return [

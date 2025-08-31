@@ -149,8 +149,9 @@ export default function ShopBuilderClient() {
   const [showBuilder, setShowBuilder] = useState(true);
   const [productWindows, setProductWindows] = useState<Array<{ id: string; pos: { x: number; y: number } }>>([]);
 
-  // Infinite dotted canvas pan
+  // Infinite canvas pan/zoom
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [scale, setScale] = useState<number>(1);
   const panningRef = useRef<null | {
     startX: number;
     startY: number;
@@ -581,18 +582,42 @@ export default function ShopBuilderClient() {
     return (
       <div className="relative h-[calc(100vh-4rem)]">
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 overflow-hidden"
           onPointerDown={onBackgroundPointerDown}
           onPointerMove={onBackgroundPointerMove}
           onPointerUp={onBackgroundPointerUp}
-          onDragOver={onBackgroundDragOver}
-          onDrop={onBackgroundDrop}
-          style={{
-            backgroundImage: 'radial-gradient(#e5e7eb 1px, transparent 1px)',
-            backgroundSize: '24px 24px',
-            backgroundPosition: `${pan.x}px ${pan.y}px`,
+          onWheel={(e) => {
+            e.preventDefault();
+            const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+            const point = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+            const delta = -e.deltaY; // wheel up zooms in
+            const zoomIntensity = 0.0015;
+            const nextScale = Math.min(3, Math.max(0.25, scale * (1 + delta * zoomIntensity)));
+            if (nextScale === scale) return;
+            // keep cursor point stable
+            const worldX = (point.x - pan.x) / scale;
+            const worldY = (point.y - pan.y) / scale;
+            setPan({ x: point.x - worldX * nextScale, y: point.y - worldY * nextScale });
+            // @ts-expect-error setScale exists below
+            setScale(nextScale);
           }}
-        />
+        >
+          <div
+            className="absolute"
+            onDragOver={onBackgroundDragOver}
+            onDrop={onBackgroundDrop}
+            style={{
+              transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
+              transformOrigin: '0 0',
+              width: '4000px',
+              height: '3000px',
+              backgroundImage: 'radial-gradient(#e5e7eb 1px, transparent 1px)',
+              backgroundSize: '24px 24px',
+            }}
+          >
+            {/* Board background only; windows remain rendered below */}
+          </div>
+        </div>
 
         <div className="absolute top-2 left-2 z-50 flex gap-2">
           {!showBuilder && (

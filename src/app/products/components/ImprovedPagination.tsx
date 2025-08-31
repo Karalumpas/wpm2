@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 
-interface Pagination {
+export interface Pagination {
   page: number;
   limit: number;
   total: number;

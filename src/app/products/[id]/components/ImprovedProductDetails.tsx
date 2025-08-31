@@ -220,11 +220,13 @@ function ProductInfoCard({ product }: { product: Product }) {
             </h3>
             <div className="bg-gray-50 rounded-xl p-4">
               <p className="text-gray-700 font-mono">
-                {formatDimensions(
-                  (product.dimensions as any)?.length,
-                  (product.dimensions as any)?.width,
-                  (product.dimensions as any)?.height
-                )}
+                {(() => {
+                  const dims = product.dimensions as Record<string, unknown> | undefined;
+                  const length = dims && dims.length ? String(dims.length) : undefined;
+                  const width = dims && dims.width ? String(dims.width) : undefined;
+                  const height = dims && dims.height ? String(dims.height) : undefined;
+                  return formatDimensions(length, width, height);
+                })()}
               </p>
             </div>
           </div>

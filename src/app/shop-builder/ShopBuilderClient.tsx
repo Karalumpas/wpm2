@@ -202,11 +202,12 @@ export default function ShopBuilderClient() {
         const worldY = (point.y - pan.y) / scale;
         const pos = { x: worldX - 160 / scale, y: worldY - 40 / scale };
         setProductWindows((wins) => {
-          if (wins.some((w) => w.id === data.id)) return wins;
+          const idStr = String(data.id);
+          if (wins.some((w) => w.id === idStr)) return wins;
           return [
             ...wins,
             {
-              id: data.id,
+              id: idStr,
               pos: { x: Math.max(20, pos.x), y: Math.max(20, pos.y) },
             },
           ];
@@ -2376,7 +2377,7 @@ export default function ShopBuilderClient() {
                             { target: 'id', source: 'sku' },
                             { target: 'title', source: 'name' },
                             { target: 'price', source: 'basePrice' },
-                            { target: 'image_link', source: 'image' },
+                            { target: 'image_link', source: 'featuredImage' },
                             {
                               target: 'google_product_category',
                               source: 'categories',

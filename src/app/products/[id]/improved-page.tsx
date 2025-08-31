@@ -79,6 +79,11 @@ export default async function ImprovedProductDetailPage({ params }: PageProps) {
 
   const allThumbs = Array.from(deduped.values());
 
+  const safeDimensions = product.dimensions as Record<string, unknown> | undefined;
+  const safeGallery = Array.isArray(product.galleryImages)
+    ? (product.galleryImages as string[])
+    : [];
+
   return (
     <ImprovedProductDetails
       product={{
@@ -90,28 +95,28 @@ export default async function ImprovedProductDetailPage({ params }: PageProps) {
         basePrice: product.basePrice ? String(product.basePrice) : null,
         regularPrice: product.regularPrice ? String(product.regularPrice) : null,
         salePrice: product.salePrice ? String(product.salePrice) : null,
-        stockStatus: product.stockStatus || undefined,
-        dimensions: product.dimensions,
-        description: product.description,
-        shortDescription: product.shortDescription,
-        featuredImage: product.featuredImage,
-        galleryImages: product.galleryImages,
-        updatedAt: product.updatedAt?.toISOString(),
-        createdAt: product.createdAt?.toISOString(),
-        lastSyncedAt: product.lastSyncedAt?.toISOString() || null,
+        stockStatus: product.stockStatus ?? undefined,
+        dimensions: safeDimensions,
+        description: product.description ?? undefined,
+        shortDescription: product.shortDescription ?? undefined,
+        featuredImage: product.featuredImage ?? undefined,
+        galleryImages: safeGallery,
+        updatedAt: product.updatedAt ? product.updatedAt.toISOString() : undefined,
+        createdAt: product.createdAt ? product.createdAt.toISOString() : undefined,
+        lastSyncedAt: product.lastSyncedAt ? product.lastSyncedAt.toISOString() : null,
       }}
-      categories={cats.map(c => ({
-        id: c.id!,
-        name: c.name!,
-        slug: c.slug,
+      categories={cats.map((c) => ({
+        id: c.id as string,
+        name: c.name as string,
+        slug: c.slug ?? null,
       }))}
-      variants={vars.map(v => ({
+      variants={vars.map((v) => ({
         id: v.id,
         sku: v.sku,
-        image: v.image,
+        image: v.image ?? null,
         price: v.price ? String(v.price) : null,
-        stockStatus: v.stockStatus,
-        attributes: v.attributes,
+        stockStatus: v.stockStatus ?? undefined,
+        attributes: (v.attributes as Record<string, unknown> | undefined) ?? undefined,
       }))}
       allImages={allThumbs}
     />

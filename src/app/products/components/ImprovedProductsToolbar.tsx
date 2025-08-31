@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ProcessedSearchParams } from '../params';
 import { MultiSelectFilter } from './MultiSelectFilter';
+import { Pagination } from './ImprovedPagination';
 import { 
   Search, 
   Filter, 
@@ -31,7 +32,7 @@ interface ImprovedProductsToolbarProps {
     totalValue: string;
     showing: number;
   };
-  pagination?: any;
+  pagination?: Pagination | undefined;
   onPageChange: (page: number) => void;
 }
 
@@ -54,18 +55,20 @@ export function ImprovedProductsToolbar({
     onParamsUpdate({ search: value || undefined, page: 1 });
   };
 
-  const handleSortChange = (sortBy: string) => {
+  const allowedSorts = ['name','basePrice','sku','createdAt','updatedAt','status','type','stockQuantity','weight','variantCount'] as const;
+  type SortKey = typeof allowedSorts[number];
+  const handleSortChange = (sortBy: SortKey) => {
     const newOrder = params.sortBy === sortBy && params.sortOrder === 'asc' ? 'desc' : 'asc';
     onParamsUpdate({ sortBy, sortOrder: newOrder, page: 1 });
   };
 
   const activeFiltersCount = [
-    params.status && params.status !== 'all',
-    params.type && params.type !== 'all',
-    params.brandIds.length > 0,
-    params.categoryIds.length > 0,
-    params.shopIds.length > 0,
-    params.search,
+    !!params.status,
+    !!params.type,
+    (params.brandIds && params.brandIds.length > 0) || false,
+    (params.categoryIds && params.categoryIds.length > 0) || false,
+    (params.shopIds && params.shopIds.length > 0) || false,
+    !!params.search,
   ].filter(Boolean).length;
 
   return (
@@ -134,7 +137,7 @@ export function ImprovedProductsToolbar({
               value={`${params.sortBy}-${params.sortOrder}`}
               onChange={(e) => {
                 const [sortBy, sortOrder] = e.target.value.split('-');
-                onParamsUpdate({ sortBy, sortOrder: sortOrder as 'asc' | 'desc', page: 1 });
+                onParamsUpdate({ sortBy: sortBy as SortKey, sortOrder: sortOrder as 'asc' | 'desc', page: 1 });
               }}
               className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
@@ -170,10 +173,13 @@ export function ImprovedProductsToolbar({
               <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
               <select
                 value={params.status || 'all'}
-                onChange={(e) => onParamsUpdate({ 
-                  status: e.target.value === 'all' ? undefined : e.target.value,
-                  page: 1 
-                })}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  onParamsUpdate({
+                    status: val === 'all' ? undefined : (val as 'published' | 'draft' | 'private'),
+                    page: 1,
+                  });
+                }}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All Statuses</option>
@@ -188,10 +194,13 @@ export function ImprovedProductsToolbar({
               <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
               <select
                 value={params.type || 'all'}
-                onChange={(e) => onParamsUpdate({ 
-                  type: e.target.value === 'all' ? undefined : e.target.value,
-                  page: 1 
-                })}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  onParamsUpdate({
+                    type: val === 'all' ? undefined : (val as 'simple' | 'variable' | 'grouped'),
+                    page: 1,
+                  });
+                }}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All Types</option>
@@ -220,15 +229,15 @@ export function ImprovedProductsToolbar({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Pagination</label>
               <select
-                value={params.paginationMode}
-                onChange={(e) => onParamsUpdate({ 
-                  paginationMode: e.target.value as 'pages' | 'infinite',
-                  page: 1 
-                })}
+                value={params.paginationMode as string}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  onParamsUpdate({ paginationMode: val as 'pages' | 'loadMore', page: 1 });
+                }}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="pages">Page Numbers</option>
-                <option value="infinite">Infinite Scroll</option>
+                <option value="loadMore">Load More</option>
               </select>
             </div>
           </div>

@@ -90,13 +90,18 @@ export async function POST(request: NextRequest) {
 
     // Check unique constraint (name + parentId)
     const parentValue: string | null = data.parentId ?? null;
+    const parentCondition =
+      parentValue === null
+        ? sql`categories.parent_id IS NULL`
+        : eq(categories.parentId, parentValue);
+
     const conflict = await db
       .select({ id: categories.id })
       .from(categories)
       .where(
         and(
           eq(categories.name, data.name),
-          eq(categories.parentId, parentValue)
+          parentCondition
         )
       )
       .limit(1);

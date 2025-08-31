@@ -248,7 +248,14 @@ export function ImprovedProductsPage({ initialParams }: ProductsPageProps) {
               isLoading={isLoading || isValidating}
               totalCount={data?.pagination?.total || 0}
               stats={stats}
-              pagination={data?.pagination}
+              pagination={data?.pagination ? {
+                page: data.pagination.page,
+                limit: data.pagination.limit,
+                total: data.pagination.total,
+                totalPages: data.pagination.totalPages,
+                hasNextPage: !!data.pagination.nextCursor,
+                hasPreviousPage: !!data.pagination.cursor,
+              } : undefined}
               onPageChange={handlePageChange}
             />
           </div>
@@ -257,9 +264,16 @@ export function ImprovedProductsPage({ initialParams }: ProductsPageProps) {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 overflow-hidden">
             <ImprovedProductsList
               products={data?.products || []}
-              pagination={data?.pagination}
+              pagination={data?.pagination ? {
+                page: data.pagination.page,
+                limit: data.pagination.limit,
+                total: data.pagination.total,
+                totalPages: data.pagination.totalPages,
+                hasNextPage: !!data.pagination.nextCursor,
+                hasPreviousPage: !!data.pagination.cursor,
+              } : undefined}
               viewMode={params.viewMode}
-              paginationMode={params.paginationMode}
+              paginationMode={params.paginationMode as 'pages' | 'infinite'}
               isLoading={isLoading}
               isLoadingMore={isLoadingMore}
               hasMore={hasMore}
@@ -272,7 +286,14 @@ export function ImprovedProductsPage({ initialParams }: ProductsPageProps) {
           {params.paginationMode === 'pages' && data?.pagination && (
             <div className="flex justify-center">
               <ImprovedPagination
-                pagination={data.pagination}
+                pagination={{
+                  page: data.pagination.page,
+                  limit: data.pagination.limit,
+                  total: data.pagination.total,
+                  totalPages: data.pagination.totalPages,
+                  hasNextPage: !!data.pagination.nextCursor,
+                  hasPreviousPage: !!data.pagination.cursor,
+                }}
                 onPageChange={handlePageChange}
               />
             </div>

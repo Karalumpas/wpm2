@@ -46,13 +46,20 @@ export async function PUT(request: NextRequest, { params }: Params) {
           ? data.parentId
           : (current[0].parentId as string | null)) ?? null;
       const nextName = data.name !== undefined ? data.name : current[0].name;
+
+      // parent condition must allow NULL comparisons; construct conditional
+      const parentCondition =
+        nextParent === null
+          ? sql`categories.parent_id IS NULL`
+          : eq(categories.parentId, nextParent);
+
       const conflict = await db
         .select({ id: categories.id })
         .from(categories)
         .where(
           and(
             eq(categories.name, nextName),
-            eq(categories.parentId, nextParent),
+            parentCondition,
             sql`id <> ${id}`
           )
         )

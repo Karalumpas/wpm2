@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ImprovedPagination } from './ImprovedPagination';
+import { ImprovedPagination, Pagination } from './ImprovedPagination';
 import { 
   Package, 
   Edit, 
@@ -32,9 +32,9 @@ interface Product {
 
 interface ImprovedProductsListProps {
   products: Product[];
-  pagination?: any;
+  pagination?: Pagination | undefined;
   viewMode: 'grid' | 'list';
-  paginationMode: 'pages' | 'infinite';
+  paginationMode: 'pages' | 'infinite' | 'loadMore';
   isLoading: boolean;
   isLoadingMore: boolean;
   hasMore: boolean;
@@ -77,7 +77,7 @@ export function ImprovedProductsList({
             disabled={isLoadingMore}
             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoadingMore ? (
+              {isLoadingMore ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
                 Loading...
@@ -393,7 +393,7 @@ function EmptyState() {
       </div>
       <h3 className="text-lg font-semibold text-gray-900 mb-2">No products found</h3>
       <p className="text-gray-500 mb-6 max-w-md mx-auto">
-        We couldn't find any products matching your search criteria. Try adjusting your filters or search terms.
+        We couldn&apos;t find any products matching your search criteria. Try adjusting your filters or search terms.
       </p>
       <button className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
         <Package className="h-4 w-4" />

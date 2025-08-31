@@ -42,9 +42,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
     .from(productVariants)
     .where(eq(productVariants.productId, id));
 
-  const featured = product.featuredImage || undefined;
+  const featured = product.featuredImage ?? undefined;
   const gallery: string[] = Array.isArray(product.galleryImages)
-    ? (product.galleryImages as unknown as string[])
+    ? (product.galleryImages as string[])
     : [];
 
   // Include variant images in gallery (unique and normalized)
@@ -79,11 +79,46 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   const allThumbs = Array.from(deduped.values());
 
+  // Coerce DB rows into expected shapes
+  const safeProduct: {
+    id: string;
+    sku: string;
+    name: string;
+    status: string;
+    type: string;
+    basePrice?: string | null;
+    featuredImage?: string | undefined;
+    stockStatus?: string | undefined;
+    regularPrice?: string | null;
+    salePrice?: string | null;
+    updatedAt?: Date | undefined;
+    createdAt?: Date | undefined;
+    lastSyncedAt?: Date | null;
+  } = {
+    ...product,
+    stockStatus: product.stockStatus ?? undefined,
+    basePrice: product.basePrice ?? null,
+    featuredImage: featured,
+    updatedAt: product.updatedAt ? new Date(product.updatedAt as unknown as string | Date) : undefined,
+    createdAt: product.createdAt ? new Date(product.createdAt as unknown as string | Date) : undefined,
+    lastSyncedAt: product.lastSyncedAt ? new Date(product.lastSyncedAt as unknown as string | Date) : null,
+  } as const;
+
+  const safeCats = cats.map((c) => ({ id: c.id as string, name: c.name as string, slug: c.slug ?? null }));
+  const safeVars = vars.map((v) => ({
+    id: v.id,
+    sku: v.sku,
+    image: v.image ?? null,
+    price: v.price ? String(v.price) : null,
+    stockStatus: v.stockStatus ?? undefined,
+    attributes: (v.attributes as Record<string, unknown> | undefined) ?? undefined,
+  }));
+
   return (
     <ProductDetailPageWithVersionSelector
-      product={product}
-      categories={cats}
-      variants={vars}
+      product={safeProduct}
+      categories={safeCats}
+      variants={safeVars}
       allImages={allThumbs}
     />
   );

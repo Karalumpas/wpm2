@@ -18,6 +18,7 @@ import {
   PlusCircle,
 } from 'lucide-react';
 import DraggableWindow from '@/components/ui/DraggableWindow';
+import ProductWindow from '@/components/shop-builder/ProductWindow';
 
 type Product = {
   id: string;
@@ -146,6 +147,7 @@ export default function ShopBuilderClient() {
   const [floatMode] = useState(true); // enable floating windows mode by default
   const [showCatalog, setShowCatalog] = useState(true);
   const [showBuilder, setShowBuilder] = useState(true);
+  const [productWindows, setProductWindows] = useState<Array<{ id: string; pos: { x: number; y: number } }>>([]);
 
   // Infinite dotted canvas pan
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -178,6 +180,24 @@ export default function ShopBuilderClient() {
       (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
     } catch {}
     panningRef.current = null;
+  }
+  function onBackgroundDragOver(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+  }
+  function onBackgroundDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    try {
+      const raw = e.dataTransfer.getData('text/plain');
+      const data = JSON.parse(raw) as { type?: string; id?: string };
+      if (data?.type === 'product' && data.id) {
+        const x = e.clientX;
+        const y = e.clientY;
+        setProductWindows((wins) => {
+          if (wins.some((w) => w.id === data.id)) return wins;
+          return [...wins, { id: data.id, pos: { x: Math.max(20, x - 160), y: Math.max(20, y - 40) } }];
+        });
+      }
+    } catch {}
   }
   useEffect(() => {
     const onKeyDown = (ev: KeyboardEvent) => {
@@ -565,6 +585,8 @@ export default function ShopBuilderClient() {
           onPointerDown={onBackgroundPointerDown}
           onPointerMove={onBackgroundPointerMove}
           onPointerUp={onBackgroundPointerUp}
+          onDragOver={onBackgroundDragOver}
+          onDrop={onBackgroundDrop}
           style={{
             backgroundImage: 'radial-gradient(#e5e7eb 1px, transparent 1px)',
             backgroundSize: '24px 24px',
@@ -987,6 +1009,19 @@ export default function ShopBuilderClient() {
             </div>
           </DraggableWindow>
         )}
+
+        {productWindows.map((w) => (
+          <DraggableWindow
+            key={w.id}
+            id={`product-${w.id}`}
+            title={`Product ${w.id.slice(0, 8)}`}
+            initialPos={w.pos}
+            initialSize={{ w: 420 }}
+            onClose={() => setProductWindows((wins) => wins.filter((x) => x.id !== w.id))}
+          >
+            <ProductWindow id={w.id} />
+          </DraggableWindow>
+        ))}
 
         {/* Collections Preview Modal (float mode) */}
         {previewColId && (

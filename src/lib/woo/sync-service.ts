@@ -129,7 +129,12 @@ export class WooCommerceProductSyncService {
       result.details!.errors.push(...variationResult.errors);
 
       // Backfill galleries for products missing a gallery using variant images
-      this.updateProgress('products', 100, 100, 'Backfilling product galleries from variant images...');
+      this.updateProgress(
+        'products',
+        100,
+        100,
+        'Backfilling product galleries from variant images...'
+      );
       await this.backfillMissingGalleriesForShop();
 
       // Add debug logs if enabled (but not as errors)
@@ -502,16 +507,24 @@ export class WooCommerceProductSyncService {
   }
 
   // If a product has no gallery images but variants do, set gallery to unique variant images (excluding featured image)
-  private async ensureGalleryFromVariantImages(productId: string): Promise<void> {
+  private async ensureGalleryFromVariantImages(
+    productId: string
+  ): Promise<void> {
     try {
-      const prodRows = await db.select().from(products).where(eq(products.id, productId)).limit(1);
+      const prodRows = await db
+        .select()
+        .from(products)
+        .where(eq(products.id, productId))
+        .limit(1);
       const product = prodRows[0];
       if (!product) return;
 
       const currentGallery: unknown = (
         product as unknown as { galleryImages?: unknown }
       ).galleryImages;
-      const galleryList: string[] = Array.isArray(currentGallery) ? (currentGallery as string[]) : [];
+      const galleryList: string[] = Array.isArray(currentGallery)
+        ? (currentGallery as string[])
+        : [];
       if (galleryList.length > 0) return; // Already has a gallery
 
       const varRows = await db
@@ -524,15 +537,20 @@ export class WooCommerceProductSyncService {
         .filter((u): u is string => typeof u === 'string' && u.length > 0);
       if (variantImages.length === 0) return;
 
-      const featured: string | null = (
-        product as unknown as { featuredImage?: string | null }
-      ).featuredImage || null;
-      const unique = Array.from(new Set(variantImages.filter((u) => !featured || u !== featured)));
+      const featured: string | null =
+        (product as unknown as { featuredImage?: string | null })
+          .featuredImage || null;
+      const unique = Array.from(
+        new Set(variantImages.filter((u) => !featured || u !== featured))
+      );
       if (unique.length === 0) return;
 
       await db
         .update(products)
-        .set({ galleryImages: unique as unknown as string[], updatedAt: new Date() })
+        .set({
+          galleryImages: unique as unknown as string[],
+          updatedAt: new Date(),
+        })
         .where(eq(products.id, productId));
     } catch (e) {
       // Non-fatal; log and continue
@@ -549,9 +567,8 @@ export class WooCommerceProductSyncService {
         .where(eq(products.shopId, this.shopId));
 
       for (const p of shopProducts) {
-        const gallery: unknown = (
-          p as unknown as { galleryImages?: unknown }
-        ).galleryImages;
+        const gallery: unknown = (p as unknown as { galleryImages?: unknown })
+          .galleryImages;
         if (!Array.isArray(gallery) || gallery.length === 0) {
           await this.ensureGalleryFromVariantImages(p.id);
         }

@@ -248,43 +248,32 @@ export function SyncCenter() {
 
   return (
     <>
-      {/* Floating CTA button */}
-      <button
-        aria-label="Åbn synkroniseringsoverblik"
-        onClick={() => setOpen(true)}
-        className="fixed bottom-5 right-5 z-40 h-14 w-14 rounded-full shadow-lg bg-gradient-to-br from-indigo-600 to-blue-600 text-white flex items-center justify-center hover:brightness-110 focus:outline-none focus:ring-4 focus:ring-indigo-300"
+      {/* Collapsible right sidebar (no overlay) */}
+      <div
+        className={`fixed right-0 top-16 bottom-0 z-40 transition-transform duration-200 ${
+          open ? 'translate-x-0' : 'translate-x-[calc(100%-42px)]'
+        }`}
+        style={{ width: 560 }}
+        aria-expanded={open}
+        aria-label="Synkronisering sidebar"
       >
-        <RefreshCcw className="h-6 w-6" />
-      </button>
-
-      {/* Overlay */}
-      {open && (
-        <div className="fixed inset-0 z-50">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={() => setOpen(false)}
-          />
-
-          {/* Panel */}
-          <div className="absolute right-0 top-0 h-full w-full sm:w-[560px] bg-white shadow-xl border-l animate-in slide-in-from-right duration-200">
-            <div className="p-4 border-b flex items-center justify-between bg-white/90">
-              <div className="flex items-center gap-2">
-                <RefreshCcw className="h-5 w-5 text-indigo-600" />
-                <h2 className="text-lg font-bold text-gray-900">
-                  Synkronisering
-                </h2>
-              </div>
-              <button
-                aria-label="Luk"
-                onClick={() => setOpen(false)}
-                className="h-9 w-9 inline-flex items-center justify-center rounded-md hover:bg-gray-100"
-              >
-                <X className="h-5 w-5" />
-              </button>
+        {/* Panel */}
+        <div className="h-full w-full bg-white shadow-xl border-l flex flex-col">
+          <div className="p-4 border-b flex items-center justify-between bg-white/90">
+            <div className="flex items-center gap-2">
+              <RefreshCcw className="h-5 w-5 text-indigo-600" />
+              <h2 className="text-lg font-bold text-gray-900">Synkronisering</h2>
             </div>
+            <button
+              aria-label={open ? 'Skjul sidebar' : 'Vis sidebar'}
+              onClick={() => setOpen((o) => !o)}
+              className="h-9 w-9 inline-flex items-center justify-center rounded-md hover:bg-gray-100"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
 
-            <div className="p-4 space-y-5">
+          <div className="p-4 space-y-5 overflow-auto">
               <div className="flex flex-wrap items-center gap-3">
                 <button
                   onClick={handleStartAll}
@@ -400,10 +389,19 @@ export function SyncCenter() {
                   </div>
                 </div>
               )}
-            </div>
           </div>
         </div>
-      )}
+
+        {/* Toggle handle */}
+        <button
+          aria-label={open ? 'Skjul synkronisering' : 'Åbn synkronisering'}
+          onClick={() => setOpen((o) => !o)}
+          className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 h-10 w-10 rounded-l-md bg-gradient-to-br from-indigo-600 to-blue-600 text-white shadow-lg flex items-center justify-center"
+          title="Synkronisering"
+        >
+          <RefreshCcw className="h-5 w-5" />
+        </button>
+      </div>
     </>
   );
 }

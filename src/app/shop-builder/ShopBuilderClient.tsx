@@ -1,8 +1,9 @@
 'use client';
 
 import useSWR from 'swr';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, FolderPlus, Download, Settings, Package, Folder, Tag, Layout, ListChecks, SlidersHorizontal, Layers, Trash2, PlusCircle } from 'lucide-react';
+import DraggableWindow from '@/components/ui/DraggableWindow';
 
 type Product = {
   id: string;
@@ -96,6 +97,39 @@ export default function ShopBuilderClient() {
     '/api/shop-builder/builds', fetcher
   );
   const [activeBuildId, setActiveBuildId] = useState<string | null>(null);
+
+  // Floating canvas/windows state
+  const [floatMode] = useState(true); // enable floating windows mode by default
+  const [showCatalog, setShowCatalog] = useState(true);
+  const [showBuilder, setShowBuilder] = useState(true);
+
+  // Infinite dotted canvas pan
+  const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const panningRef = useRef<null | { startX: number; startY: number; panX: number; panY: number }>(null);
+  const spaceDownRef = useRef(false);
+
+  function onBackgroundPointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    if (e.button === 1 || spaceDownRef.current) {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      panningRef.current = { startX: e.clientX, startY: e.clientY, panX: pan.x, panY: pan.y };
+    }
+  }
+  function onBackgroundPointerMove(e: React.PointerEvent<HTMLDivElement>) {
+    if (!panningRef.current) return;
+    const { startX, startY, panX, panY } = panningRef.current;
+    setPan({ x: panX + (e.clientX - startX), y: panY + (e.clientY - startY) });
+  }
+  function onBackgroundPointerUp(e: React.PointerEvent<HTMLDivElement>) {
+    try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
+    panningRef.current = null;
+  }
+  useEffect(() => {
+    const onKeyDown = (ev: KeyboardEvent) => { if (ev.code === 'Space') spaceDownRef.current = true; };
+    const onKeyUp = (ev: KeyboardEvent) => { if (ev.code === 'Space') spaceDownRef.current = false; };
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    return () => { window.removeEventListener('keydown', onKeyDown); window.removeEventListener('keyup', onKeyUp); };
+  }, []);
 
   async function saveBuild() {
     const payload = {
@@ -339,6 +373,269 @@ function matchCollection(c: Collection, ps: Product[]): Product[] {
         return arr;
       });
     }
+  }
+
+  // Floating windows rendering
+  if (floatMode) {
+    return (
+      <div className="relative h-[calc(100vh-4rem)]">
+        <div
+          className="absolute inset-0"
+          onPointerDown={onBackgroundPointerDown}
+          onPointerMove={onBackgroundPointerMove}
+          onPointerUp={onBackgroundPointerUp}
+          style={{
+            backgroundImage: 'radial-gradient(#e5e7eb 1px, transparent 1px)',
+            backgroundSize: '24px 24px',
+            backgroundPosition: `${pan.x}px ${pan.y}px`,
+          }}
+        />
+
+        <div className="absolute top-2 left-2 z-50 flex gap-2">
+          {!showBuilder && (
+            <button className="text-xs px-2 py-1 rounded border bg-white hover:bg-gray-50" onClick={() => setShowBuilder(true)}>Open Builder</button>
+          )}
+          {!showCatalog && (
+            <button className="text-xs px-2 py-1 rounded border bg-white hover:bg-gray-50" onClick={() => setShowCatalog(true)}>Open Catalog</button>
+          )}
+        </div>
+
+        {showBuilder && (
+          <DraggableWindow id="builder" title="Shop Builder" initialPos={{ x: 320, y: 80 }} initialSize={{ w: 900 }} onClose={() => setShowBuilder(false)}>
+            <div className="mb-3 flex items-center gap-2">
+              <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='structure'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('structure')}><Folder className="h-4 w-4"/> Structure</button>
+              <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='collections'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('collections')}><ListChecks className="h-4 w-4"/> Collections</button>
+              <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='layout'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('layout')}><Layout className="h-4 w-4"/> Layout</button>
+              <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='feeds'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('feeds')}><Layers className="h-4 w-4"/> Feeds</button>
+              <button className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab==='bulk'?'bg-indigo-600 text-white border-indigo-600':'hover:bg-gray-50'}`} onClick={() => setActiveTab('bulk')}><SlidersHorizontal className="h-4 w-4"/> Bulk</button>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-lg p-3 flex items-center gap-3">
+              <input className="flex-1 border rounded px-2 py-2 text-sm" value={builderName} onChange={(e) => setBuilderName(e.target.value)} placeholder="Webshop name" />
+              <select className="border rounded px-2 py-2 text-sm" value={activeBuildId || ''} onChange={(e) => e.target.value ? loadBuild(e.target.value) : null}>
+                <option value="">Load build.</option>
+                {(buildsData?.builds || []).map((b) => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
+              <button className="inline-flex items-center gap-2 px-3 py-2 rounded-md border hover:bg-gray-50" onClick={saveBuild}>
+                Save
+              </button>
+              <button className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-indigo-600 text-white shadow hover:brightness-110" onClick={exportConfig}>
+                <Download className="h-4 w-4" /> Export
+              </button>
+            </div>
+
+            {activeTab==='structure' && (
+              <div className="bg-white border border-gray-200 rounded-lg p-3 mt-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2 font-semibold text-gray-900"><Folder className="h-4 w-4" /> Categories</div>
+                  <button className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50" onClick={createCategory}><FolderPlus className="h-3.5 w-3.5" /> New</button>
+                </div>
+                {categories.length === 0 && <div className="text-sm text-gray-700">No builder categories yet. Create your structure and drag products into each list.</div>}
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {categories.map((c) => (
+                    <div key={c.id} className="border rounded-md p-2" draggable onDragStart={(e) => onDragStartCategory(e, c.id)} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onDropToCategory(e, c.id)}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="text-sm font-semibold text-gray-900 truncate" title={c.name}>{c.name}</div>
+                        <div className="flex items-center gap-2">
+                          <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => renameCategory(c.id)}>Rename</button>
+                          <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => deleteCategory(c.id)}>Delete</button>
+                        </div>
+                      </div>
+                      <div className="min-h-[120px] rounded border border-dashed border-gray-300 p-2">
+                        {c.productIds.length === 0 && (
+                          <div className="text-xs text-gray-600">Drop products here.</div>
+                        )}
+                        <div className="space-y-1">
+                          {c.productIds.map((pid) => {
+                            const p = products.find((x) => x.id === pid);
+                            if (!p) return null;
+                            return (
+                              <div key={pid} className="text-xs px-2 py-1 rounded bg-gray-50 border flex items-center justify-between">
+                                <span className="truncate">{p.name}</span>
+                                <button className="ml-2 text-[10px] px-1.5 py-0.5 rounded border" onClick={() => setCategories((cs) => cs.map((cc) => (cc.id === c.id ? { ...cc, productIds: cc.productIds.filter((id) => id !== pid) } : cc)))}>Remove</button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab==='layout' && (
+              <div className="bg-white border border-gray-200 rounded-lg p-3 mt-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="border rounded p-2">
+                    <div className="text-xs font-semibold text-gray-900 mb-1">Palette</div>
+                    {(['hero','grid','carousel'] as const).map((t) => (
+                      <div key={t} className="border rounded p-2 mb-1 bg-gray-50" draggable onDragStart={(e) => onPaletteDragStart(e, t)}>
+                        {t.toUpperCase()}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="md:col-span-2 border rounded p-2 min-h-[200px]" onDragOver={(e) => e.preventDefault()} onDrop={(e) => onCanvasDrop(e)}>
+                    {layoutBlocks.length === 0 && <div className="text-sm text-gray-700">Drag blocks here from the palette.</div>}
+                    <div className="space-y-2">
+                      {layoutBlocks.map((b, i) => (
+                        <div key={b.id} className="border rounded p-2 bg-white" draggable onDragStart={(e) => onBlockDragStart(e, b.id)} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onCanvasDrop(e, i)}>
+                          <div className="flex items-center justify-between">
+                            <div className="text-xs font-semibold text-gray-900">{b.type.toUpperCase()}</div>
+                            <div className="flex items-center gap-1">
+                              <button className="text-[11px] px-2 py-0.5 rounded border" onClick={() => setLayoutBlocks((bs) => bs.filter((x) => x.id !== b.id))}>Remove</button>
+                            </div>
+                          </div>
+                          <div className="mt-2 grid grid-cols-2 gap-2">
+                            <input className="border rounded px-2 py-1 text-xs" value={b.title || ''} onChange={(e) => setLayoutBlocks((bs) => bs.map((x) => x.id === b.id ? { ...x, title: e.target.value } : x))} />
+                            <select className="border rounded px-2 py-1 text-xs" value={b.source?.type || 'selected'} onChange={(e) => setLayoutBlocks((bs) => bs.map((x) => x.id === b.id ? { ...x, source: { ...(x.source||{}), type: e.target.value as any } } : x))}>
+                              <option value="selected">Selected</option>
+                              <option value="collection">Collection</option>
+                              <option value="category">Category</option>
+                            </select>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab==='feeds' && (
+              <div className="mt-4">
+                <textarea className="w-full h-40 font-mono text-xs border rounded p-2" value={feedPreview} onChange={()=>{}}/>
+              </div>
+            )}
+
+            {activeTab==='bulk' && (
+              <div className="mt-4 space-y-2">
+                <div className="grid grid-cols-1 gap-2">
+                  <input className="border rounded px-2 py-2 text-sm" placeholder="Title prefix" value={titlePrefix} onChange={(e) => setTitlePrefix(e.target.value)} />
+                  <input className="border rounded px-2 py-2 text-sm" placeholder="Title suffix" value={titleSuffix} onChange={(e) => setTitleSuffix(e.target.value)} />
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-gray-800">Price +/-%</label>
+                    <input type="number" className="border rounded px-2 py-2 text-sm w-24" value={pricePercent} onChange={(e) => setPricePercent(Number(e.target.value))} />
+                  </div>
+                </div>
+                <div className="text-[11px] text-gray-600">Transforms stored in build config; apply during export/import/feed gen.</div>
+              </div>
+            )}
+          </DraggableWindow>
+        )}
+
+        {showCatalog && (
+          <DraggableWindow id="catalog" title="Central Catalog" initialPos={{ x: 40, y: 80 }} initialSize={{ w: 320 }} onClose={() => setShowCatalog(false)}>
+            <div className="flex items-center justify-between mb-2">
+              <div className="font-semibold text-gray-900">Central Catalog</div>
+              <button className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50" onClick={() => reloadProducts()}>Refresh</button>
+            </div>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="relative flex-1">
+                <Search className="h-4 w-4 absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input className="pl-7 pr-2 py-2 border rounded-md text-sm w-full" placeholder="Search products." value={query} onChange={(e) => setQuery(e.target.value)} />
+              </div>
+              <select className="px-2 py-2 border rounded-md text-sm" value={shopId} onChange={(e) => setShopId(e.target.value)}>
+                <option value="">All shops</option>
+                {(shopsData?.shops || []).map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="grid gap-2 max-h-[60vh] overflow-auto">
+              {products.map((p) => (
+                <div key={p.id} className="border rounded-md p-2 hover:bg-gray-50 flex items-center gap-2" draggable onDragStart={(e) => onDragStartProduct(e, p.id)}>
+                  <div className="h-8 w-8 rounded bg-gray-200 overflow-hidden flex items-center justify-center">
+                    <Package className="h-4 w-4 text-gray-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium text-gray-900 truncate">{p.name}</div>
+                    <div className="text-xs text-gray-700">SKU: {p.sku}</div>
+                  </div>
+                  <button className="ml-auto text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={() => setSelectedProducts((sp) => (sp.includes(p.id) ? sp : [...sp, p.id]))}>Select</button>
+                </div>
+              ))}
+              {products.length === 0 && <div className="text-sm text-gray-700">No products match.</div>}
+            </div>
+          </DraggableWindow>
+        )}
+
+        {/* Collections Preview Modal (float mode) */}
+        {previewColId && (
+          <div className="fixed inset-0 z-50">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setPreviewColId(null)} />
+            <div className="absolute inset-0 p-6 flex items-center justify-center">
+              <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg border border-gray-200">
+                <div className="p-3 border-b flex items-center justify-between">
+                  <div className="text-sm font-semibold text-gray-900">Collection preview</div>
+                  <button className="text-sm px-2 py-1 rounded border hover:bg-gray-50" onClick={() => setPreviewColId(null)}>Close</button>
+                </div>
+                <div className="p-3 space-y-2">
+                  {(() => {
+                    const c = collections.find((x) => x.id === previewColId);
+                    if (!c) return <div className="text-sm text-gray-700">Not found</div>;
+                    const all = matchCollection(c, products);
+                    const pageSize = 30;
+                    const totalPages = Math.max(1, Math.ceil(all.length / pageSize));
+                    const page = Math.min(previewPage, totalPages);
+                    const slice = all.slice((page - 1) * pageSize, page * pageSize);
+                    const addAllToSelected = () => {
+                      setSelectedProducts((prev) => Array.from(new Set([...prev, ...all.map((p) => p.id)])));
+                    };
+                    const addAllToCategory = () => {
+                      if (!previewTargetCat) return;
+                      setCategories((cs) => cs.map((cc) => cc.id === previewTargetCat ? { ...cc, productIds: Array.from(new Set([...(cc.productIds || []), ...all.map((p) => p.id)])) } : cc));
+                    };
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <select className="border rounded px-2 py-1 text-xs" value={previewTargetCat} onChange={(e) => setPreviewTargetCat(e.target.value)}>
+                            <option value="">Choose builder category.</option>
+                            {categories.map((bc) => <option key={bc.id} value={bc.id}>{bc.name}</option>)}
+                          </select>
+                          <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={addAllToSelected}>Add all to Selected</button>
+                          <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" onClick={addAllToCategory} disabled={!previewTargetCat}>Add all to Category</button>
+                        </div>
+                        <div className="text-xs text-gray-700 mb-2">Matched {all.length} products</div>
+                        <div className="max-h-72 overflow-auto border rounded">
+                          <table className="min-w-full text-xs">
+                            <thead className="bg-gray-50">
+                              <tr>
+                                <th className="text-left px-2 py-1">Name</th>
+                                <th className="text-left px-2 py-1">SKU</th>
+                                <th className="text-left px-2 py-1">Price</th>
+                                <th className="text-left px-2 py-1">Status</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {slice.map((p) => (
+                                <tr key={p.id} className="border-t">
+                                  <td className="px-2 py-1 truncate">{p.name}</td>
+                                  <td className="px-2 py-1">{p.sku}</td>
+                                  <td className="px-2 py-1">{p.basePrice ?? '-'}</td>
+                                  <td className="px-2 py-1">{p.status ?? '-'}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                        <div className="mt-2 flex items-center justify-between">
+                          <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" disabled={page<=1} onClick={() => setPreviewPage((p) => Math.max(1, p-1))}>Prev</button>
+                          <div className="text-xs text-gray-700">Page {page} / {totalPages}</div>
+                          <button className="text-xs px-2 py-1 rounded border hover:bg-gray-50" disabled={page>=totalPages} onClick={() => setPreviewPage((p) => Math.min(totalPages, p+1))}>Next</button>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
   }
 
   return (

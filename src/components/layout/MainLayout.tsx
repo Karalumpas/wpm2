@@ -194,10 +194,13 @@ function Sidebar({
   const { data: session } = useSession();
 
   return (
-    <div className="flex flex-1 flex-col min-h-0 backdrop-blur-md border-r shadow-lg" style={{ 
-      backgroundColor: 'var(--surface)', 
-      borderColor: 'var(--border)'
-    }}>
+    <div
+      className="flex flex-1 flex-col min-h-0 backdrop-blur-md border-r shadow-lg"
+      style={{
+        backgroundColor: 'var(--surface)',
+        borderColor: 'var(--border)',
+      }}
+    >
       <div className="flex flex-1 flex-col overflow-y-auto pt-6 pb-4">
         <div className="flex items-center justify-between flex-shrink-0 px-4">
           <div className="flex items-center">

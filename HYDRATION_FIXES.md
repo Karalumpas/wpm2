@@ -1,12 +1,15 @@
 # Hydration Safety Fixes
 
 ## Problem
+
 React hydration mismatch errors were occurring due to differences between server-side and client-side rendering, particularly around:
+
 - localStorage access during SSR
 - DOM manipulation before hydration
 - Inconsistent default values between server and client
 
 ## Root Causes
+
 1. **localStorage Access**: Trying to access `window.localStorage` during server-side rendering
 2. **DOM Manipulation**: Attempting to modify DOM before React hydration completed
 3. **API Differences**: Using browser-specific APIs like `matchMedia` without proper fallbacks
@@ -15,6 +18,7 @@ React hydration mismatch errors were occurring due to differences between server
 ## Solutions Implemented
 
 ### 1. Safe localStorage Helpers
+
 **File**: `src/contexts/SettingsContext.tsx`
 
 ```typescript
@@ -43,36 +47,41 @@ function setStoredSettings(settings: UserSettings) {
 ```
 
 **Benefits**:
+
 - ✅ No server-side localStorage access
 - ✅ Graceful fallback when localStorage unavailable
 - ✅ Handles private browsing mode exceptions
 
 ### 2. Safe DOM Manipulation
+
 **File**: `src/contexts/SettingsContext.tsx`
 
 ```typescript
 function applySettingsToDOM(settings: UserSettings) {
   if (typeof window === 'undefined' || !document?.documentElement) return;
-  
+
   try {
     const root = document.documentElement;
-    
+
     // Safe theme application
     root.setAttribute('data-theme', settings.theme || 'ocean');
-    
+
     // Safe color mode with matchMedia fallback
     const colorMode = settings.colorMode || 'auto';
     if (colorMode === 'auto') {
       if (window.matchMedia) {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        root.setAttribute('data-color-mode', mediaQuery.matches ? 'dark' : 'light');
+        root.setAttribute(
+          'data-color-mode',
+          mediaQuery.matches ? 'dark' : 'light'
+        );
       } else {
         root.setAttribute('data-color-mode', 'light');
       }
     } else {
       root.setAttribute('data-color-mode', colorMode);
     }
-    
+
     // Continue with other attributes...
   } catch (err) {
     console.warn('Failed to apply settings to DOM:', err);
@@ -81,22 +90,24 @@ function applySettingsToDOM(settings: UserSettings) {
 ```
 
 **Benefits**:
+
 - ✅ No DOM access during SSR
 - ✅ Safe API checking before use
 - ✅ Graceful error handling
 
 ### 3. Hydration State Tracking
+
 **File**: `src/contexts/SettingsContext.tsx`
 
 ```typescript
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [isHydrated, setIsHydrated] = useState(false);
-  
+
   // Track hydration completion
   useEffect(() => {
     setIsHydrated(true);
   }, []);
-  
+
   // Use layout effect for DOM manipulation after hydration
   useIsomorphicLayoutEffect(() => {
     if (isHydrated && localSettings) {
@@ -107,11 +118,13 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 ```
 
 **Benefits**:
+
 - ✅ DOM manipulation only after hydration
 - ✅ Prevents server/client mismatch
 - ✅ Uses appropriate effect hooks
 
 ### 4. NoSSR Utility Component
+
 **File**: `src/components/NoSSR.tsx`
 
 ```typescript
@@ -131,31 +144,36 @@ export default function NoSSR({ children }: { children: React.ReactNode }) {
 ```
 
 **Benefits**:
+
 - ✅ Prevents hydration mismatches for client-only components
 - ✅ Simple utility for wrapping problematic components
 - ✅ Minimal performance impact
 
 ### 5. Consistent Default Values
+
 **Files**: `src/app/layout.tsx`, `src/contexts/SettingsContext.tsx`
 
 **layout.tsx**:
+
 ```html
-<html 
-  lang="en" 
-  data-theme="ocean" 
-  data-color-mode="light" 
+<html
+  lang="en"
+  data-theme="ocean"
+  data-color-mode="light"
   data-font="sans"
   suppressHydrationWarning
 >
-<body suppressHydrationWarning>
+  <body suppressHydrationWarning></body>
+</html>
 ```
 
 **SettingsContext.tsx**:
+
 ```typescript
 const DEFAULT_SETTINGS: UserSettings = {
-  theme: 'ocean',          // ✅ Matches layout.tsx
-  colorMode: 'auto',       // ✅ Resolves to 'light' by default
-  font: 'sans',           // ✅ Matches layout.tsx
+  theme: 'ocean', // ✅ Matches layout.tsx
+  colorMode: 'auto', // ✅ Resolves to 'light' by default
+  font: 'sans', // ✅ Matches layout.tsx
   largeText: false,
   reducedMotion: false,
   compactMode: false,
@@ -163,6 +181,7 @@ const DEFAULT_SETTINGS: UserSettings = {
 ```
 
 **Benefits**:
+
 - ✅ Server and client render same initial state
 - ✅ Suppresses harmless hydration warnings
 - ✅ Consistent user experience
@@ -170,15 +189,18 @@ const DEFAULT_SETTINGS: UserSettings = {
 ## Testing Strategy
 
 ### Automated Tests
+
 **File**: `tests/hydration.safety.test.ts`
 
 Tests cover:
+
 - ✅ localStorage safety during SSR simulation
 - ✅ DOM manipulation safety without window
 - ✅ Default value consistency
 - ✅ matchMedia fallback behavior
 
 ### Manual Testing
+
 1. **Hard Refresh**: Verify no hydration warnings in console
 2. **Theme Persistence**: Settings persist across page reloads
 3. **SSR Rendering**: Proper initial theme application
@@ -187,11 +209,13 @@ Tests cover:
 ## Performance Impact
 
 ### Before Fixes
+
 - ❌ Hydration mismatches causing re-renders
 - ❌ Potential localStorage errors in SSR
 - ❌ Failed theme applications causing visual flicker
 
 ### After Fixes
+
 - ✅ Clean hydration without mismatches
 - ✅ Zero SSR errors or warnings
 - ✅ Smooth theme transitions
@@ -200,6 +224,7 @@ Tests cover:
 ## Browser Compatibility
 
 The fixes ensure compatibility with:
+
 - ✅ Modern browsers with full API support
 - ✅ Older browsers without `matchMedia`
 - ✅ Private browsing modes with disabled localStorage

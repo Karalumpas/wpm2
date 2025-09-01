@@ -14,7 +14,17 @@ const updateSettingsSchema = z.object({
     .optional(),
   productsPerPage: z.number().min(1).max(100).optional(),
   defaultViewMode: z.enum(['grid', 'list']).optional(),
-  theme: z.enum(['ocean', 'sunset', 'forest', 'royal', 'neutral', 'midnight', 'emerald']).optional(),
+  theme: z
+    .enum([
+      'ocean',
+      'sunset',
+      'forest',
+      'royal',
+      'neutral',
+      'midnight',
+      'emerald',
+    ])
+    .optional(),
   colorMode: z.enum(['light', 'dark', 'auto']).optional(),
   font: z.enum(['sans', 'serif', 'mono']).optional(),
   largeText: z.boolean().optional(),

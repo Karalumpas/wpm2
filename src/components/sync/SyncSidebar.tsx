@@ -209,16 +209,18 @@ export default function SyncSidebar({
   onToggleCollapse: () => void;
 }) {
   // Always poll for sync jobs, but adjust intervals based on sidebar state
-  const { jobs, refresh, error } = useSyncJobs(undefined, { sidebarCollapsed: collapsed });
+  const { jobs, refresh, error } = useSyncJobs(undefined, {
+    sidebarCollapsed: collapsed,
+  });
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [selectedShop, setSelectedShop] = useState('');
   const [starting, setStarting] = useState(false);
-  
+
   // Check if there are any active jobs that need monitoring
-  const hasActiveJobs = jobs.some(job => 
-    job.status === 'running' || job.status === 'queued'
+  const hasActiveJobs = jobs.some(
+    (job) => job.status === 'running' || job.status === 'queued'
   );
-  
+
   // Force a refresh when sidebar is expanded after being collapsed
   useEffect(() => {
     if (!collapsed) {
@@ -328,10 +330,10 @@ export default function SyncSidebar({
         </div>
         <button
           className={cn(
-            "hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-200 shadow-sm hover:shadow-md relative",
-            hasActiveJobs 
-              ? "bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700" 
-              : "bg-white hover:bg-slate-50 border-slate-200"
+            'hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-200 shadow-sm hover:shadow-md relative',
+            hasActiveJobs
+              ? 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700'
+              : 'bg-white hover:bg-slate-50 border-slate-200'
           )}
           onClick={onToggleCollapse}
           title={collapsed ? 'Expand sync center' : 'Collapse sync center'}

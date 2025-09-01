@@ -28,28 +28,31 @@ const mockHelpers = {
   },
   applySettingsToDOM: (settings: any) => {
     if (typeof window === 'undefined' || !document?.documentElement) return;
-    
+
     try {
       const root = document.documentElement;
       root.setAttribute('data-theme', settings.theme || 'ocean');
-      
+
       const colorMode = settings.colorMode || 'auto';
       if (colorMode === 'auto') {
         if (window.matchMedia) {
           const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-          root.setAttribute('data-color-mode', mediaQuery.matches ? 'dark' : 'light');
+          root.setAttribute(
+            'data-color-mode',
+            mediaQuery.matches ? 'dark' : 'light'
+          );
         } else {
           root.setAttribute('data-color-mode', 'light');
         }
       } else {
         root.setAttribute('data-color-mode', colorMode);
       }
-      
+
       root.setAttribute('data-font', settings.font || 'sans');
     } catch (err) {
       console.warn('Failed to apply settings to DOM:', err);
     }
-  }
+  },
 };
 
 describe('Hydration Safety', () => {
@@ -128,7 +131,10 @@ describe('Hydration Safety', () => {
 
     expect(error).toBeNull();
     expect(mockRoot.setAttribute).toHaveBeenCalledWith('data-theme', 'ocean');
-    expect(mockRoot.setAttribute).toHaveBeenCalledWith('data-color-mode', 'light');
+    expect(mockRoot.setAttribute).toHaveBeenCalledWith(
+      'data-color-mode',
+      'light'
+    );
     expect(mockRoot.setAttribute).toHaveBeenCalledWith('data-font', 'sans');
   });
 
@@ -178,7 +184,10 @@ describe('Hydration Safety', () => {
     }
 
     expect(error).toBeNull();
-    expect(mockRoot.setAttribute).toHaveBeenCalledWith('data-color-mode', 'light');
+    expect(mockRoot.setAttribute).toHaveBeenCalledWith(
+      'data-color-mode',
+      'light'
+    );
 
     // Restore matchMedia
     window.matchMedia = originalMatchMedia;

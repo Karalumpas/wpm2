@@ -7,7 +7,7 @@ import {
   categories,
 } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { ProductDetailPageWithVersionSelector } from './components/ProductDetailPageWithVersionSelector';
+import ImprovedProductDetails from './components/ImprovedProductDetails';
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -126,8 +126,13 @@ export default async function ProductDetailPage({ params }: PageProps) {
   }));
 
   return (
-    <ProductDetailPageWithVersionSelector
-      product={safeProduct}
+    <ImprovedProductDetails
+      product={{
+        ...safeProduct,
+        updatedAt: safeProduct.updatedAt?.toISOString(),
+        createdAt: safeProduct.createdAt?.toISOString(),
+        lastSyncedAt: safeProduct.lastSyncedAt?.toISOString() || null,
+      }}
       categories={safeCats}
       variants={safeVars}
       allImages={allThumbs}

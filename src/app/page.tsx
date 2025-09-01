@@ -144,207 +144,253 @@ export default async function Home() {
   ] as const;
 
   return (
-    <div className="space-y-8">
-      {/* Stats */}
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {statCards.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <Link
-                key={stat.name}
-                href={stat.href}
-                className="relative bg-white pt-5 px-4 pb-4 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden hover:shadow-md transition-shadow border border-gray-200"
-              >
-                <div>
-                  <div className="absolute bg-indigo-600 rounded-md p-3">
-                    <Icon className="h-6 w-6 text-white" />
-                  </div>
-                  <p className="ml-16 text-sm font-medium text-gray-700 truncate">
-                    {stat.name}
-                  </p>
-                </div>
-                <div className="ml-16 mt-2 flex items-baseline">
-                  <p className="text-2xl font-bold text-gray-900">
-                    {stat.value}
-                  </p>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-        <div className="mt-3 text-sm text-gray-700">
-          <span className="inline-flex items-center mr-4">
-            <CheckCircle2 className="h-4 w-4 text-emerald-600 mr-1" />{' '}
-            Published: {data.counts.published}
-          </span>
-          <span className="inline-flex items-center">
-            <Clock className="h-4 w-4 text-gray-500 mr-1" /> Drafts:{' '}
-            {data.counts.drafts}
-          </span>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-8">
+          {/* Header */}
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+                Product Manager Dashboard
+              </h1>
+              <p className="mt-2 text-gray-600">
+                Welcome to your WooCommerce product management system
+              </p>
+            </div>
 
-      {/* Activity and lists */}
-      <div className="px-4 sm:px-6 lg:px-8 grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Sync Activity */}
-        <div className="bg-white rounded-lg shadow border border-gray-200 xl:col-span-2">
-          <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-            <h3 className="text-base font-semibold text-gray-900">
-              Sync Activity
-            </h3>
-            <Link
-              href="#"
-              className="text-sm text-indigo-600 hover:text-indigo-700"
-            >
-              Open Sync Panel
-            </Link>
-          </div>
-          <div className="p-4">
-            {data.jobs.length === 0 ? (
-              <div className="text-sm text-gray-700">No recent sync jobs.</div>
-            ) : (
-              <ul className="divide-y divide-gray-200">
-                {data.jobs.map((j) => (
-                  <li
-                    key={j.id}
-                    className="py-3 flex items-center justify-between"
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {statCards.map((stat) => {
+                const Icon = stat.icon;
+                return (
+                  <Link
+                    key={stat.name}
+                    href={stat.href}
+                    className="bg-white rounded-2xl p-6 shadow-sm border border-blue-100/50 hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-200 transition-all duration-300"
                   >
-                    <div className="min-w-0">
-                      <div className="text-sm font-medium text-gray-900">
-                        {j.shopName || j.shopId.slice(0, 8)}
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-blue-100 rounded-xl">
+                        <Icon className="h-6 w-6 text-blue-600" />
                       </div>
-                      <div className="text-xs text-gray-700 truncate">
-                        {j.message ||
-                          (j.status === 'running' ? 'Running…' : j.status)}
+                      <div>
+                        <p className="text-2xl font-bold text-gray-900">
+                          {stat.value}
+                        </p>
+                        <p className="text-sm text-gray-600">{stat.name}</p>
                       </div>
                     </div>
-                    <div>
-                      {j.status === 'completed' ? (
-                        <span className="px-2 py-1 text-xs rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          Completed
-                        </span>
-                      ) : j.status === 'failed' ? (
-                        <span className="px-2 py-1 text-xs rounded-full bg-rose-50 text-rose-700 border border-rose-200">
-                          Failed
-                        </span>
-                      ) : j.status === 'paused' ? (
-                        <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700 border border-gray-200">
-                          Paused
-                        </span>
-                      ) : (
-                        <span className="px-2 py-1 text-xs rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                          {j.status}
-                        </span>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
+                  </Link>
+                );
+              })}
+            </div>
 
-        {/* Shops Health */}
-        <div className="bg-white rounded-lg shadow border border-gray-200">
-          <div className="px-4 py-3 border-b border-gray-200">
-            <h3 className="text-base font-semibold text-gray-900">
-              Shops Health
-            </h3>
+            {/* Status Summary */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200/50">
+              <div className="flex items-center gap-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 font-medium text-sm">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Published: {data.counts.published}
+                </div>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-100 text-amber-700 border border-amber-200 font-medium text-sm">
+                  <Clock className="h-4 w-4" />
+                  Drafts: {data.counts.drafts}
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="p-4">
-            {data.shops.length === 0 ? (
-              <div className="text-sm text-gray-700">No shops connected.</div>
-            ) : (
-              <ul className="space-y-3">
-                {data.shops.map((s) => (
-                  <li key={s.id} className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">
-                      {s.name}
-                    </span>
-                    {s.lastConnectionOk ? (
-                      <span className="inline-flex items-center text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> OK
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center text-xs px-2 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
-                        <AlertTriangle className="h-3.5 w-3.5 mr-1" /> Check
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-      </div>
 
-      {/* Recent Products & Quick Actions */}
-      <div className="px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow border border-gray-200">
-          <div className="px-4 py-3 border-b border-gray-200">
-            <h3 className="text-base font-semibold text-gray-900">
-              Recently Updated Products
-            </h3>
-          </div>
-          <div className="p-4">
-            {data.recentProducts.length === 0 ? (
-              <div className="text-sm text-gray-700">No products yet.</div>
-            ) : (
-              <ul className="divide-y divide-gray-200">
-                {data.recentProducts.map((p) => (
-                  <li
-                    key={p.id}
-                    className="py-3 flex items-center justify-between"
+          {/* Activity and Content */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            {/* Sync Activity */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 xl:col-span-2">
+              <div className="p-6 border-b border-gray-100">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    Sync Activity
+                  </h3>
+                  <Link
+                    href="#"
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                   >
-                    <div className="min-w-0">
-                      <div className="text-sm font-medium text-gray-900 truncate">
-                        {p.name}
-                      </div>
-                      <div className="text-xs text-gray-700">SKU: {p.sku}</div>
+                    Open Sync Panel
+                  </Link>
+                </div>
+              </div>
+              <div className="p-6">
+                {data.jobs.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="p-3 bg-gray-100 rounded-xl w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                      <BarChart3 className="h-6 w-6 text-gray-400" />
                     </div>
-                    <Link
-                      href={`/products/${p.id}`}
-                      className="text-xs text-indigo-600 hover:text-indigo-700"
-                    >
-                      View
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
+                    <p className="text-sm text-gray-500">No recent sync jobs</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {data.jobs.map((j) => (
+                      <div
+                        key={j.id}
+                        className="flex items-center justify-between p-4 bg-gray-50 rounded-xl"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm font-medium text-gray-900">
+                            {j.shopName || j.shopId.slice(0, 8)}
+                          </div>
+                          <div className="text-xs text-gray-500 truncate">
+                            {j.message ||
+                              (j.status === 'running' ? 'Running…' : j.status)}
+                          </div>
+                        </div>
+                        <div className="ml-4">
+                          {j.status === 'completed' ? (
+                            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 font-medium text-sm">
+                              <CheckCircle2 className="h-4 w-4" />
+                              Completed
+                            </span>
+                          ) : j.status === 'failed' ? (
+                            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-100 text-red-700 border border-red-200 font-medium text-sm">
+                              <AlertTriangle className="h-4 w-4" />
+                              Failed
+                            </span>
+                          ) : j.status === 'paused' ? (
+                            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 border border-gray-200 font-medium text-sm">
+                              <Clock className="h-4 w-4" />
+                              Paused
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-100 text-blue-700 border border-blue-200 font-medium text-sm">
+                              <Clock className="h-4 w-4" />
+                              {j.status}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
 
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Quick Actions
-          </h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {quickActions.map((action) => {
-              const Icon = action.icon;
-              return (
-                <Link
-                  key={action.name}
-                  href={action.href}
-                  className="relative group bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200"
-                >
-                  <div>
-                    <span className="rounded-lg inline-flex p-3 bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100">
-                      <Icon className="h-6 w-6" />
-                    </span>
+            {/* Shops Health */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50">
+              <div className="p-6 border-b border-gray-100">
+                <h3 className="text-xl font-semibold text-gray-900">
+                  Shops Health
+                </h3>
+              </div>
+              <div className="p-6">
+                {data.shops.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="p-3 bg-gray-100 rounded-xl w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                      <Wifi className="h-6 w-6 text-gray-400" />
+                    </div>
+                    <p className="text-sm text-gray-500">No shops connected</p>
                   </div>
-                  <div className="mt-6">
-                    <h3 className="text-base font-semibold text-gray-900">
-                      {action.name}
-                    </h3>
-                    <p className="mt-1.5 text-sm text-gray-700">
-                      {action.description}
-                    </p>
+                ) : (
+                  <div className="space-y-3">
+                    {data.shops.map((s) => (
+                      <div
+                        key={s.id}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
+                      >
+                        <span className="text-sm font-medium text-gray-900">
+                          {s.name}
+                        </span>
+                        {s.lastConnectionOk ? (
+                          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 font-medium text-xs">
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            OK
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-100 text-amber-700 border border-amber-200 font-medium text-xs">
+                            <AlertTriangle className="h-3.5 w-3.5" />
+                            Check
+                          </span>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                </Link>
-              );
-            })}
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Products & Quick Actions */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50">
+              <div className="p-6 border-b border-gray-100">
+                <h3 className="text-xl font-semibold text-gray-900">
+                  Recently Updated Products
+                </h3>
+              </div>
+              <div className="p-6">
+                {data.recentProducts.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="p-3 bg-gray-100 rounded-xl w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                      <Package className="h-6 w-6 text-gray-400" />
+                    </div>
+                    <p className="text-sm text-gray-500">No products yet</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {data.recentProducts.map((p) => (
+                      <div
+                        key={p.id}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm font-medium text-gray-900 truncate">
+                            {p.name}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            SKU: {p.sku}
+                          </div>
+                        </div>
+                        <Link
+                          href={`/products/${p.id}`}
+                          className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                        >
+                          View
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50">
+              <div className="p-6 border-b border-gray-100">
+                <h3 className="text-xl font-semibold text-gray-900">
+                  Quick Actions
+                </h3>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 gap-3">
+                  {quickActions.map((action) => {
+                    const Icon = action.icon;
+                    return (
+                      <Link
+                        key={action.name}
+                        href={action.href}
+                        className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 hover:shadow-sm transition-all duration-200"
+                      >
+                        <div className="p-2 bg-blue-100 rounded-lg">
+                          <Icon className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-sm font-medium text-gray-900">
+                            {action.name}
+                          </h4>
+                          <p className="text-xs text-gray-500">
+                            {action.description}
+                          </p>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

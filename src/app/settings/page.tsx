@@ -214,63 +214,63 @@ export default function SettingsPage() {
 
   return (
     <ProtectedClient>
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="px-4 py-6 sm:px-0">
-          <div className="border-b border-gray-200 pb-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-3xl font-bold leading-tight text-gray-900">
-                  Settings
-                </h1>
-                <p className="mt-1 text-sm text-gray-600">
-                  Manage appearance, database and system settings
-                </p>
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={fetchStats}
-                  disabled={statsLoading}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-                >
-                  {statsLoading ? '🔄' : '📊'} Refresh Stats
-                </button>
-                <button
-                  onClick={() => setShowLogs(!showLogs)}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  {showLogs ? 'Hide' : 'Show'} Logs
-                </button>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="bg-white rounded-2xl shadow-sm border border-blue-100/50 p-8">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900">
+                    Settings
+                  </h1>
+                  <p className="mt-2 text-gray-600">
+                    Manage appearance, database and system settings
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={fetchStats}
+                    disabled={statsLoading}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 disabled:opacity-50"
+                  >
+                    {statsLoading ? '🔄' : '📊'} Refresh Stats
+                  </button>
+                  <button
+                    onClick={() => setShowLogs(!showLogs)}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
+                  >
+                    {showLogs ? 'Hide' : 'Show'} Logs
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Main content */}
-        <div className="px-4 py-6 sm:px-0">
-          <div className="space-y-6">
+          {/* Main content */}
+          <div className="space-y-8">
             {/* User Settings */}
-            <div className="bg-white shadow rounded-lg">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50">
+              <div className="p-8 border-b border-gray-100">
+                <h3 className="text-xl font-semibold text-gray-900">
                   User Settings
                 </h3>
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-2 text-gray-600">
                   Configure your display preferences and currency settings
                 </p>
               </div>
 
-              <div className="p-6 space-y-6">
+              <div className="p-8 space-y-8">
                 {/* Currency Settings */}
                 <div>
-                  <h4 className="text-base font-medium text-gray-900 mb-4">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-6">
                     Currency Settings
                   </h4>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Currency Selection */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-semibold text-gray-900 mb-3">
                         Currency
                       </label>
                       <select
@@ -291,7 +291,7 @@ export default function SettingsPage() {
                           }
                         }}
                         disabled={settingsLoading || settingsUpdateLoading}
-                        className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50"
+                        className="block w-full border border-gray-200 rounded-xl px-4 py-3 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 disabled:opacity-50"
                       >
                         {SUPPORTED_CURRENCIES.map((currency) => (
                           <option key={currency.code} value={currency.code}>
@@ -303,7 +303,7 @@ export default function SettingsPage() {
 
                     {/* Currency Position */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-semibold text-gray-900 mb-3">
                         Currency Position
                       </label>
                       <select
@@ -315,7 +315,7 @@ export default function SettingsPage() {
                           )
                         }
                         disabled={settingsLoading || settingsUpdateLoading}
-                        className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50"
+                        className="block w-full border border-gray-200 rounded-xl px-4 py-3 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 disabled:opacity-50"
                       >
                         {CURRENCY_POSITION_OPTIONS.map((option) => (
                           <option key={option.value} value={option.value}>
@@ -329,14 +329,14 @@ export default function SettingsPage() {
 
                 {/* Display Settings */}
                 <div>
-                  <h4 className="text-base font-medium text-gray-900 mb-4">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-6">
                     Display Settings
                   </h4>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Products per page */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-semibold text-gray-900 mb-3">
                         Products per page
                       </label>
                       <select
@@ -348,7 +348,7 @@ export default function SettingsPage() {
                           )
                         }
                         disabled={settingsLoading || settingsUpdateLoading}
-                        className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50"
+                        className="block w-full border border-gray-200 rounded-xl px-4 py-3 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 disabled:opacity-50"
                       >
                         <option value={12}>12</option>
                         <option value={24}>24</option>
@@ -359,7 +359,7 @@ export default function SettingsPage() {
 
                     {/* Default view mode */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-semibold text-gray-900 mb-3">
                         Default view mode
                       </label>
                       <select
@@ -371,7 +371,7 @@ export default function SettingsPage() {
                           )
                         }
                         disabled={settingsLoading || settingsUpdateLoading}
-                        className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50"
+                        className="block w-full border border-gray-200 rounded-xl px-4 py-3 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 disabled:opacity-50"
                       >
                         <option value="grid">Grid</option>
                         <option value="list">List</option>
@@ -382,36 +382,43 @@ export default function SettingsPage() {
 
                 {/* Settings Update Result */}
                 {settingsUpdateResult && (
-                  <Alert>
-                    <div
-                      className={
-                        settingsUpdateResult.includes('successfully')
-                          ? 'text-green-700'
-                          : 'text-red-700'
-                      }
-                    >
-                      <p className="font-medium">
-                        {settingsUpdateResult.includes('successfully')
-                          ? '✅'
-                          : '❌'}{' '}
-                        {settingsUpdateResult}
-                      </p>
-                    </div>
-                  </Alert>
+                  <div
+                    className={`p-4 rounded-xl border ${
+                      settingsUpdateResult.includes('successfully')
+                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                        : 'bg-red-50 text-red-800 border-red-200'
+                    }`}
+                  >
+                    <p className="font-medium flex items-center gap-2">
+                      {settingsUpdateResult.includes('successfully') ? (
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                      {settingsUpdateResult}
+                    </p>
+                  </div>
                 )}
 
                 {settingsError && (
-                  <Alert>
-                    <div className="text-red-700">
-                      <p className="font-medium">❌ {settingsError}</p>
-                    </div>
-                  </Alert>
+                  <div className="p-4 rounded-xl border bg-red-50 text-red-800 border-red-200">
+                    <p className="font-medium flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {settingsError}
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
 
             {/* Database Management */}
-            <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
               {/* Appearance */}
               <div className="xl:col-span-2">
                 <div className="bg-white shadow rounded-lg p-6">

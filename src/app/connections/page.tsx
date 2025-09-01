@@ -37,10 +37,10 @@ export default function ConnectionsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading shops...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-600 border-t-transparent mx-auto"></div>
+          <p className="mt-4 text-gray-600 font-medium">Loading shops...</p>
         </div>
       </div>
     );
@@ -48,37 +48,37 @@ export default function ConnectionsPage() {
 
   return (
     <ProtectedClient>
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="px-4 py-6 sm:px-0">
-          <div className="border-b border-gray-200 pb-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-3xl font-bold leading-tight text-gray-900">
-                  Shop Connections
-                </h1>
-                <p className="mt-1 text-sm text-gray-600">
-                  Manage your WooCommerce shop connections
-                </p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="bg-white rounded-2xl shadow-sm border border-blue-100/50 p-8">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900">
+                    Shop Connections
+                  </h1>
+                  <p className="mt-2 text-gray-600">
+                    Manage your WooCommerce shop connections
+                  </p>
+                </div>
+                <button
+                  onClick={() => router.push('/connections/new')}
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-medium"
+                >
+                  Add New Shop
+                </button>
               </div>
-              <button
-                onClick={() => router.push('/connections/new')}
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Add New Shop
-              </button>
             </div>
           </div>
-        </div>
 
-        {/* Main content */}
-        <div className="px-4 py-6 sm:px-0">
+          {/* Main content */}
           {error && (
-            <div className="rounded-md bg-red-50 p-4 mb-6">
-              <div className="flex">
-                <div className="flex-shrink-0">
+            <div className="mb-6 bg-white rounded-2xl shadow-sm border border-red-100/50 p-6">
+              <div className="flex items-start gap-4">
+                <div className="p-2 bg-red-100 rounded-xl">
                   <svg
-                    className="h-5 w-5 text-red-400"
+                    className="h-5 w-5 text-red-600"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                   >
@@ -89,42 +89,42 @@ export default function ConnectionsPage() {
                     />
                   </svg>
                 </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">Error</h3>
-                  <div className="mt-2 text-sm text-red-700">
-                    <p>{error}</p>
-                  </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-red-900">Error</h3>
+                  <p className="mt-1 text-sm text-red-700">{error}</p>
                 </div>
               </div>
             </div>
           )}
 
           {shops.length === 0 ? (
-            <div className="text-center py-12">
-              <svg
-                className="mx-auto h-12 w-12 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                />
-              </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">
-                No shops connected
-              </h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Get started by adding your first WooCommerce shop.
-              </p>
-              <div className="mt-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-blue-100/50 p-12">
+              <div className="text-center">
+                <div className="p-4 bg-gray-100 rounded-2xl w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+                  <svg
+                    className="h-8 w-8 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  No shops connected
+                </h3>
+                <p className="text-gray-600 mb-8">
+                  Get started by adding your first WooCommerce shop.
+                </p>
                 <button
                   onClick={() => router.push('/connections/new')}
-                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-medium"
                 >
                   Add Shop
                 </button>
@@ -487,41 +487,52 @@ function ShopCard({ shop, onUpdate }: ShopCardProps) {
   };
 
   return (
-    <div className="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
-      <div className="px-4 py-5 sm:p-6">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 overflow-hidden">
+      <div className="p-6">
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 truncate">
+            <h3 className="text-xl font-semibold text-gray-900 truncate">
               {shop.name}
             </h3>
-            <p className="mt-1 text-sm text-gray-500 truncate">{shop.url}</p>
+            <p className="mt-1 text-sm text-gray-600 truncate">{shop.url}</p>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3">
             {/* Status Badge */}
-            <span
-              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(shop.status)}`}
-            >
-              {shop.status}
-            </span>
+            {shop.status === 'active' ? (
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 border border-emerald-200 font-medium text-sm">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                Active
+              </span>
+            ) : shop.status === 'error' ? (
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-100 text-red-700 border border-red-200 font-medium text-sm">
+                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                Error
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 border border-gray-200 font-medium text-sm">
+                <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+                Inactive
+              </span>
+            )}
           </div>
         </div>
 
         {shop.lastConnectionCheckAt && (
-          <div className="mt-3 text-xs text-gray-500">
+          <div className="mt-4 text-sm text-gray-500">
             Last tested: {new Date(shop.lastConnectionCheckAt).toLocaleString()}
           </div>
         )}
 
         {/* Test Progress Bar */}
         {testing && (
-          <div className="mt-4">
-            <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>Testing connection...</span>
-              <span>{testProgress}%</span>
+          <div className="mt-6">
+            <div className="flex justify-between text-sm text-gray-600 mb-3">
+              <span className="font-medium">Testing connection...</span>
+              <span className="font-mono">{testProgress}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
               <div
-                className="bg-indigo-600 h-2 rounded-full transition-all duration-300 ease-out"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 h-2.5 rounded-full transition-all duration-300 ease-out"
                 style={{ width: `${testProgress}%` }}
               ></div>
             </div>
@@ -530,19 +541,19 @@ function ShopCard({ shop, onUpdate }: ShopCardProps) {
 
         {/* Sync Progress Bar */}
         {syncing && (
-          <div className="mt-4">
-            <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>Synchronizing products...</span>
-              <span>{syncProgress}%</span>
+          <div className="mt-6">
+            <div className="flex justify-between text-sm text-gray-600 mb-3">
+              <span className="font-medium">Synchronizing products...</span>
+              <span className="font-mono">{syncProgress}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
               <div
-                className="bg-green-600 h-2 rounded-full transition-all duration-300 ease-out"
+                className="bg-gradient-to-r from-emerald-600 to-green-600 h-2.5 rounded-full transition-all duration-300 ease-out"
                 style={{ width: `${syncProgress}%` }}
               ></div>
             </div>
             {syncJobId && (
-              <div className="mt-1 text-xs text-gray-500">Job: {syncJobId}</div>
+              <div className="mt-2 text-xs text-gray-500 font-mono">Job: {syncJobId}</div>
             )}
           </div>
         )}
@@ -693,17 +704,22 @@ function ShopCard({ shop, onUpdate }: ShopCardProps) {
 
         {testResult && !testing && (
           <div
-            className={`mt-3 p-3 rounded-md text-sm ${
+            className={`mt-6 p-4 rounded-xl text-sm border ${
               testResult.success
-                ? 'bg-green-50 text-green-700 border border-green-200'
-                : 'bg-red-50 text-red-700 border border-red-200'
+                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                : 'bg-red-50 text-red-800 border-red-200'
             }`}
           >
             {testResult.success ? (
               <div>
-                <p className="font-medium">✓ Connection successful</p>
+                <p className="font-semibold flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Connection successful
+                </p>
                 {testResult.details && (
-                  <ul className="mt-1 text-xs space-y-1">
+                  <ul className="mt-2 text-xs space-y-1 pl-6">
                     <li>
                       WordPress: {testResult.details.reachable ? '✓' : '✗'}
                     </li>
@@ -716,24 +732,34 @@ function ShopCard({ shop, onUpdate }: ShopCardProps) {
                 )}
               </div>
             ) : (
-              <p>✗ {testResult.error}</p>
+              <p className="flex items-center gap-2">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {testResult.error}
+              </p>
             )}
           </div>
         )}
 
         {syncResult && !syncing && (
           <div
-            className={`mt-3 p-3 rounded-md text-sm ${
+            className={`mt-6 p-4 rounded-xl text-sm border ${
               syncResult.success
-                ? 'bg-green-50 text-green-700 border border-green-200'
-                : 'bg-red-50 text-red-700 border border-red-200'
+                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                : 'bg-red-50 text-red-800 border-red-200'
             }`}
           >
             {syncResult.success ? (
               <div>
-                <p className="font-medium">✓ {syncResult.message}</p>
+                <p className="font-semibold flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  {syncResult.message}
+                </p>
                 {syncResult.details && (
-                  <ul className="mt-1 text-xs space-y-1">
+                  <ul className="mt-2 text-xs space-y-1 pl-6">
                     <li>
                       Products:{' '}
                       {syncResult.details.productsCreated +
@@ -753,7 +779,7 @@ function ShopCard({ shop, onUpdate }: ShopCardProps) {
                       total
                     </li>
                     {syncResult.details.errors.length > 0 && (
-                      <li className="text-yellow-600">
+                      <li className="text-amber-700">
                         ⚠️ {syncResult.details.errors.length} warnings
                       </li>
                     )}
@@ -761,27 +787,32 @@ function ShopCard({ shop, onUpdate }: ShopCardProps) {
                 )}
               </div>
             ) : (
-              <p>✗ {syncResult.message}</p>
+              <p className="flex items-center gap-2">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {syncResult.message}
+              </p>
             )}
           </div>
         )}
       </div>
 
-      <div className="px-4 py-4 sm:px-6">
-        <div className="flex space-x-2">
+      <div className="p-6 border-t border-gray-100">
+        <div className="flex gap-3">
           <button
             onClick={testConnection}
             disabled={testing || syncing}
-            className={`flex-1 py-2 px-3 border rounded-md shadow-sm text-sm leading-4 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors ${
+            className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${
               testing
-                ? 'bg-indigo-50 border-indigo-300 text-indigo-700'
-                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                ? 'bg-blue-100 border border-blue-200 text-blue-700 cursor-not-allowed'
+                : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 shadow-sm'
             }`}
           >
             {testing ? (
-              <div className="flex items-center justify-center">
+              <div className="flex items-center justify-center gap-2">
                 <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-indigo-600"
+                  className="animate-spin w-4 h-4 text-blue-600"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -809,16 +840,16 @@ function ShopCard({ shop, onUpdate }: ShopCardProps) {
           <button
             onClick={syncProducts}
             disabled={testing || syncing}
-            className={`flex-1 py-2 px-3 border rounded-md shadow-sm text-sm leading-4 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 transition-colors ${
+            className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${
               syncing
-                ? 'bg-green-50 border-green-300 text-green-700'
-                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                ? 'bg-emerald-100 border border-emerald-200 text-emerald-700 cursor-not-allowed'
+                : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 shadow-sm'
             }`}
           >
             {syncing ? (
-              <div className="flex items-center justify-center">
+              <div className="flex items-center justify-center gap-2">
                 <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-green-600"
+                  className="animate-spin w-4 h-4 text-emerald-600"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -846,7 +877,7 @@ function ShopCard({ shop, onUpdate }: ShopCardProps) {
           <button
             onClick={() => window.open(`/connections/${shop.id}/edit`, '_self')}
             disabled={testing || syncing}
-            className="flex-1 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-xl text-sm font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Edit
           </button>

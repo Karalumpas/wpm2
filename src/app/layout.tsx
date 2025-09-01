@@ -15,7 +15,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html 
+      lang="en" 
+      data-theme="ocean" 
+      data-color-mode="light" 
+      data-font="sans"
+      suppressHydrationWarning
+    >
       <body className="antialiased" suppressHydrationWarning={true}>
         <SessionProvider>
           <SettingsProvider>

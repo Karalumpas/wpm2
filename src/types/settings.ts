@@ -10,9 +10,12 @@ export interface UserSettings {
   currencyPosition: 'left' | 'right' | 'left_space' | 'right_space';
   productsPerPage: number;
   defaultViewMode: 'grid' | 'list';
-  theme?: 'ocean' | 'sunset' | 'forest' | 'royal' | 'neutral';
+  theme?: 'ocean' | 'sunset' | 'forest' | 'royal' | 'neutral' | 'midnight' | 'emerald';
+  colorMode?: 'light' | 'dark' | 'auto';
   font?: 'sans' | 'serif' | 'mono';
   largeText?: boolean;
+  reducedMotion?: boolean;
+  compactMode?: boolean;
 }
 
 export interface CurrencyInfo {

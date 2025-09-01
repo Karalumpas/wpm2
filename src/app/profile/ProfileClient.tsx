@@ -14,13 +14,15 @@ export default function ProfileClient({ user }: ProfileClientProps) {
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-2xl shadow-sm border border-blue-100/50 p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">Profile</h1>
-          
+
           <div className="space-y-8">
             <div className="p-6 bg-gray-50 rounded-xl">
-              <h2 className="text-sm font-semibold text-gray-900 mb-2">Email Address</h2>
+              <h2 className="text-sm font-semibold text-gray-900 mb-2">
+                Email Address
+              </h2>
               <p className="text-gray-700 font-medium">{user.email}</p>
             </div>
-            
+
             <div className="pt-6 border-t border-gray-200">
               <button
                 onClick={() => signOut({ callbackUrl: '/login' })}

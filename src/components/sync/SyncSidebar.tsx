@@ -1,7 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import useSWR from 'swr';
+import { cn } from '@/lib/utils';
 import {
   useSyncJobs,
   startBackgroundSync,
@@ -47,7 +48,9 @@ function StatusBadge({ job }: { job: SyncJob }) {
       );
     case 'paused':
       return (
-        <span className={`${common} bg-slate-100 text-slate-700 border-slate-200`}>
+        <span
+          className={`${common} bg-slate-100 text-slate-700 border-slate-200`}
+        >
           Paused
         </span>
       );
@@ -142,22 +145,36 @@ function SyncJobCard({
           )}
         </div>
       </div>
-      
+
       <div className="grid grid-cols-2 gap-3 text-xs text-slate-600">
         <div className="space-y-1">
-          <div><span className="font-medium">Enqueued:</span> {formatTime(job.enqueuedAt as Date)}</div>
-          <div><span className="font-medium">Started:</span> {formatTime(job.startedAt as Date | undefined)}</div>
+          <div>
+            <span className="font-medium">Enqueued:</span>{' '}
+            {formatTime(job.enqueuedAt as Date)}
+          </div>
+          <div>
+            <span className="font-medium">Started:</span>{' '}
+            {formatTime(job.startedAt as Date | undefined)}
+          </div>
         </div>
         <div className="space-y-1">
-          <div><span className="font-medium">Finished:</span> {formatTime(job.finishedAt as Date | undefined)}</div>
-          <div className="truncate"><span className="font-medium">Status:</span> {job.message || 'No message'}</div>
+          <div>
+            <span className="font-medium">Finished:</span>{' '}
+            {formatTime(job.finishedAt as Date | undefined)}
+          </div>
+          <div className="truncate">
+            <span className="font-medium">Status:</span>{' '}
+            {job.message || 'No message'}
+          </div>
         </div>
       </div>
-      
+
       {last && (
         <div className="space-y-3 pt-2 border-t border-slate-200">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-medium text-slate-700">Products Progress</span>
+            <span className="font-medium text-slate-700">
+              Products Progress
+            </span>
             <span className="text-slate-600">
               {last.productsSynced} / {last.totalProducts}
             </span>
@@ -167,7 +184,9 @@ function SyncJobCard({
             total={last.totalProducts}
           />
           <div className="flex items-center justify-between text-xs">
-            <span className="font-medium text-slate-700">Categories Progress</span>
+            <span className="font-medium text-slate-700">
+              Categories Progress
+            </span>
             <span className="text-slate-600">
               {last.categoriesSynced} / {last.totalCategories}
             </span>
@@ -189,21 +208,31 @@ export default function SyncSidebar({
   collapsed: boolean;
   onToggleCollapse: () => void;
 }) {
-  const { jobs, refresh, error } = useSyncJobs();
+  // Always poll for sync jobs, but adjust intervals based on sidebar state
+  const { jobs, refresh, error } = useSyncJobs(undefined, { sidebarCollapsed: collapsed });
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [selectedShop, setSelectedShop] = useState('');
   const [starting, setStarting] = useState(false);
+  
+  // Check if there are any active jobs that need monitoring
+  const hasActiveJobs = jobs.some(job => 
+    job.status === 'running' || job.status === 'queued'
+  );
+  
+  // Force a refresh when sidebar is expanded after being collapsed
+  useEffect(() => {
+    if (!collapsed) {
+      refresh();
+    }
+  }, [collapsed, refresh]);
 
   const { data: shopsData } = useSWR<{
     shops: Array<{ id: string; name: string }>;
-  }>(
-    '/api/shops',
-    async (url: string) => {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('Failed to fetch');
-      return res.json();
-    }
-  );
+  }>('/api/shops', async (url: string) => {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Failed to fetch');
+    return res.json();
+  });
 
   const ordered = useMemo(() => {
     return [...jobs]
@@ -219,12 +248,8 @@ export default function SyncSidebar({
         const last = logs
           .slice(-30)
           .map((line) => {
-            const productMatch = line.match(
-              /synced (\d+)\/(\d+) products/i
-            );
-            const categoryMatch = line.match(
-              /synced (\d+)\/(\d+) categories/i
-            );
+            const productMatch = line.match(/synced (\d+)\/(\d+) products/i);
+            const categoryMatch = line.match(/synced (\d+)\/(\d+) categories/i);
             return {
               productsSynced: productMatch ? parseInt(productMatch[1]) : 0,
               totalProducts: productMatch ? parseInt(productMatch[2]) : 0,
@@ -236,10 +261,21 @@ export default function SyncSidebar({
             (acc, cur) => ({
               productsSynced: Math.max(acc.productsSynced, cur.productsSynced),
               totalProducts: Math.max(acc.totalProducts, cur.totalProducts),
-              categoriesSynced: Math.max(acc.categoriesSynced, cur.categoriesSynced),
-              totalCategories: Math.max(acc.totalCategories, cur.totalCategories),
+              categoriesSynced: Math.max(
+                acc.categoriesSynced,
+                cur.categoriesSynced
+              ),
+              totalCategories: Math.max(
+                acc.totalCategories,
+                cur.totalCategories
+              ),
             }),
-            { productsSynced: 0, totalProducts: 0, categoriesSynced: 0, totalCategories: 0 }
+            {
+              productsSynced: 0,
+              totalProducts: 0,
+              categoriesSynced: 0,
+              totalCategories: 0,
+            }
           );
         return { ...job, last };
       });
@@ -254,21 +290,19 @@ export default function SyncSidebar({
     try {
       setStarting(true);
       const res = await startBackgroundSync();
-      if ('error' in res)
-        alert(`Could not start sync: ${res.error}`);
+      if ('error' in res) alert(`Could not start sync: ${res.error}`);
       await refresh();
     } finally {
       setStarting(false);
     }
   }
-  
+
   async function handleStartSingle() {
     if (!selectedShop) return;
     try {
       setStarting(true);
       const res = await startBackgroundSync(selectedShop);
-      if ('error' in res)
-        alert(`Could not start sync: ${res.error}`);
+      if ('error' in res) alert(`Could not start sync: ${res.error}`);
       await refresh();
     } finally {
       setStarting(false);
@@ -287,14 +321,24 @@ export default function SyncSidebar({
             <RefreshCcw className="h-5 w-5" />
           </div>
           {!collapsed && (
-            <h2 className="text-lg font-bold text-slate-900 tracking-tight">Sync Center</h2>
+            <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+              Sync Center
+            </h2>
           )}
         </div>
         <button
-          className="hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 transition-all duration-200 shadow-sm hover:shadow-md"
+          className={cn(
+            "hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-200 shadow-sm hover:shadow-md relative",
+            hasActiveJobs 
+              ? "bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700" 
+              : "bg-white hover:bg-slate-50 border-slate-200"
+          )}
           onClick={onToggleCollapse}
-          title={collapsed ? 'Expand menu' : 'Collapse menu'}
+          title={collapsed ? 'Expand sync center' : 'Collapse sync center'}
         >
+          {hasActiveJobs && (
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
+          )}
           {collapsed ? '›' : '‹'}
         </button>
       </div>
@@ -305,7 +349,9 @@ export default function SyncSidebar({
           <div className="space-y-4">
             {/* Control Panel */}
             <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 p-4 shadow-lg">
-              <h3 className="text-sm font-semibold text-slate-900 mb-3">Sync Controls</h3>
+              <h3 className="text-sm font-semibold text-slate-900 mb-3">
+                Sync Controls
+              </h3>
               <div className="space-y-3">
                 <button
                   onClick={handleStartAll}
@@ -319,7 +365,7 @@ export default function SyncSidebar({
                   )}
                   Start All Shops
                 </button>
-                
+
                 <div className="space-y-2">
                   <select
                     className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-slate-300"
@@ -333,7 +379,7 @@ export default function SyncSidebar({
                       </option>
                     ))}
                   </select>
-                  
+
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={handleStartSingle}
@@ -361,20 +407,24 @@ export default function SyncSidebar({
 
             {/* Jobs List */}
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-slate-900">Active Jobs</h3>
+              <h3 className="text-sm font-semibold text-slate-900">
+                Active Jobs
+              </h3>
               {ordered.length === 0 ? (
                 <div className="bg-white/60 rounded-2xl border border-slate-200 p-6 text-center text-slate-500 text-sm">
                   No sync jobs running
                 </div>
               ) : (
-                ordered.slice(0, 3).map((job) => (
-                  <SyncJobCard
-                    key={job.id}
-                    job={job}
-                    onChange={refresh}
-                    last={job.last}
-                  />
-                ))
+                ordered
+                  .slice(0, 3)
+                  .map((job) => (
+                    <SyncJobCard
+                      key={job.id}
+                      job={job}
+                      onChange={refresh}
+                      last={job.last}
+                    />
+                  ))
               )}
             </div>
 
@@ -383,7 +433,8 @@ export default function SyncSidebar({
               <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 p-4 shadow-lg">
                 <div className="flex items-center justify-between mb-3">
                   <div className="text-sm font-semibold text-slate-900">
-                    Job Details: {selectedJob.shopName || selectedJob.shopId.slice(0, 8)}
+                    Job Details:{' '}
+                    {selectedJob.shopName || selectedJob.shopId.slice(0, 8)}
                   </div>
                   {(selectedJob.status === 'completed' ||
                     selectedJob.status === 'failed' ||

@@ -1,8 +1,12 @@
 'use client';
 
-import { createContext, useContext, useCallback, useEffect } from 'react';
-import useSWR from 'swr';
+import { createContext, useContext, useEffect, useLayoutEffect, useState, ReactNode, useRef } from 'react';
+import useSWR, { mutate } from 'swr';
+import { useCallback } from 'react';
 import { UserSettings } from '@/types/settings';
+
+// Use isomorphic layout effect to prevent hydration mismatches
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 const DEFAULT_SETTINGS: UserSettings = {
   currency: 'DKK',
@@ -11,8 +15,11 @@ const DEFAULT_SETTINGS: UserSettings = {
   productsPerPage: 24,
   defaultViewMode: 'grid',
   theme: 'ocean',
+  colorMode: 'auto',
   font: 'sans',
   largeText: false,
+  reducedMotion: false,
+  compactMode: false,
 };
 
 interface SettingsContextType {
@@ -41,7 +48,12 @@ async function settingsFetcher(): Promise<UserSettings> {
     }
 
     const data = await response.json();
-    return { ...DEFAULT_SETTINGS, ...data } as UserSettings;
+    const settings = { ...DEFAULT_SETTINGS, ...data } as UserSettings;
+    
+    // Store in localStorage for next time (client-side only)
+    setStoredSettings(settings);
+    
+    return settings;
   } catch (err) {
     // Silently handle all errors and use defaults
     console.warn('Failed to fetch settings, using defaults:', err);
@@ -49,7 +61,81 @@ async function settingsFetcher(): Promise<UserSettings> {
   }
 }
 
+// Helper function to apply settings to DOM
+function applySettingsToDOM(settings: UserSettings) {
+  if (typeof window === 'undefined' || !document?.documentElement) return;
+  
+  try {
+    const root = document.documentElement;
+    
+    // theme
+    root.setAttribute('data-theme', settings.theme || 'ocean');
+    
+    // color mode
+    const colorMode = settings.colorMode || 'auto';
+    if (colorMode === 'auto') {
+      // Use system preference - safely check for matchMedia support
+      if (window.matchMedia) {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        root.setAttribute('data-color-mode', mediaQuery.matches ? 'dark' : 'light');
+      } else {
+        // Fallback for browsers without matchMedia support
+        root.setAttribute('data-color-mode', 'light');
+      }
+    } else {
+      root.setAttribute('data-color-mode', colorMode);
+    }
+    
+    // font
+    root.setAttribute('data-font', settings.font || 'sans');
+    
+    // text scale
+    if (settings.largeText) root.classList.add('text-scale-lg');
+    else root.classList.remove('text-scale-lg');
+    
+    // reduced motion
+    if (settings.reducedMotion) root.classList.add('motion-reduce');
+    else root.classList.remove('motion-reduce');
+    
+    // compact mode
+    if (settings.compactMode) root.classList.add('compact-mode');
+    else root.classList.remove('compact-mode');
+  } catch (err) {
+    console.warn('Failed to apply settings to DOM:', err);
+  }
+}
+
+// Helper to safely get localStorage only on client
+function getStoredSettings(): UserSettings | null {
+  if (typeof window === 'undefined') return null;
+  
+  try {
+    const stored = localStorage.getItem('user-settings');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return { ...DEFAULT_SETTINGS, ...parsed };
+    }
+  } catch (err) {
+    console.warn('Failed to parse stored settings:', err);
+  }
+  
+  return null;
+}
+
+// Helper to safely set localStorage only on client
+function setStoredSettings(settings: UserSettings) {
+  if (typeof window === 'undefined') return;
+  
+  try {
+    localStorage.setItem('user-settings', JSON.stringify(settings));
+  } catch (err) {
+    console.warn('Failed to store settings:', err);
+  }
+}
+
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
+  const [isHydrated, setIsHydrated] = useState(false);
+  
   const {
     data: settings,
     error,
@@ -61,37 +147,90 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     revalidateIfStale: false,
     dedupingInterval: 30000, // Cache for 30 seconds
     errorRetryCount: 1,
-    fallbackData: DEFAULT_SETTINGS,
+    fallbackData: DEFAULT_SETTINGS, // Always use defaults as fallback to prevent hydration mismatch
   });
 
-  const updateSettings = useCallback(
-    async (newSettings: Partial<UserSettings>) => {
+  // Track hydration state
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  // Debouncing refs
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingUpdatesRef = useRef<Partial<UserSettings>>({});
+
+  // Initialize with stored settings on client-side only (after hydration)
+  useEffect(() => {
+    if (!isHydrated) return;
+    
+    const stored = getStoredSettings();
+    if (stored && !settings) {
+      mutate(stored, false);
+    }
+  }, [mutate, settings, isHydrated]);
+
+  // Debounced save function
+  const debouncedSave = useCallback(async (updates: Partial<UserSettings>) => {
+    // Clear existing timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    // Merge with pending updates
+    pendingUpdatesRef.current = { ...pendingUpdatesRef.current, ...updates };
+
+    // Set new timeout
+    saveTimeoutRef.current = setTimeout(async () => {
+      const toSave = { ...pendingUpdatesRef.current };
+      pendingUpdatesRef.current = {}; // Clear pending updates
+
+      console.debug('💾 Saving batched settings:', Object.keys(toSave));
+
       try {
         const response = await fetch('/api/settings/user', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(newSettings),
+          body: JSON.stringify(toSave),
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to update settings');
+          console.warn('Failed to save settings to server');
+          // Don't revert optimistic updates for better UX
+          return;
         }
 
-        const updatedSettings = await response.json();
-
-        // Update SWR cache
-        mutate(updatedSettings, false);
-
-        return updatedSettings;
+        console.debug('✅ Settings saved successfully');
+        // Revalidate from server
+        mutate();
       } catch (err) {
-        console.error('Failed to update settings:', err);
-        throw err;
+        console.error('Failed to save settings:', err);
       }
+    }, 750); // 750ms debounce delay for better batching
+  }, [mutate]);
+
+  const updateSettings = useCallback(
+    async (newSettings: Partial<UserSettings>): Promise<UserSettings> => {
+      const current = settings || DEFAULT_SETTINGS;
+      const updated = { ...current, ...newSettings };
+      
+      // Immediate optimistic update
+      mutate(updated, false);
+      
+      // Update localStorage immediately (client-side only)
+      setStoredSettings(updated);
+      
+      // Apply to DOM immediately
+      applySettingsToDOM(updated);
+      
+      // Debounced server save
+      debouncedSave(newSettings);
+      
+      // Return the updated settings for compatibility
+      return updated;
     },
-    [mutate]
+    [mutate, settings, debouncedSave]
   );
 
   const refetch = useCallback(() => {
@@ -110,18 +249,34 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     refetch,
   };
 
-  // Apply theme + font to document root
-  useEffect(() => {
+  // Apply theme + font to document root (only after hydration)
+  useIsomorphicLayoutEffect(() => {
+    if (!isHydrated) return;
+    
     const s = settings || DEFAULT_SETTINGS;
-    const root = document.documentElement;
-    // theme
-    root.setAttribute('data-theme', s.theme || 'ocean');
-    // font
-    root.setAttribute('data-font', s.font || 'sans');
-    // text scale
-    if (s.largeText) root.classList.add('text-scale-lg');
-    else root.classList.remove('text-scale-lg');
-  }, [settings]);
+    applySettingsToDOM(s);
+    
+    // Set up listener for auto color mode changes
+    if (s.colorMode === 'auto') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = (e: MediaQueryListEvent) => {
+        const root = document.documentElement;
+        root.setAttribute('data-color-mode', e.matches ? 'dark' : 'light');
+      };
+      mediaQuery.addEventListener('change', handleChange);
+      
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+  }, [settings, isHydrated]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <SettingsContext.Provider value={contextValue}>

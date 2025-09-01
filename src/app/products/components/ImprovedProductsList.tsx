@@ -134,7 +134,9 @@ function ProductGridCard({ product }: { product: Product }) {
   }
   if (product.images) {
     // Add other images, but avoid duplicating the featured image
-    const otherImages = product.images.filter(img => img !== product.featuredImage);
+    const otherImages = product.images.filter(
+      (img) => img !== product.featuredImage
+    );
     images.push(...otherImages);
   }
 

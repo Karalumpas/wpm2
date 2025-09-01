@@ -138,7 +138,9 @@ export default function MediaPage() {
           {isUploading && (
             <div className="mt-6 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent mx-auto"></div>
-              <p className="mt-2 text-sm text-gray-600 font-medium">Uploading...</p>
+              <p className="mt-2 text-sm text-gray-600 font-medium">
+                Uploading...
+              </p>
             </div>
           )}
         </div>

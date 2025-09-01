@@ -62,7 +62,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen" style={{ background: 'var(--background)' }}>
       {/* Mobile sidebar */}
       <div className={`lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
         <div className="fixed inset-0 z-40 flex">
@@ -194,7 +194,10 @@ function Sidebar({
   const { data: session } = useSession();
 
   return (
-    <div className="flex flex-1 flex-col min-h-0 bg-white/95 backdrop-blur-md border-r border-gray-200/50 shadow-lg">
+    <div className="flex flex-1 flex-col min-h-0 backdrop-blur-md border-r shadow-lg" style={{ 
+      backgroundColor: 'var(--surface)', 
+      borderColor: 'var(--border)'
+    }}>
       <div className="flex flex-1 flex-col overflow-y-auto pt-6 pb-4">
         <div className="flex items-center justify-between flex-shrink-0 px-4">
           <div className="flex items-center">

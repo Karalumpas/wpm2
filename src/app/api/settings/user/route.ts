@@ -14,9 +14,12 @@ const updateSettingsSchema = z.object({
     .optional(),
   productsPerPage: z.number().min(1).max(100).optional(),
   defaultViewMode: z.enum(['grid', 'list']).optional(),
-  theme: z.enum(['ocean', 'sunset', 'forest', 'royal', 'neutral']).optional(),
+  theme: z.enum(['ocean', 'sunset', 'forest', 'royal', 'neutral', 'midnight', 'emerald']).optional(),
+  colorMode: z.enum(['light', 'dark', 'auto']).optional(),
   font: z.enum(['sans', 'serif', 'mono']).optional(),
   largeText: z.boolean().optional(),
+  reducedMotion: z.boolean().optional(),
+  compactMode: z.boolean().optional(),
 });
 
 /**
@@ -39,8 +42,11 @@ export async function GET() {
       productsPerPage: 25,
       defaultViewMode: 'grid' as const,
       theme: 'ocean' as const,
+      colorMode: 'auto' as const,
       font: 'sans' as const,
       largeText: false,
+      reducedMotion: false,
+      compactMode: false,
     };
 
     return NextResponse.json(defaultSettings);

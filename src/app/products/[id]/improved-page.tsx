@@ -79,7 +79,9 @@ export default async function ImprovedProductDetailPage({ params }: PageProps) {
 
   const allThumbs = Array.from(deduped.values());
 
-  const safeDimensions = product.dimensions as Record<string, unknown> | undefined;
+  const safeDimensions = product.dimensions as
+    | Record<string, unknown>
+    | undefined;
   const safeGallery = Array.isArray(product.galleryImages)
     ? (product.galleryImages as string[])
     : [];
@@ -93,7 +95,9 @@ export default async function ImprovedProductDetailPage({ params }: PageProps) {
         status: product.status,
         type: product.type,
         basePrice: product.basePrice ? String(product.basePrice) : null,
-        regularPrice: product.regularPrice ? String(product.regularPrice) : null,
+        regularPrice: product.regularPrice
+          ? String(product.regularPrice)
+          : null,
         salePrice: product.salePrice ? String(product.salePrice) : null,
         stockStatus: product.stockStatus ?? undefined,
         dimensions: safeDimensions,
@@ -101,9 +105,15 @@ export default async function ImprovedProductDetailPage({ params }: PageProps) {
         shortDescription: product.shortDescription ?? undefined,
         featuredImage: product.featuredImage ?? undefined,
         galleryImages: safeGallery,
-        updatedAt: product.updatedAt ? product.updatedAt.toISOString() : undefined,
-        createdAt: product.createdAt ? product.createdAt.toISOString() : undefined,
-        lastSyncedAt: product.lastSyncedAt ? product.lastSyncedAt.toISOString() : null,
+        updatedAt: product.updatedAt
+          ? product.updatedAt.toISOString()
+          : undefined,
+        createdAt: product.createdAt
+          ? product.createdAt.toISOString()
+          : undefined,
+        lastSyncedAt: product.lastSyncedAt
+          ? product.lastSyncedAt.toISOString()
+          : null,
       }}
       categories={cats.map((c) => ({
         id: c.id as string,
@@ -116,7 +126,8 @@ export default async function ImprovedProductDetailPage({ params }: PageProps) {
         image: v.image ?? null,
         price: v.price ? String(v.price) : null,
         stockStatus: v.stockStatus ?? undefined,
-        attributes: (v.attributes as Record<string, unknown> | undefined) ?? undefined,
+        attributes:
+          (v.attributes as Record<string, unknown> | undefined) ?? undefined,
       }))}
       allImages={allThumbs}
     />

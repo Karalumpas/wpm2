@@ -57,11 +57,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
         .select({ id: categories.id })
         .from(categories)
         .where(
-          and(
-            eq(categories.name, nextName),
-            parentCondition,
-            sql`id <> ${id}`
-          )
+          and(eq(categories.name, nextName), parentCondition, sql`id <> ${id}`)
         )
         .limit(1);
       if (conflict.length) {

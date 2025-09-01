@@ -98,12 +98,7 @@ export async function POST(request: NextRequest) {
     const conflict = await db
       .select({ id: categories.id })
       .from(categories)
-      .where(
-        and(
-          eq(categories.name, data.name),
-          parentCondition
-        )
-      )
+      .where(and(eq(categories.name, data.name), parentCondition))
       .limit(1);
     if (conflict.length) {
       return NextResponse.json(

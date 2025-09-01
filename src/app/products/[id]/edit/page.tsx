@@ -40,7 +40,5 @@ export default async function EditProductPage({ params }: PageProps) {
     shortDescription: product.shortDescription ?? null,
   } as const;
 
-  return (
-    <ProductEditPageWithVersionSelector initial={initial} />
-  );
+  return <ProductEditPageWithVersionSelector initial={initial} />;
 }

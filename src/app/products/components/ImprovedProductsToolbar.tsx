@@ -4,18 +4,18 @@ import { useState } from 'react';
 import { ProcessedSearchParams } from '../params';
 import { MultiSelectFilter } from './MultiSelectFilter';
 import { Pagination } from './ImprovedPagination';
-import { 
-  Search, 
-  Filter, 
-  SortAsc, 
-  SortDesc, 
-  Grid3X3, 
-  List, 
+import {
+  Search,
+  Filter,
+  SortAsc,
+  SortDesc,
+  Grid3X3,
+  List,
   RotateCcw,
   ChevronDown,
   Settings2,
   Download,
-  Upload
+  Upload,
 } from 'lucide-react';
 
 interface ImprovedProductsToolbarProps {
@@ -55,10 +55,22 @@ export function ImprovedProductsToolbar({
     onParamsUpdate({ search: value || undefined, page: 1 });
   };
 
-  const allowedSorts = ['name','basePrice','sku','createdAt','updatedAt','status','type','stockQuantity','weight','variantCount'] as const;
-  type SortKey = typeof allowedSorts[number];
+  const allowedSorts = [
+    'name',
+    'basePrice',
+    'sku',
+    'createdAt',
+    'updatedAt',
+    'status',
+    'type',
+    'stockQuantity',
+    'weight',
+    'variantCount',
+  ] as const;
+  type SortKey = (typeof allowedSorts)[number];
   const handleSortChange = (sortBy: SortKey) => {
-    const newOrder = params.sortBy === sortBy && params.sortOrder === 'asc' ? 'desc' : 'asc';
+    const newOrder =
+      params.sortBy === sortBy && params.sortOrder === 'asc' ? 'desc' : 'asc';
     onParamsUpdate({ sortBy, sortOrder: newOrder, page: 1 });
   };
 
@@ -137,7 +149,11 @@ export function ImprovedProductsToolbar({
               value={`${params.sortBy}-${params.sortOrder}`}
               onChange={(e) => {
                 const [sortBy, sortOrder] = e.target.value.split('-');
-                onParamsUpdate({ sortBy: sortBy as SortKey, sortOrder: sortOrder as 'asc' | 'desc', page: 1 });
+                onParamsUpdate({
+                  sortBy: sortBy as SortKey,
+                  sortOrder: sortOrder as 'asc' | 'desc',
+                  page: 1,
+                });
               }}
               className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
@@ -170,13 +186,18 @@ export function ImprovedProductsToolbar({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Status Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Status
+              </label>
               <select
                 value={params.status || 'all'}
                 onChange={(e) => {
                   const val = e.target.value;
                   onParamsUpdate({
-                    status: val === 'all' ? undefined : (val as 'published' | 'draft' | 'private'),
+                    status:
+                      val === 'all'
+                        ? undefined
+                        : (val as 'published' | 'draft' | 'private'),
                     page: 1,
                   });
                 }}
@@ -191,13 +212,18 @@ export function ImprovedProductsToolbar({
 
             {/* Type Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Type
+              </label>
               <select
                 value={params.type || 'all'}
                 onChange={(e) => {
                   const val = e.target.value;
                   onParamsUpdate({
-                    type: val === 'all' ? undefined : (val as 'simple' | 'variable' | 'grouped'),
+                    type:
+                      val === 'all'
+                        ? undefined
+                        : (val as 'simple' | 'variable' | 'grouped'),
                     page: 1,
                   });
                 }}
@@ -212,10 +238,14 @@ export function ImprovedProductsToolbar({
 
             {/* Items per page */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Per Page</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Per Page
+              </label>
               <select
                 value={params.limit}
-                onChange={(e) => onParamsUpdate({ limit: parseInt(e.target.value), page: 1 })}
+                onChange={(e) =>
+                  onParamsUpdate({ limit: parseInt(e.target.value), page: 1 })
+                }
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value={12}>12 items</option>
@@ -227,12 +257,17 @@ export function ImprovedProductsToolbar({
 
             {/* Pagination Mode */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Pagination</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Pagination
+              </label>
               <select
                 value={params.paginationMode as string}
                 onChange={(e) => {
                   const val = e.target.value;
-                  onParamsUpdate({ paginationMode: val as 'pages' | 'loadMore', page: 1 });
+                  onParamsUpdate({
+                    paginationMode: val as 'pages' | 'loadMore',
+                    page: 1,
+                  });
                 }}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
@@ -245,7 +280,8 @@ export function ImprovedProductsToolbar({
           {/* Multi-select filters can be added here */}
           <div className="pt-4 border-t border-gray-200">
             <p className="text-sm text-gray-500">
-              Additional filters like brands, categories, and shops can be implemented here using the existing MultiSelectFilter component.
+              Additional filters like brands, categories, and shops can be
+              implemented here using the existing MultiSelectFilter component.
             </p>
           </div>
         </div>
@@ -255,8 +291,13 @@ export function ImprovedProductsToolbar({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-gray-600 border-t border-gray-100 pt-4">
         <div className="flex items-center gap-4">
           <span>
-            Showing <span className="font-medium text-gray-900">{stats.showing}</span> of{' '}
-            <span className="font-medium text-gray-900">{totalCount.toLocaleString()}</span> products
+            Showing{' '}
+            <span className="font-medium text-gray-900">{stats.showing}</span>{' '}
+            of{' '}
+            <span className="font-medium text-gray-900">
+              {totalCount.toLocaleString()}
+            </span>{' '}
+            products
           </span>
           {isLoading && (
             <div className="flex items-center gap-2">
@@ -265,7 +306,7 @@ export function ImprovedProductsToolbar({
             </div>
           )}
         </div>
-        
+
         <div className="flex items-center gap-4">
           <button className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
             <Download className="h-4 w-4" />

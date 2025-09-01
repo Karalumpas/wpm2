@@ -1,7 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { VersionSelector, useUIVersion } from '@/components/ui/version-selector';
+import {
+  VersionSelector,
+  useUIVersion,
+} from '@/components/ui/version-selector';
 import ProductEditor from '../components/ProductEditor';
 import ImprovedProductEditor from '../components/ImprovedProductEditor';
 
@@ -55,10 +58,10 @@ export function ProductEditPageWithVersionSelector({
       ) : (
         <ImprovedProductEditor initial={initial} />
       )}
-      
-      <VersionSelector 
-        currentVersion={version} 
-        onVersionChange={changeVersion} 
+
+      <VersionSelector
+        currentVersion={version}
+        onVersionChange={changeVersion}
       />
     </>
   );

@@ -99,19 +99,30 @@ export default async function ProductDetailPage({ params }: PageProps) {
     stockStatus: product.stockStatus ?? undefined,
     basePrice: product.basePrice ?? null,
     featuredImage: featured,
-    updatedAt: product.updatedAt ? new Date(product.updatedAt as unknown as string | Date) : undefined,
-    createdAt: product.createdAt ? new Date(product.createdAt as unknown as string | Date) : undefined,
-    lastSyncedAt: product.lastSyncedAt ? new Date(product.lastSyncedAt as unknown as string | Date) : null,
+    updatedAt: product.updatedAt
+      ? new Date(product.updatedAt as unknown as string | Date)
+      : undefined,
+    createdAt: product.createdAt
+      ? new Date(product.createdAt as unknown as string | Date)
+      : undefined,
+    lastSyncedAt: product.lastSyncedAt
+      ? new Date(product.lastSyncedAt as unknown as string | Date)
+      : null,
   } as const;
 
-  const safeCats = cats.map((c) => ({ id: c.id as string, name: c.name as string, slug: c.slug ?? null }));
+  const safeCats = cats.map((c) => ({
+    id: c.id as string,
+    name: c.name as string,
+    slug: c.slug ?? null,
+  }));
   const safeVars = vars.map((v) => ({
     id: v.id,
     sku: v.sku,
     image: v.image ?? null,
     price: v.price ? String(v.price) : null,
     stockStatus: v.stockStatus ?? undefined,
-    attributes: (v.attributes as Record<string, unknown> | undefined) ?? undefined,
+    attributes:
+      (v.attributes as Record<string, unknown> | undefined) ?? undefined,
   }));
 
   return (
@@ -123,4 +134,3 @@ export default async function ProductDetailPage({ params }: PageProps) {
     />
   );
 }
-

@@ -1,6 +1,9 @@
 'use client';
 
-import { VersionSelector, useUIVersion } from '@/components/ui/version-selector';
+import {
+  VersionSelector,
+  useUIVersion,
+} from '@/components/ui/version-selector';
 import { OriginalProductDetailPage } from './OriginalProductDetailPage';
 import ImprovedProductDetails from './ImprovedProductDetails';
 
@@ -55,8 +58,8 @@ export function ProductDetailPageWithVersionSelector({
   const { version, changeVersion } = useUIVersion();
 
   // Filter out null categories and ensure proper typing
-  const validCategories = categories.filter((cat): cat is Category => 
-    cat.id !== null && cat.name !== null
+  const validCategories = categories.filter(
+    (cat): cat is Category => cat.id !== null && cat.name !== null
   ) as Category[];
 
   return (
@@ -77,17 +80,17 @@ export function ProductDetailPageWithVersionSelector({
             lastSyncedAt: product.lastSyncedAt?.toISOString() || null,
           }}
           categories={validCategories}
-          variants={variants.map(v => ({
+          variants={variants.map((v) => ({
             ...v,
             price: v.price ? String(v.price) : null,
           }))}
           allImages={allImages}
         />
       )}
-      
-      <VersionSelector 
-        currentVersion={version} 
-        onVersionChange={changeVersion} 
+
+      <VersionSelector
+        currentVersion={version}
+        onVersionChange={changeVersion}
       />
     </>
   );

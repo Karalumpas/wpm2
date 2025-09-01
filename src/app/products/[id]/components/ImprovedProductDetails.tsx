@@ -1,12 +1,12 @@
 import Link from 'next/link';
-import { 
-  Edit, 
-  ArrowLeft, 
-  Package, 
-  DollarSign, 
-  Tag, 
-  Ruler, 
-  Calendar, 
+import {
+  Edit,
+  ArrowLeft,
+  Package,
+  DollarSign,
+  Tag,
+  Ruler,
+  Calendar,
   ExternalLink,
   Share2,
   RefreshCw,
@@ -16,9 +16,13 @@ import {
   AlertTriangle,
   CheckCircle2,
   Clock,
-  ShoppingCart
+  ShoppingCart,
 } from 'lucide-react';
-import { formatDateTime, formatPrice, formatDimensions } from '@/lib/formatters';
+import {
+  formatDateTime,
+  formatPrice,
+  formatDimensions,
+} from '@/lib/formatters';
 import InteractiveGallery from './InteractiveGallery';
 import CopyButton from './CopyButton';
 import VariantsTable from '../variants/VariantsTable';
@@ -81,14 +85,19 @@ export default function ImprovedProductDetails({
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 mt-8">
           {/* Image Gallery */}
           <div className="xl:col-span-7">
-            <ProductImageGallery images={allImages} productName={product.name} />
+            <ProductImageGallery
+              images={allImages}
+              productName={product.name}
+            />
           </div>
 
           {/* Product Info Sidebar */}
           <div className="xl:col-span-5 space-y-6">
             <ProductInfoCard product={product} />
             <ProductActions product={product} />
-            {categories.length > 0 && <ProductCategories categories={categories} />}
+            {categories.length > 0 && (
+              <ProductCategories categories={categories} />
+            )}
             <ProductMetadata product={product} />
           </div>
         </div>
@@ -98,10 +107,8 @@ export default function ImprovedProductDetails({
           {product.description && (
             <ProductDescription description={product.description} />
           )}
-          
-          {variants.length > 0 && (
-            <ProductVariants variants={variants} />
-          )}
+
+          {variants.length > 0 && <ProductVariants variants={variants} />}
 
           <ProductAnalytics />
         </div>
@@ -156,12 +163,20 @@ function ProductHeader({ product }: { product: Product }) {
   );
 }
 
-function ProductImageGallery({ images, productName }: { images: string[], productName: string }) {
+function ProductImageGallery({
+  images,
+  productName,
+}: {
+  images: string[];
+  productName: string;
+}) {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 overflow-hidden">
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Product Gallery</h2>
+          <h2 className="text-lg font-semibold text-gray-900">
+            Product Gallery
+          </h2>
           <span className="text-sm text-gray-500">{images.length} images</span>
         </div>
         <InteractiveGallery images={images} alt={productName} />
@@ -194,7 +209,9 @@ function ProductInfoCard({ product }: { product: Product }) {
               </div>
             ) : (
               <span className="text-2xl font-bold text-gray-900">
-                {product.basePrice ? formatPrice(product.basePrice) : 'No price set'}
+                {product.basePrice
+                  ? formatPrice(product.basePrice)
+                  : 'No price set'}
               </span>
             )}
           </div>
@@ -212,25 +229,31 @@ function ProductInfoCard({ product }: { product: Product }) {
         )}
 
         {/* Dimensions */}
-        {product.dimensions && Object.values(product.dimensions).some(Boolean) && (
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <Ruler className="h-5 w-5 text-blue-600" />
-              Dimensions
-            </h3>
-            <div className="bg-gray-50 rounded-xl p-4">
-              <p className="text-gray-700 font-mono">
-                {(() => {
-                  const dims = product.dimensions as Record<string, unknown> | undefined;
-                  const length = dims && dims.length ? String(dims.length) : undefined;
-                  const width = dims && dims.width ? String(dims.width) : undefined;
-                  const height = dims && dims.height ? String(dims.height) : undefined;
-                  return formatDimensions(length, width, height);
-                })()}
-              </p>
+        {product.dimensions &&
+          Object.values(product.dimensions).some(Boolean) && (
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <Ruler className="h-5 w-5 text-blue-600" />
+                Dimensions
+              </h3>
+              <div className="bg-gray-50 rounded-xl p-4">
+                <p className="text-gray-700 font-mono">
+                  {(() => {
+                    const dims = product.dimensions as
+                      | Record<string, unknown>
+                      | undefined;
+                    const length =
+                      dims && dims.length ? String(dims.length) : undefined;
+                    const width =
+                      dims && dims.width ? String(dims.width) : undefined;
+                    const height =
+                      dims && dims.height ? String(dims.height) : undefined;
+                    return formatDimensions(length, width, height);
+                  })()}
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
     </div>
   );
@@ -248,12 +271,12 @@ function ProductActions({ product }: { product: Product }) {
           <Edit className="h-4 w-4" />
           Edit Product
         </Link>
-        
+
         <button className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
           <RefreshCw className="h-4 w-4" />
           Sync Now
         </button>
-        
+
         <button className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
           <ExternalLink className="h-4 w-4" />
           View in Shop
@@ -287,7 +310,9 @@ function ProductCategories({ categories }: { categories: Category[] }) {
 function ProductMetadata({ product }: { product: Product }) {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Product Information</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        Product Information
+      </h3>
       <dl className="space-y-3">
         <div className="flex justify-between">
           <dt className="text-sm text-gray-500">Created</dt>
@@ -304,7 +329,9 @@ function ProductMetadata({ product }: { product: Product }) {
         <div className="flex justify-between">
           <dt className="text-sm text-gray-500">Last Synced</dt>
           <dd className="text-sm text-gray-900">
-            {product.lastSyncedAt ? formatDateTime(product.lastSyncedAt) : 'Never'}
+            {product.lastSyncedAt
+              ? formatDateTime(product.lastSyncedAt)
+              : 'Never'}
           </dd>
         </div>
         <div className="flex justify-between">
@@ -319,7 +346,9 @@ function ProductMetadata({ product }: { product: Product }) {
 function ProductDescription({ description }: { description: string }) {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">Product Description</h2>
+      <h2 className="text-xl font-semibold text-gray-900 mb-4">
+        Product Description
+      </h2>
       <div
         className="prose prose-gray max-w-none"
         dangerouslySetInnerHTML={{ __html: description }}
@@ -333,8 +362,12 @@ function ProductVariants({ variants }: { variants: Variant[] }) {
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 overflow-hidden">
       <div className="p-6 border-b border-gray-100">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">Product Variants</h2>
-          <span className="text-sm text-gray-500">{variants.length} variants</span>
+          <h2 className="text-xl font-semibold text-gray-900">
+            Product Variants
+          </h2>
+          <span className="text-sm text-gray-500">
+            {variants.length} variants
+          </span>
         </div>
       </div>
       <div className="p-6">
@@ -359,7 +392,7 @@ function ProductAnalytics() {
         <TrendingUp className="h-5 w-5 text-blue-600" />
         Product Analytics
       </h2>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="text-center">
           <div className="bg-blue-100 rounded-full p-4 w-16 h-16 flex items-center justify-center mx-auto mb-3">
@@ -368,7 +401,7 @@ function ProductAnalytics() {
           <p className="text-2xl font-bold text-gray-900">0</p>
           <p className="text-sm text-gray-500">Page Views</p>
         </div>
-        
+
         <div className="text-center">
           <div className="bg-emerald-100 rounded-full p-4 w-16 h-16 flex items-center justify-center mx-auto mb-3">
             <ShoppingCart className="h-8 w-8 text-emerald-600" />
@@ -376,7 +409,7 @@ function ProductAnalytics() {
           <p className="text-2xl font-bold text-gray-900">0</p>
           <p className="text-sm text-gray-500">Orders</p>
         </div>
-        
+
         <div className="text-center">
           <div className="bg-purple-100 rounded-full p-4 w-16 h-16 flex items-center justify-center mx-auto mb-3">
             <DollarSign className="h-8 w-8 text-purple-600" />
@@ -385,7 +418,7 @@ function ProductAnalytics() {
           <p className="text-sm text-gray-500">Revenue</p>
         </div>
       </div>
-      
+
       <div className="mt-6 text-center">
         <p className="text-sm text-gray-500">
           Analytics data will be available once the product has activity
@@ -411,7 +444,9 @@ function ProductStatusBadge({ status }: { status: string }) {
   const Icon = icons[status] || Clock;
 
   return (
-    <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border font-medium text-sm ${styles[status] || styles.private}`}>
+    <span
+      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border font-medium text-sm ${styles[status] || styles.private}`}
+    >
       <Icon className="h-4 w-4" />
       {status}
     </span>
@@ -426,13 +461,21 @@ function ProductTypeBadge({ type }: { type: string }) {
   } as Record<string, string>;
 
   return (
-    <span className={`inline-flex items-center px-3 py-1.5 rounded-lg border font-medium text-sm ${styles[type] || styles.simple}`}>
+    <span
+      className={`inline-flex items-center px-3 py-1.5 rounded-lg border font-medium text-sm ${styles[type] || styles.simple}`}
+    >
       {type}
     </span>
   );
 }
 
-function StockStatusBadge({ status, size = 'normal' }: { status: string, size?: 'normal' | 'large' }) {
+function StockStatusBadge({
+  status,
+  size = 'normal',
+}: {
+  status: string;
+  size?: 'normal' | 'large';
+}) {
   const styles = {
     instock: 'bg-emerald-100 text-emerald-700 border-emerald-200',
     outofstock: 'bg-red-100 text-red-700 border-red-200',
@@ -446,10 +489,13 @@ function StockStatusBadge({ status, size = 'normal' }: { status: string, size?: 
   } as Record<string, React.ComponentType<{ className?: string }>>;
 
   const Icon = icons[status] || CheckCircle2;
-  const sizeClasses = size === 'large' ? 'px-4 py-2 text-base' : 'px-3 py-1.5 text-sm';
+  const sizeClasses =
+    size === 'large' ? 'px-4 py-2 text-base' : 'px-3 py-1.5 text-sm';
 
   return (
-    <span className={`inline-flex items-center gap-2 rounded-lg border font-medium ${sizeClasses} ${styles[status] || styles.instock}`}>
+    <span
+      className={`inline-flex items-center gap-2 rounded-lg border font-medium ${sizeClasses} ${styles[status] || styles.instock}`}
+    >
       <Icon className="h-4 w-4" />
       {status}
     </span>

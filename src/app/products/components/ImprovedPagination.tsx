@@ -16,16 +16,24 @@ interface ImprovedPaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export function ImprovedPagination({ pagination, onPageChange }: ImprovedPaginationProps) {
-  const { page, totalPages, hasNextPage, hasPreviousPage, total, limit } = pagination;
-  
+export function ImprovedPagination({
+  pagination,
+  onPageChange,
+}: ImprovedPaginationProps) {
+  const { page, totalPages, hasNextPage, hasPreviousPage, total, limit } =
+    pagination;
+
   // Calculate visible page numbers
   const getVisiblePages = () => {
     const delta = 2; // Number of pages to show on each side of current page
     const range = [];
     const rangeWithDots = [];
 
-    for (let i = Math.max(2, page - delta); i <= Math.min(totalPages - 1, page + delta); i++) {
+    for (
+      let i = Math.max(2, page - delta);
+      i <= Math.min(totalPages - 1, page + delta);
+      i++
+    ) {
       range.push(i);
     }
 
@@ -58,7 +66,7 @@ export function ImprovedPagination({ pagination, onPageChange }: ImprovedPaginat
       <div className="text-sm text-gray-600">
         Showing{' '}
         <span className="font-medium text-gray-900">
-          {((page - 1) * limit) + 1}
+          {(page - 1) * limit + 1}
         </span>{' '}
         to{' '}
         <span className="font-medium text-gray-900">
@@ -88,17 +96,14 @@ export function ImprovedPagination({ pagination, onPageChange }: ImprovedPaginat
           {visiblePages.map((pageNum, index) => {
             if (pageNum === 'dots1' || pageNum === 'dots2') {
               return (
-                <div
-                  key={`dots-${index}`}
-                  className="px-3 py-2 text-gray-400"
-                >
+                <div key={`dots-${index}`} className="px-3 py-2 text-gray-400">
                   <MoreHorizontal className="h-4 w-4" />
                 </div>
               );
             }
 
             const isCurrentPage = pageNum === page;
-            
+
             return (
               <button
                 key={pageNum}

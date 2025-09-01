@@ -2,10 +2,10 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  Save, 
-  X, 
-  Upload, 
+import {
+  Save,
+  X,
+  Upload,
   Image as ImageIcon,
   DollarSign,
   Package,
@@ -13,7 +13,7 @@ import {
   FileText,
   AlertCircle,
   Eye,
-  RotateCcw
+  RotateCcw,
 } from 'lucide-react';
 
 type ProductData = {
@@ -35,50 +35,56 @@ interface ImprovedProductEditorProps {
   initial: ProductData;
 }
 
-export default function ImprovedProductEditor({ initial }: ImprovedProductEditorProps) {
+export default function ImprovedProductEditor({
+  initial,
+}: ImprovedProductEditorProps) {
   const router = useRouter();
   const [form, setForm] = useState<ProductData>(initial);
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
-  const [activeTab, setActiveTab] = useState<'basic' | 'pricing' | 'inventory' | 'seo' | 'media'>('basic');
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [activeTab, setActiveTab] = useState<
+    'basic' | 'pricing' | 'inventory' | 'seo' | 'media'
+  >('basic');
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
 
-  const onChange = useCallback(<K extends keyof ProductData>(
-    key: K,
-    value: ProductData[K]
-  ) => {
-    setForm((f) => ({ ...f, [key]: value }));
-    setHasChanges(true);
-    
-    // Clear validation error for this field
-    if (validationErrors[key as string]) {
-      setValidationErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[key as string];
-        return newErrors;
-      });
-    }
-  }, [validationErrors]);
+  const onChange = useCallback(
+    <K extends keyof ProductData>(key: K, value: ProductData[K]) => {
+      setForm((f) => ({ ...f, [key]: value }));
+      setHasChanges(true);
+
+      // Clear validation error for this field
+      if (validationErrors[key as string]) {
+        setValidationErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[key as string];
+          return newErrors;
+        });
+      }
+    },
+    [validationErrors]
+  );
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
-    
+
     if (!form.name.trim()) {
       errors.name = 'Product name is required';
     }
-    
+
     if (!form.sku.trim()) {
       errors.sku = 'SKU is required';
     }
-    
+
     if (form.basePrice && isNaN(parseFloat(form.basePrice))) {
       errors.basePrice = 'Price must be a valid number';
     }
-    
+
     if (form.regularPrice && isNaN(parseFloat(form.regularPrice))) {
       errors.regularPrice = 'Regular price must be a valid number';
     }
-    
+
     if (form.salePrice && isNaN(parseFloat(form.salePrice))) {
       errors.salePrice = 'Sale price must be a valid number';
     }
@@ -99,12 +105,12 @@ export default function ImprovedProductEditor({ initial }: ImprovedProductEditor
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
-      
+
       if (!res.ok) {
         const msg = await res.text().catch(() => '');
         throw new Error(msg || 'Failed to save changes');
       }
-      
+
       setHasChanges(false);
       // Show success message
       showNotification('Product updated successfully!', 'success');
@@ -169,7 +175,7 @@ export default function ImprovedProductEditor({ initial }: ImprovedProductEditor
                   <span className="text-sm font-medium">Unsaved changes</span>
                 </div>
               )}
-              
+
               <button
                 onClick={reset}
                 disabled={!hasChanges}
@@ -215,7 +221,7 @@ export default function ImprovedProductEditor({ initial }: ImprovedProductEditor
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
-                
+
                 return (
                   <button
                     key={tab.id}
@@ -265,9 +271,7 @@ export default function ImprovedProductEditor({ initial }: ImprovedProductEditor
                   errors={validationErrors}
                 />
               )}
-              {activeTab === 'media' && (
-                <MediaTab />
-              )}
+              {activeTab === 'media' && <MediaTab />}
             </div>
           </div>
         </div>
@@ -282,22 +286,25 @@ function BasicInfoTab({
   errors,
 }: {
   form: ProductData;
-  onChange: <K extends keyof ProductData>(key: K, value: ProductData[K]) => void;
+  onChange: <K extends keyof ProductData>(
+    key: K,
+    value: ProductData[K]
+  ) => void;
   errors: Record<string, string>;
 }) {
   return (
     <div className="p-6 space-y-6">
       <div className="border-b border-gray-100 pb-4">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Basic Information</h2>
-        <p className="text-gray-600">Essential product details and identification</p>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          Basic Information
+        </h2>
+        <p className="text-gray-600">
+          Essential product details and identification
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <FormField
-          label="Product Name"
-          required
-          error={errors.name}
-        >
+        <FormField label="Product Name" required error={errors.name}>
           <input
             type="text"
             value={form.name}
@@ -325,7 +332,9 @@ function BasicInfoTab({
         <FormField label="Product Status" required>
           <select
             value={form.status}
-            onChange={(e) => onChange('status', e.target.value as ProductData['status'])}
+            onChange={(e) =>
+              onChange('status', e.target.value as ProductData['status'])
+            }
             className="input-field"
           >
             <option value="published">Published</option>
@@ -337,7 +346,9 @@ function BasicInfoTab({
         <FormField label="Product Type" required>
           <select
             value={form.type}
-            onChange={(e) => onChange('type', e.target.value as ProductData['type'])}
+            onChange={(e) =>
+              onChange('type', e.target.value as ProductData['type'])
+            }
             className="input-field"
           >
             <option value="simple">Simple Product</option>
@@ -356,14 +367,19 @@ function PricingTab({
   errors,
 }: {
   form: ProductData;
-  onChange: <K extends keyof ProductData>(key: K, value: ProductData[K]) => void;
+  onChange: <K extends keyof ProductData>(
+    key: K,
+    value: ProductData[K]
+  ) => void;
   errors: Record<string, string>;
 }) {
   return (
     <div className="p-6 space-y-6">
       <div className="border-b border-gray-100 pb-4">
         <h2 className="text-xl font-semibold text-gray-900 mb-2">Pricing</h2>
-        <p className="text-gray-600">Set regular and sale prices for your product</p>
+        <p className="text-gray-600">
+          Set regular and sale prices for your product
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -464,14 +480,21 @@ function InventoryTab({
   errors,
 }: {
   form: ProductData;
-  onChange: <K extends keyof ProductData>(key: K, value: ProductData[K]) => void;
+  onChange: <K extends keyof ProductData>(
+    key: K,
+    value: ProductData[K]
+  ) => void;
   errors: Record<string, string>;
 }) {
   return (
     <div className="p-6 space-y-6">
       <div className="border-b border-gray-100 pb-4">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Inventory & Shipping</h2>
-        <p className="text-gray-600">Stock status, dimensions, and shipping details</p>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          Inventory & Shipping
+        </h2>
+        <p className="text-gray-600">
+          Stock status, dimensions, and shipping details
+        </p>
       </div>
 
       <div className="space-y-6">
@@ -493,7 +516,7 @@ function InventoryTab({
             <Ruler className="h-5 w-5" />
             Dimensions
           </h3>
-          
+
           <div className="grid grid-cols-3 gap-4">
             <FormField label="Length (cm)">
               <input
@@ -558,14 +581,21 @@ function SEOTab({
   errors,
 }: {
   form: ProductData;
-  onChange: <K extends keyof ProductData>(key: K, value: ProductData[K]) => void;
+  onChange: <K extends keyof ProductData>(
+    key: K,
+    value: ProductData[K]
+  ) => void;
   errors: Record<string, string>;
 }) {
   return (
     <div className="p-6 space-y-6">
       <div className="border-b border-gray-100 pb-4">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Content & SEO</h2>
-        <p className="text-gray-600">Product descriptions and search optimization</p>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          Content & SEO
+        </h2>
+        <p className="text-gray-600">
+          Product descriptions and search optimization
+        </p>
       </div>
 
       <div className="space-y-6">
@@ -575,7 +605,9 @@ function SEOTab({
         >
           <textarea
             value={form.shortDescription ?? ''}
-            onChange={(e) => onChange('shortDescription', e.target.value || null)}
+            onChange={(e) =>
+              onChange('shortDescription', e.target.value || null)
+            }
             rows={3}
             className="input-field resize-none"
             placeholder="Write a brief product summary..."
@@ -603,17 +635,23 @@ function MediaTab() {
   return (
     <div className="p-6 space-y-6">
       <div className="border-b border-gray-100 pb-4">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Media Gallery</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          Media Gallery
+        </h2>
         <p className="text-gray-600">Upload and manage product images</p>
       </div>
 
       <div className="space-y-6">
         {/* Featured Image */}
         <div>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Featured Image</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            Featured Image
+          </h3>
           <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 transition-colors">
             <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 mb-2">Drag and drop an image here, or click to select</p>
+            <p className="text-gray-600 mb-2">
+              Drag and drop an image here, or click to select
+            </p>
             <p className="text-sm text-gray-500">Recommended size: 800x800px</p>
             <button className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
               <Upload className="h-4 w-4" />
@@ -624,7 +662,9 @@ function MediaTab() {
 
         {/* Gallery */}
         <div>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Product Gallery</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            Product Gallery
+          </h3>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
               <div
@@ -664,9 +704,7 @@ function FormField({
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </span>
-        {help && (
-          <p className="text-xs text-gray-500 mt-1">{help}</p>
-        )}
+        {help && <p className="text-xs text-gray-500 mt-1">{help}</p>}
       </label>
       {children}
       {error && (
@@ -678,4 +716,3 @@ function FormField({
     </div>
   );
 }
-

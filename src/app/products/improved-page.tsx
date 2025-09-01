@@ -20,7 +20,9 @@ interface ProductsPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function ImprovedPage({ searchParams }: ProductsPageProps) {
+export default async function ImprovedPage({
+  searchParams,
+}: ProductsPageProps) {
   // Require authentication; redirect to login if not signed in
   const session = await auth();
   if (!session?.user) {
@@ -43,5 +45,6 @@ export default async function ImprovedPage({ searchParams }: ProductsPageProps) 
  */
 export const metadata = {
   title: 'Products - Enhanced Product Manager',
-  description: 'Browse and manage your product catalog with an enhanced user experience',
+  description:
+    'Browse and manage your product catalog with an enhanced user experience',
 };

@@ -10,7 +10,10 @@ interface VersionSelectorProps {
   currentVersion: UIVersion;
 }
 
-export function VersionSelector({ onVersionChange, currentVersion }: VersionSelectorProps) {
+export function VersionSelector({
+  onVersionChange,
+  currentVersion,
+}: VersionSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -28,8 +31,12 @@ export function VersionSelector({ onVersionChange, currentVersion }: VersionSele
       {isOpen && (
         <div className="absolute bottom-16 right-0 bg-white rounded-2xl shadow-xl border border-gray-200 p-4 min-w-72">
           <div className="mb-3">
-            <h3 className="text-sm font-semibold text-gray-900 mb-1">UI Version</h3>
-            <p className="text-xs text-gray-500">Choose your preferred interface design</p>
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">
+              UI Version
+            </h3>
+            <p className="text-xs text-gray-500">
+              Choose your preferred interface design
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -49,7 +56,9 @@ export function VersionSelector({ onVersionChange, currentVersion }: VersionSele
               </div>
               <div className="flex-1">
                 <div className="font-medium text-sm">Original UI</div>
-                <div className="text-xs text-gray-500">Current production interface</div>
+                <div className="text-xs text-gray-500">
+                  Current production interface
+                </div>
               </div>
               {currentVersion === 'original' && (
                 <div className="w-2 h-2 bg-blue-600 rounded-full" />
@@ -77,7 +86,9 @@ export function VersionSelector({ onVersionChange, currentVersion }: VersionSele
                     New
                   </span>
                 </div>
-                <div className="text-xs text-gray-500">Modern design with improved UX</div>
+                <div className="text-xs text-gray-500">
+                  Modern design with improved UX
+                </div>
               </div>
               {currentVersion === 'improved' && (
                 <div className="w-2 h-2 bg-blue-600 rounded-full" />

@@ -3,16 +3,16 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ImprovedPagination, Pagination } from './ImprovedPagination';
-import { 
-  Package, 
-  Edit, 
-  Eye, 
+import {
+  Package,
+  Edit,
+  Eye,
   MoreHorizontal,
   Star,
   ShoppingCart,
   TrendingUp,
   Clock,
-  DollarSign
+  DollarSign,
 } from 'lucide-react';
 
 interface Product {
@@ -77,7 +77,7 @@ export function ImprovedProductsList({
             disabled={isLoadingMore}
             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-              {isLoadingMore ? (
+            {isLoadingMore ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
                 Loading...
@@ -142,7 +142,7 @@ function ProductGridCard({ product }: { product: Product }) {
             <Package className="h-12 w-12 text-gray-400" />
           </div>
         )}
-        
+
         {/* Quick Actions Overlay */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2">
           <Link
@@ -177,7 +177,9 @@ function ProductGridCard({ product }: { product: Product }) {
           >
             {product.name}
           </Link>
-          <p className="text-xs text-gray-500 font-mono mt-1">SKU: {product.sku}</p>
+          <p className="text-xs text-gray-500 font-mono mt-1">
+            SKU: {product.sku}
+          </p>
         </div>
 
         <div className="flex items-center justify-between">
@@ -193,7 +195,7 @@ function ProductGridCard({ product }: { product: Product }) {
               </p>
             )}
           </div>
-          
+
           <TypeBadge type={product.type} />
         </div>
 
@@ -241,7 +243,9 @@ function ProductListCard({ product }: { product: Product }) {
               >
                 {product.name}
               </Link>
-              <p className="text-sm text-gray-500 font-mono">SKU: {product.sku}</p>
+              <p className="text-sm text-gray-500 font-mono">
+                SKU: {product.sku}
+              </p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -266,7 +270,7 @@ function ProductListCard({ product }: { product: Product }) {
                   {new Date(product.updatedAt).toLocaleDateString()}
                 </p>
               )}
-              
+
               <div className="flex items-center gap-1">
                 <Link
                   href={`/products/${product.id}`}
@@ -300,7 +304,9 @@ function StatusBadge({ status }: { status: string }) {
   } as Record<string, string>;
 
   return (
-    <span className={`px-2 py-1 text-xs rounded-md border font-medium ${styles[status] || styles.private}`}>
+    <span
+      className={`px-2 py-1 text-xs rounded-md border font-medium ${styles[status] || styles.private}`}
+    >
       {status}
     </span>
   );
@@ -314,7 +320,9 @@ function TypeBadge({ type }: { type: string }) {
   } as Record<string, string>;
 
   return (
-    <span className={`px-2 py-1 text-xs rounded-md font-medium ${styles[type] || styles.simple}`}>
+    <span
+      className={`px-2 py-1 text-xs rounded-md font-medium ${styles[type] || styles.simple}`}
+    >
       {type}
     </span>
   );
@@ -330,7 +338,9 @@ function StockStatusBadge({ status }: { status?: string }) {
   } as Record<string, string>;
 
   return (
-    <span className={`px-2 py-1 text-xs rounded-md font-medium ${styles[status] || 'bg-gray-100 text-gray-700'}`}>
+    <span
+      className={`px-2 py-1 text-xs rounded-md font-medium ${styles[status] || 'bg-gray-100 text-gray-700'}`}
+    >
       {status}
     </span>
   );
@@ -344,7 +354,10 @@ function ProductsListSkeleton({ viewMode }: { viewMode: 'grid' | 'list' }) {
       <div className="p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {items.map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse">
+            <div
+              key={i}
+              className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse"
+            >
               <div className="aspect-square bg-gray-200" />
               <div className="p-4 space-y-3">
                 <div className="h-4 bg-gray-200 rounded w-3/4" />
@@ -364,7 +377,10 @@ function ProductsListSkeleton({ viewMode }: { viewMode: 'grid' | 'list' }) {
   return (
     <div className="p-6 space-y-4">
       {items.map((_, i) => (
-        <div key={i} className="bg-white rounded-xl border border-gray-100 p-4 animate-pulse">
+        <div
+          key={i}
+          className="bg-white rounded-xl border border-gray-100 p-4 animate-pulse"
+        >
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0" />
             <div className="flex-1 space-y-2">
@@ -391,9 +407,12 @@ function EmptyState() {
       <div className="mx-auto w-24 h-24 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
         <Package className="h-12 w-12 text-gray-400" />
       </div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">No products found</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        No products found
+      </h3>
       <p className="text-gray-500 mb-6 max-w-md mx-auto">
-        We couldn&apos;t find any products matching your search criteria. Try adjusting your filters or search terms.
+        We couldn&apos;t find any products matching your search criteria. Try
+        adjusting your filters or search terms.
       </p>
       <button className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
         <Package className="h-4 w-4" />

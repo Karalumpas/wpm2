@@ -62,22 +62,22 @@ export function MainLayout({ children }: MainLayoutProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Mobile sidebar */}
       <div className={`lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
         <div className="fixed inset-0 z-40 flex">
           <div
-            className="fixed inset-0 bg-gray-600 bg-opacity-75"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
           />
-          <div className="relative flex w-full max-w-xs flex-1 flex-col bg-white">
+          <div className="relative flex w-full max-w-xs flex-1 flex-col bg-white/95 backdrop-blur-md border-r border-gray-200/50">
             <div className="absolute top-0 right-0 -mr-12 pt-2">
               <button
                 type="button"
-                className="ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                className="ml-1 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-white shadow-lg"
                 onClick={() => setSidebarOpen(false)}
               >
-                <X className="h-6 w-6 text-white" />
+                <X className="h-6 w-6" />
               </button>
             </div>
             <Sidebar collapsed={false} onToggleCollapse={() => {}} />
@@ -104,7 +104,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         className={cn(
           'hidden lg:fixed lg:inset-y-0 lg:right-0 lg:flex lg:flex-col transition-[width]'
         )}
-        style={{ width: rightCollapsed ? '4rem' : '16rem' }}
+        style={{ width: rightCollapsed ? '4rem' : '20rem' }}
       >
         <SyncSidebar
           collapsed={rightCollapsed}
@@ -115,22 +115,22 @@ export function MainLayout({ children }: MainLayoutProps) {
       <div
         className={cn(
           sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64',
-          rightCollapsed ? 'lg:pr-16' : 'lg:pr-64'
+          rightCollapsed ? 'lg:pr-16' : 'lg:pr-80'
         )}
       >
         {/* Top bar */}
-        <div className="sticky top-0 z-10 bg-white shadow">
+        <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-lg border-b border-gray-200/50 shadow-sm">
           <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
             <button
               type="button"
-              className="lg:hidden -ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+              className="lg:hidden -ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-xl text-gray-500 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
               onClick={() => setSidebarOpen(true)}
             >
               <Menu className="h-6 w-6" />
             </button>
             <div className="flex flex-1 justify-between">
               <div className="flex flex-1">
-                <h1 className="text-xl font-semibold text-gray-900 ml-4 lg:ml-0">
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent ml-4 lg:ml-0">
                   WooCommerce Product Manager
                 </h1>
               </div>
@@ -139,29 +139,30 @@ export function MainLayout({ children }: MainLayoutProps) {
                   <div className="relative">
                     <button
                       onClick={() => setProfileOpen((o) => !o)}
-                      className="inline-flex items-center justify-center w-9 h-9 rounded-full border bg-white hover:bg-gray-50"
+                      className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-200"
                       aria-haspopup="menu"
                       aria-expanded={profileOpen}
                     >
-                      <User className="h-5 w-5 text-gray-700" />
+                      <User className="h-5 w-5" />
                     </button>
                     {profileOpen && (
-                      <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50">
+                      <div className="absolute right-0 mt-2 w-48 bg-white/95 backdrop-blur-md border border-gray-200/50 rounded-xl shadow-xl py-2 z-50">
                         <Link
                           href="/profile"
-                          className="block px-3 py-2 text-sm text-gray-800 hover:bg-gray-50"
+                          className="block px-4 py-2.5 text-sm text-gray-800 hover:bg-blue-50 hover:text-blue-900 transition-colors rounded-lg mx-2"
                         >
                           Profile
                         </Link>
                         <Link
                           href="/settings"
-                          className="block px-3 py-2 text-sm text-gray-800 hover:bg-gray-50"
+                          className="block px-4 py-2.5 text-sm text-gray-800 hover:bg-blue-50 hover:text-blue-900 transition-colors rounded-lg mx-2"
                         >
                           Settings
                         </Link>
+                        <div className="h-px bg-gray-200 my-2 mx-2"></div>
                         <button
                           onClick={() => signOut({ callbackUrl: '/login' })}
-                          className="block w-full text-left px-3 py-2 text-sm text-gray-800 hover:bg-gray-50"
+                          className="block w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors rounded-lg mx-2"
                         >
                           Log out
                         </button>
@@ -193,26 +194,28 @@ function Sidebar({
   const { data: session } = useSession();
 
   return (
-    <div className="flex flex-1 flex-col min-h-0 bg-white border-r border-gray-200">
-      <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
-        <div className="flex items-center justify-between flex-shrink-0 px-3">
+    <div className="flex flex-1 flex-col min-h-0 bg-white/95 backdrop-blur-md border-r border-gray-200/50 shadow-lg">
+      <div className="flex flex-1 flex-col overflow-y-auto pt-6 pb-4">
+        <div className="flex items-center justify-between flex-shrink-0 px-4">
           <div className="flex items-center">
-            <Package className="h-7 w-7 text-indigo-600" />
+            <div className="p-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl">
+              <Package className="h-6 w-6 text-white" />
+            </div>
             {!collapsed && (
-              <span className="ml-2 text-xl font-bold text-gray-900">
+              <span className="ml-3 text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 WPM v2
               </span>
             )}
           </div>
           <button
-            className="hidden lg:inline-flex items-center justify-center w-8 h-8 rounded-md border bg-white hover:bg-gray-50"
+            className="hidden lg:inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 transition-all duration-200"
             onClick={onToggleCollapse}
             title={collapsed ? 'Expand menu' : 'Collapse menu'}
           >
             {collapsed ? '»' : '«'}
           </button>
         </div>
-        <nav className="mt-6 flex-1 space-y-1 px-2">
+        <nav className="mt-8 flex-1 space-y-2 px-3">
           {navigation.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -222,10 +225,10 @@ function Sidebar({
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors',
+                  'group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200',
                   isActive
-                    ? 'bg-indigo-100 text-indigo-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                    : 'text-gray-600 hover:bg-blue-50 hover:text-blue-900'
                 )}
                 title={collapsed ? item.name : undefined}
               >
@@ -235,8 +238,8 @@ function Sidebar({
                       ? 'h-5 w-5 flex-shrink-0'
                       : 'mr-3 h-5 w-5 flex-shrink-0',
                     isActive
-                      ? 'text-indigo-500'
-                      : 'text-gray-400 group-hover:text-gray-500'
+                      ? 'text-white'
+                      : 'text-gray-400 group-hover:text-blue-600'
                   )}
                 />
                 {!collapsed && item.name}

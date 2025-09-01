@@ -85,7 +85,7 @@ export default function DraggableWindow({
 
   return (
     <div
-      className={`absolute z-40 shadow-lg border border-gray-200 rounded-lg bg-white ${className || ''}`}
+      className={`absolute z-40 shadow-xl border border-slate-200 rounded-2xl bg-white/95 backdrop-blur-md ${className || ''}`}
       style={{
         left: pos.x,
         top: pos.y,
@@ -94,20 +94,20 @@ export default function DraggableWindow({
       }}
     >
       <div
-        className="cursor-move select-none px-3 py-2 border-b bg-gray-50 rounded-t-lg flex items-center justify-between gap-2"
+        className="cursor-move select-none px-4 py-3 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50 rounded-t-2xl flex items-center justify-between gap-3"
         onPointerDown={onPointerDownHeader}
         onPointerMove={onPointerMoveHeader}
         onPointerUp={onPointerUpHeader}
       >
         <div
-          className="text-sm font-semibold text-gray-900 truncate"
+          className="text-sm font-semibold text-slate-900 truncate"
           title={title}
         >
           {title}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <button
-            className="text-xs px-2 py-1 rounded border hover:bg-gray-100"
+            className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 transition-all duration-200 text-xs font-medium shadow-sm"
             onClick={(e) => {
               e.stopPropagation();
               setCollapsed((c) => !c);
@@ -117,7 +117,7 @@ export default function DraggableWindow({
             {collapsed ? 'Expand' : 'Collapse'}
           </button>
           <button
-            className="text-xs px-2 py-1 rounded border hover:bg-gray-100"
+            className="px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 hover:text-red-800 transition-all duration-200 text-xs font-medium shadow-sm"
             onClick={(e) => {
               e.stopPropagation();
               onClose?.();
@@ -130,10 +130,10 @@ export default function DraggableWindow({
       </div>
       {!collapsed && (
         <div
-          className="p-3 overflow-auto"
+          className="p-4 overflow-auto"
           style={{
             height: initialSize.h ? initialSize.h : 'auto',
-            maxHeight: initialSize.h ? initialSize.h : 'calc(80vh - 42px)',
+            maxHeight: initialSize.h ? initialSize.h : 'calc(80vh - 60px)',
           }}
         >
           {children}

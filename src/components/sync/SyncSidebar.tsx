@@ -29,26 +29,26 @@ function formatTime(d?: Date) {
 }
 
 function StatusBadge({ job }: { job: SyncJob }) {
-  const common = 'px-2 py-0.5 text-xs rounded-full border';
+  const common = 'px-3 py-1.5 text-xs rounded-xl border font-medium shadow-sm';
   switch (job.status) {
     case 'queued':
       return (
         <span
           className={`${common} bg-amber-50 text-amber-800 border-amber-200`}
         >
-          Kø
+          Queued
         </span>
       );
     case 'running':
       return (
         <span className={`${common} bg-blue-50 text-blue-800 border-blue-200`}>
-          Kører
+          Running
         </span>
       );
     case 'paused':
       return (
-        <span className={`${common} bg-gray-100 text-gray-700 border-gray-200`}>
-          Pauset
+        <span className={`${common} bg-slate-100 text-slate-700 border-slate-200`}>
+          Paused
         </span>
       );
     case 'completed':
@@ -56,13 +56,13 @@ function StatusBadge({ job }: { job: SyncJob }) {
         <span
           className={`${common} bg-emerald-50 text-emerald-800 border-emerald-200`}
         >
-          Færdig
+          Completed
         </span>
       );
     case 'failed':
       return (
         <span className={`${common} bg-rose-50 text-rose-800 border-rose-200`}>
-          Fejlet
+          Failed
         </span>
       );
   }
@@ -72,31 +72,34 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
   const pct =
     total > 0 ? Math.min(100, Math.round((current / total) * 100)) : 0;
   return (
-    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+    <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
       <div
-        className="h-2 bg-gradient-to-r from-indigo-500 to-blue-500"
+        className="h-2 bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-300"
         style={{ width: `${pct}%` }}
       />
     </div>
   );
 }
 
-function JobCard({ job, onChange }: { job: SyncJob; onChange: () => void }) {
-  const last = job.progress?.[job.progress.length - 1];
-  const icon =
-    job.status === 'failed' ? (
-      <CircleAlert className="h-4 w-4 text-rose-600" />
-    ) : job.status === 'completed' ? (
-      <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-    ) : (
-      <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />
-    );
+function SyncJobCard({
+  job,
+  onChange,
+  last,
+}: {
+  job: SyncJob;
+  onChange: () => void;
+  last?: {
+    productsSynced: number;
+    totalProducts: number;
+    categoriesSynced: number;
+    totalCategories: number;
+  };
+}) {
   return (
-    <div className="border rounded-lg p-3 bg-white shadow-sm">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
-          {icon}
-          <div className="text-sm font-semibold text-gray-900">
+    <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 p-4 shadow-lg space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <div className="text-sm font-semibold text-slate-900">
             {job.shopName || `Shop: ${job.shopId.slice(0, 8)}`}
           </div>
         </div>
@@ -104,7 +107,7 @@ function JobCard({ job, onChange }: { job: SyncJob; onChange: () => void }) {
           <StatusBadge job={job} />
           {job.status === 'running' && (
             <button
-              className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 transition-all duration-200 text-xs font-medium shadow-sm"
               onClick={async () => {
                 await controlSyncJob(job.id, 'pause');
                 onChange();
@@ -115,20 +118,20 @@ function JobCard({ job, onChange }: { job: SyncJob; onChange: () => void }) {
           )}
           {job.status === 'paused' && (
             <button
-              className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 text-xs font-medium shadow-sm"
               onClick={async () => {
                 await controlSyncJob(job.id, 'resume');
                 onChange();
               }}
             >
-              <Play className="h-3.5 w-3.5" /> Genoptag
+              <Play className="h-3.5 w-3.5" /> Resume
             </button>
           )}
           {(job.status === 'running' ||
             job.status === 'queued' ||
             job.status === 'paused') && (
             <button
-              className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50 text-rose-600 border-rose-200"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 hover:text-red-800 transition-all duration-200 text-xs font-medium shadow-sm"
               onClick={async () => {
                 await controlSyncJob(job.id, 'cancel');
                 onChange();
@@ -139,24 +142,40 @@ function JobCard({ job, onChange }: { job: SyncJob; onChange: () => void }) {
           )}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-2 text-xs text-gray-700 mb-2">
-        <div>Enqueued: {formatTime(job.enqueuedAt as Date)}</div>
-        <div>Start: {formatTime(job.startedAt as Date | undefined)}</div>
-        <div>Slut: {formatTime(job.finishedAt as Date | undefined)}</div>
-        <div className="truncate">{job.message || ''}</div>
-      </div>
-      {last && (
+      
+      <div className="grid grid-cols-2 gap-3 text-xs text-slate-600">
         <div className="space-y-1">
+          <div><span className="font-medium">Enqueued:</span> {formatTime(job.enqueuedAt as Date)}</div>
+          <div><span className="font-medium">Started:</span> {formatTime(job.startedAt as Date | undefined)}</div>
+        </div>
+        <div className="space-y-1">
+          <div><span className="font-medium">Finished:</span> {formatTime(job.finishedAt as Date | undefined)}</div>
+          <div className="truncate"><span className="font-medium">Status:</span> {job.message || 'No message'}</div>
+        </div>
+      </div>
+      
+      {last && (
+        <div className="space-y-3 pt-2 border-t border-slate-200">
           <div className="flex items-center justify-between text-xs">
-            <div className="font-medium capitalize">{last.stage}</div>
-            <div className="text-gray-700">
-              {last.current}/{last.total}
-            </div>
+            <span className="font-medium text-slate-700">Products Progress</span>
+            <span className="text-slate-600">
+              {last.productsSynced} / {last.totalProducts}
+            </span>
           </div>
-          <ProgressBar current={last.current} total={last.total} />
-          <div className="text-xs text-gray-700 truncate" title={last.message}>
-            {last.message}
+          <ProgressBar
+            current={last.productsSynced}
+            total={last.totalProducts}
+          />
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-medium text-slate-700">Categories Progress</span>
+            <span className="text-slate-600">
+              {last.categoriesSynced} / {last.totalCategories}
+            </span>
           </div>
+          <ProgressBar
+            current={last.categoriesSynced}
+            total={last.totalCategories}
+          />
         </div>
       )}
     </div>
@@ -170,35 +189,60 @@ export default function SyncSidebar({
   collapsed: boolean;
   onToggleCollapse: () => void;
 }) {
-  const { jobs, isLoading, error, refresh } = useSyncJobs();
+  const { jobs, refresh, error } = useSyncJobs();
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [selectedShop, setSelectedShop] = useState('');
+  const [starting, setStarting] = useState(false);
+
   const { data: shopsData } = useSWR<{
-    shops: Array<{ id: string; name: string; count: number }>;
+    shops: Array<{ id: string; name: string }>;
   }>(
     '/api/shops',
-    async (url) => {
-      const res = await fetch(url, { cache: 'no-store' });
-      if (!res.ok) throw new Error('Failed to load shops');
+    async (url: string) => {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Failed to fetch');
       return res.json();
-    },
-    { revalidateOnFocus: false }
+    }
   );
 
-  const [starting, setStarting] = useState(false);
-  const [selectedShop, setSelectedShop] = useState<string | ''>('');
-  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
-
   const ordered = useMemo(() => {
-    return [...jobs].sort((a, b) => {
-      const order = (s: SyncJob['status']) =>
-        s === 'running' ? 0 : s === 'queued' ? 1 : s === 'failed' ? 2 : 3;
-      const byStatus = order(a.status) - order(b.status);
-      if (byStatus !== 0) return byStatus;
-      const at = (x?: Date) => (x ? x.getTime() : 0);
-      return (
-        at(b.startedAt as Date | undefined) -
-        at(a.startedAt as Date | undefined)
-      );
-    });
+    return [...jobs]
+      .sort((a, b) => {
+        if (a.status === 'running' && b.status !== 'running') return -1;
+        if (b.status === 'running' && a.status !== 'running') return 1;
+        return (
+          new Date(b.enqueuedAt).getTime() - new Date(a.enqueuedAt).getTime()
+        );
+      })
+      .map((job) => {
+        const logs = job.logs || [];
+        const last = logs
+          .slice(-30)
+          .map((line) => {
+            const productMatch = line.match(
+              /synced (\d+)\/(\d+) products/i
+            );
+            const categoryMatch = line.match(
+              /synced (\d+)\/(\d+) categories/i
+            );
+            return {
+              productsSynced: productMatch ? parseInt(productMatch[1]) : 0,
+              totalProducts: productMatch ? parseInt(productMatch[2]) : 0,
+              categoriesSynced: categoryMatch ? parseInt(categoryMatch[1]) : 0,
+              totalCategories: categoryMatch ? parseInt(categoryMatch[2]) : 0,
+            };
+          })
+          .reduce(
+            (acc, cur) => ({
+              productsSynced: Math.max(acc.productsSynced, cur.productsSynced),
+              totalProducts: Math.max(acc.totalProducts, cur.totalProducts),
+              categoriesSynced: Math.max(acc.categoriesSynced, cur.categoriesSynced),
+              totalCategories: Math.max(acc.totalCategories, cur.totalCategories),
+            }),
+            { productsSynced: 0, totalProducts: 0, categoriesSynced: 0, totalCategories: 0 }
+          );
+        return { ...job, last };
+      });
   }, [jobs]);
 
   const selectedJob =
@@ -211,19 +255,20 @@ export default function SyncSidebar({
       setStarting(true);
       const res = await startBackgroundSync();
       if ('error' in res)
-        alert(`Kunne ikke starte synkronisering: ${res.error}`);
+        alert(`Could not start sync: ${res.error}`);
       await refresh();
     } finally {
       setStarting(false);
     }
   }
+  
   async function handleStartSingle() {
     if (!selectedShop) return;
     try {
       setStarting(true);
       const res = await startBackgroundSync(selectedShop);
       if ('error' in res)
-        alert(`Kunne ikke starte synkronisering: ${res.error}`);
+        alert(`Could not start sync: ${res.error}`);
       await refresh();
     } finally {
       setStarting(false);
@@ -232,113 +277,120 @@ export default function SyncSidebar({
 
   return (
     <div
-      className="hidden lg:fixed lg:inset-y-0 lg:right-0 lg:flex lg:flex-col border-l bg-white"
-      style={{ width: collapsed ? '4rem' : '16rem' }}
+      className="hidden lg:fixed lg:inset-y-0 lg:right-0 lg:flex lg:flex-col bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 backdrop-blur-md border-l border-slate-200 shadow-xl"
+      style={{ width: collapsed ? '4rem' : '20rem' }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-3 border-b">
-        <div className="flex items-center gap-2">
-          <RefreshCcw className="h-5 w-5 text-indigo-600" />
+      <div className="flex items-center justify-between px-4 py-4 border-b border-slate-200 bg-white/80 backdrop-blur-md">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-md">
+            <RefreshCcw className="h-5 w-5" />
+          </div>
           {!collapsed && (
-            <h2 className="text-sm font-semibold text-gray-900">Synk</h2>
+            <h2 className="text-lg font-bold text-slate-900 tracking-tight">Sync Center</h2>
           )}
         </div>
         <button
-          className="hidden lg:inline-flex items-center justify-center w-8 h-8 rounded-md border bg-white hover:bg-gray-50"
+          className="hidden lg:inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 transition-all duration-200 shadow-sm hover:shadow-md"
           onClick={onToggleCollapse}
-          title={collapsed ? 'Udvid menu' : 'Skjul menu'}
+          title={collapsed ? 'Expand menu' : 'Collapse menu'}
         >
           {collapsed ? '›' : '‹'}
         </button>
       </div>
 
       {/* Body */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-3">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {!collapsed && (
-          <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={handleStartAll}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-indigo-600 text-white shadow hover:brightness-110 disabled:opacity-60"
-                disabled={starting}
-              >
-                {starting ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Play className="h-4 w-4" />
-                )}
-                Start (alle)
-              </button>
-              <select
-                className="px-2.5 py-2 border rounded-md bg-white text-gray-900"
-                value={selectedShop}
-                onChange={(e) => setSelectedShop(e.target.value)}
-              >
-                <option value="">Vælg shop…</option>
-                {shopsData?.shops.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={handleStartSingle}
-                disabled={!selectedShop || starting}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-gray-300 hover:bg-gray-50 text-gray-900"
-              >
-                <Play className="h-4 w-4" /> Start
-              </button>
-              <button
-                onClick={() => refresh()}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-gray-300 hover:bg-gray-50 text-gray-900"
-              >
-                <RefreshCcw className="h-4 w-4" /> Opdater
-              </button>
+          <div className="space-y-4">
+            {/* Control Panel */}
+            <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 p-4 shadow-lg">
+              <h3 className="text-sm font-semibold text-slate-900 mb-3">Sync Controls</h3>
+              <div className="space-y-3">
+                <button
+                  onClick={handleStartAll}
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-60 font-medium"
+                  disabled={starting}
+                >
+                  {starting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Play className="h-4 w-4" />
+                  )}
+                  Start All Shops
+                </button>
+                
+                <div className="space-y-2">
+                  <select
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-slate-300"
+                    value={selectedShop}
+                    onChange={(e) => setSelectedShop(e.target.value)}
+                  >
+                    <option value="">Select Shop...</option>
+                    {shopsData?.shops.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={handleStartSingle}
+                      disabled={!selectedShop || starting}
+                      className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 transition-all duration-200 shadow-sm disabled:opacity-60 text-sm font-medium"
+                    >
+                      <Play className="h-4 w-4" /> Start
+                    </button>
+                    <button
+                      onClick={() => refresh()}
+                      className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 transition-all duration-200 shadow-sm text-sm font-medium"
+                    >
+                      <RefreshCcw className="h-4 w-4" /> Refresh
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {error && (
-              <div className="text-xs text-rose-700">
-                Fejl ved hentning af jobstatus: {String(error)}
+              <div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-xs text-red-700">
+                <strong>Error:</strong> {error}
               </div>
             )}
 
-            {isLoading && jobs.length === 0 ? (
-              <div className="flex items-center gap-2 text-gray-700 text-xs">
-                <Loader2 className="h-4 w-4 animate-spin" /> Henter status…
-              </div>
-            ) : (
-              <div className="grid gap-2">
-                {ordered.length === 0 ? (
-                  <div className="text-xs text-gray-700">
-                    Ingen job endnu. Start en synk for at se status.
-                  </div>
-                ) : (
-                  ordered.map((job) => (
-                    <div
-                      key={job.id}
-                      onClick={() => setSelectedJobId(job.id)}
-                      className={`rounded-lg ${selectedJob?.id === job.id ? 'ring-2 ring-indigo-400' : ''}`}
-                    >
-                      <JobCard job={job} onChange={refresh} />
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
+            {/* Jobs List */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-slate-900">Active Jobs</h3>
+              {ordered.length === 0 ? (
+                <div className="bg-white/60 rounded-2xl border border-slate-200 p-6 text-center text-slate-500 text-sm">
+                  No sync jobs running
+                </div>
+              ) : (
+                ordered.slice(0, 3).map((job) => (
+                  <SyncJobCard
+                    key={job.id}
+                    job={job}
+                    onChange={refresh}
+                    last={job.last}
+                  />
+                ))
+              )}
+            </div>
 
+            {/* Job Details */}
             {selectedJob && (
-              <div className="mt-2">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="text-xs font-semibold text-gray-900">
-                    Job log:{' '}
-                    {selectedJob.shopName || selectedJob.shopId.slice(0, 8)}
+              <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 p-4 shadow-lg">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-sm font-semibold text-slate-900">
+                    Job Details: {selectedJob.shopName || selectedJob.shopId.slice(0, 8)}
                   </div>
                   {(selectedJob.status === 'completed' ||
                     selectedJob.status === 'failed' ||
                     selectedJob.status === 'paused' ||
                     selectedJob.status === 'queued') && (
                     <button
-                      className="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-gray-300 hover:bg-gray-50 text-gray-900 text-xs"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 hover:text-red-800 transition-all duration-200 text-xs font-medium shadow-sm"
                       onClick={async () => {
                         const r = await removeSyncJob(selectedJob.id);
                         if (!('error' in r)) {
@@ -347,18 +399,18 @@ export default function SyncSidebar({
                         }
                       }}
                     >
-                      Fjern job
+                      Remove Job
                     </button>
                   )}
                 </div>
-                <div className="h-40 w-full bg-[#0b1020] text-[#d1e7ff] rounded-lg border border-[#1f2742] font-mono text-[11px] p-2 overflow-auto shadow-inner">
+                <div className="h-40 w-full bg-slate-900 text-blue-100 rounded-xl border border-slate-300 font-mono text-xs p-3 overflow-auto shadow-inner">
                   {(selectedJob.logs || []).slice(-400).map((line, idx) => (
-                    <div key={idx} className="whitespace-pre">
+                    <div key={idx} className="whitespace-pre-wrap break-words">
                       {line}
                     </div>
                   ))}
                   {(!selectedJob.logs || selectedJob.logs.length === 0) && (
-                    <div className="text-[#8aa4cf]">Ingen log endnu.</div>
+                    <div className="text-slate-400">No logs yet.</div>
                   )}
                 </div>
               </div>

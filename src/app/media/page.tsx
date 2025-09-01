@@ -107,17 +107,21 @@ export default function MediaPage() {
     <ProtectedClient>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Media Library</h1>
-          <p className="mt-2 text-gray-600">
-            Upload and manage files using MinIO object storage
-          </p>
+          <div className="bg-white rounded-2xl shadow-sm border border-blue-100/50 p-8">
+            <h1 className="text-3xl font-bold text-gray-900">Media Library</h1>
+            <p className="mt-2 text-gray-600">
+              Upload and manage files using MinIO object storage
+            </p>
+          </div>
         </div>
 
         <div className="mb-8">
-          <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+          <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-blue-200 border-dashed rounded-2xl cursor-pointer bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 transition-all duration-200">
             <div className="flex flex-col items-center justify-center pt-5 pb-6">
-              <Upload className="w-8 h-8 mb-4 text-gray-500" />
-              <p className="mb-2 text-sm text-gray-500">
+              <div className="p-4 bg-blue-100 rounded-2xl mb-4">
+                <Upload className="w-8 h-8 text-blue-600" />
+              </div>
+              <p className="mb-2 text-sm text-gray-700">
                 <span className="font-semibold">Click to upload</span> or drag
                 and drop
               </p>
@@ -132,40 +136,44 @@ export default function MediaPage() {
             />
           </label>
           {isUploading && (
-            <div className="mt-4 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-              <p className="mt-2 text-sm text-gray-500">Uploading...</p>
+            <div className="mt-6 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent mx-auto"></div>
+              <p className="mt-2 text-sm text-gray-600 font-medium">Uploading...</p>
             </div>
           )}
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-red-800">{error}</p>
+          <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-2xl">
+            <p className="text-red-800 font-medium">{error}</p>
           </div>
         )}
 
         {isLoading ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading files...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-600 border-t-transparent mx-auto"></div>
+            <p className="mt-4 text-gray-600 font-medium">Loading files...</p>
           </div>
         ) : files.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">📁</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No files uploaded
-            </h3>
-            <p className="text-gray-600">
-              Upload your first file to get started
-            </p>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-12">
+            <div className="text-center">
+              <div className="p-4 bg-gray-100 rounded-2xl w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+                <div className="text-4xl">📁</div>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No files uploaded
+              </h3>
+              <p className="text-gray-600">
+                Upload your first file to get started
+              </p>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {files.map((file) => (
               <div
                 key={file.id}
-                className="bg-white rounded-lg shadow-sm border overflow-hidden"
+                className="bg-white rounded-2xl shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-md transition-all duration-200"
               >
                 <div className="aspect-square bg-gray-100 relative">
                   {file.mimeType.startsWith('image/') ? (
@@ -180,14 +188,14 @@ export default function MediaPage() {
                     </div>
                   )}
 
-                  <div className="absolute top-2 right-2 flex space-x-1">
+                  <div className="absolute top-3 right-3 flex flex-col gap-1">
                     {file.isIndexed && (
-                      <span className="bg-green-500 text-white text-xs px-2 py-1 rounded">
+                      <span className="bg-emerald-500 text-white text-xs px-2 py-1 rounded-lg font-medium shadow-sm">
                         Indexed
                       </span>
                     )}
                     {file.isFeatured && (
-                      <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                      <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-lg font-medium shadow-sm">
                         Featured
                       </span>
                     )}
@@ -196,7 +204,7 @@ export default function MediaPage() {
 
                 <div className="p-4">
                   <h3
-                    className="font-medium text-gray-900 text-sm truncate"
+                    className="font-semibold text-gray-900 text-sm truncate"
                     title={file.originalFileName}
                   >
                     {file.originalFileName}
@@ -205,12 +213,12 @@ export default function MediaPage() {
                   <p className="text-xs text-gray-400 mt-1">{file.mimeType}</p>
 
                   <div className="flex items-center justify-between mt-4">
-                    <div className="flex space-x-2">
+                    <div className="flex gap-2">
                       <a
                         href={file.minioUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800"
+                        className="p-2 bg-blue-100 text-blue-600 hover:bg-blue-200 rounded-lg transition-colors"
                         title="View"
                       >
                         <Eye className="h-4 w-4" />
@@ -218,7 +226,7 @@ export default function MediaPage() {
                       <a
                         href={file.minioUrl}
                         download={file.fileName}
-                        className="text-green-600 hover:text-green-800"
+                        className="p-2 bg-emerald-100 text-emerald-600 hover:bg-emerald-200 rounded-lg transition-colors"
                         title="Download"
                       >
                         <Download className="h-4 w-4" />
@@ -226,7 +234,7 @@ export default function MediaPage() {
                     </div>
                     <button
                       onClick={() => handleDelete(file.id)}
-                      className="text-red-600 hover:text-red-800"
+                      className="p-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg transition-colors"
                       title="Delete"
                     >
                       <Trash2 className="h-4 w-4" />

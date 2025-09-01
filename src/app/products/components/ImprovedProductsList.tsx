@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ImprovedPagination, Pagination } from './ImprovedPagination';
+import SwipeCarousel from '@/components/ui/SwipeCarousel';
 import {
   Package,
   Edit,
@@ -26,6 +27,7 @@ interface Product {
   salePrice?: string;
   stockStatus?: string;
   featuredImage?: string;
+  images?: string[];
   updatedAt?: string;
   // Add other product properties as needed
 }
@@ -125,17 +127,29 @@ function ProductsListView({ products }: { products: Product[] }) {
 }
 
 function ProductGridCard({ product }: { product: Product }) {
+  // Prepare images array for carousel
+  const images = [];
+  if (product.featuredImage) {
+    images.push(product.featuredImage);
+  }
+  if (product.images) {
+    // Add other images, but avoid duplicating the featured image
+    const otherImages = product.images.filter(img => img !== product.featuredImage);
+    images.push(...otherImages);
+  }
+
   return (
     <div className="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-200 transition-all duration-300">
-      {/* Image */}
+      {/* Image Carousel */}
       <div className="aspect-square relative bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-        {product.featuredImage ? (
-          <Image
-            src={product.featuredImage}
+        {images.length > 0 ? (
+          <SwipeCarousel
+            images={images}
             alt={product.name}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            className="h-full"
+            aspect="square"
+            draggable={true}
+            priority={false}
           />
         ) : (
           <div className="flex items-center justify-center h-full">
@@ -143,27 +157,8 @@ function ProductGridCard({ product }: { product: Product }) {
           </div>
         )}
 
-        {/* Quick Actions Overlay */}
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2">
-          <Link
-            href={`/products/${product.id}`}
-            className="p-2 bg-white/90 rounded-lg hover:bg-white transition-colors"
-          >
-            <Eye className="h-4 w-4 text-gray-700" />
-          </Link>
-          <Link
-            href={`/products/${product.id}/edit`}
-            className="p-2 bg-white/90 rounded-lg hover:bg-white transition-colors"
-          >
-            <Edit className="h-4 w-4 text-gray-700" />
-          </Link>
-          <button className="p-2 bg-white/90 rounded-lg hover:bg-white transition-colors">
-            <MoreHorizontal className="h-4 w-4 text-gray-700" />
-          </button>
-        </div>
-
         {/* Status Badge */}
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-3 right-3 z-10">
           <StatusBadge status={product.status} />
         </div>
       </div>
@@ -206,6 +201,26 @@ function ProductGridCard({ product }: { product: Product }) {
               {new Date(product.updatedAt).toLocaleDateString()}
             </p>
           )}
+        </div>
+
+        {/* Quick Actions */}
+        <div className="flex items-center gap-2 pt-2">
+          <Link
+            href={`/products/${product.id}`}
+            className="flex-1 px-3 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm rounded-lg hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 flex items-center justify-center gap-2"
+          >
+            <Eye className="h-4 w-4" />
+            View
+          </Link>
+          <Link
+            href={`/products/${product.id}/edit`}
+            className="px-3 py-2 bg-white border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors flex items-center justify-center"
+          >
+            <Edit className="h-4 w-4" />
+          </Link>
+          <button className="px-3 py-2 bg-white border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors flex items-center justify-center">
+            <MoreHorizontal className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </div>

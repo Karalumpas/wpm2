@@ -598,7 +598,7 @@ export default function ShopBuilderClient() {
   // Floating windows rendering
   if (floatMode) {
     return (
-      <div className="relative h-[calc(100vh-4rem)]">
+      <div className="relative h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
         <div
           className="absolute inset-0 overflow-hidden"
           onPointerDown={onBackgroundPointerDown}
@@ -636,7 +636,7 @@ export default function ShopBuilderClient() {
               transformOrigin: '0 0',
               width: '4000px',
               height: '3000px',
-              backgroundImage: 'radial-gradient(#e5e7eb 1px, transparent 1px)',
+              backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)',
               backgroundSize: '24px 24px',
             }}
           >
@@ -651,33 +651,33 @@ export default function ShopBuilderClient() {
                     onClose={() => setShowBuilder(false)}
                     scale={scale}
                   >
-                    <div className="mb-3 flex items-center gap-2">
+                    <div className="mb-4 flex items-center gap-2">
                       <button
-                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'structure' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border transition-all duration-200 ${activeTab === 'structure' ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-transparent shadow-md' : 'hover:bg-slate-50 border-slate-200 text-slate-700'}`}
                         onClick={() => setActiveTab('structure')}
                       >
                         <Folder className="h-4 w-4" /> Structure
                       </button>
                       <button
-                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'collections' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border transition-all duration-200 ${activeTab === 'collections' ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-transparent shadow-md' : 'hover:bg-slate-50 border-slate-200 text-slate-700'}`}
                         onClick={() => setActiveTab('collections')}
                       >
                         <ListChecks className="h-4 w-4" /> Collections
                       </button>
                       <button
-                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'layout' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border transition-all duration-200 ${activeTab === 'layout' ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-transparent shadow-md' : 'hover:bg-slate-50 border-slate-200 text-slate-700'}`}
                         onClick={() => setActiveTab('layout')}
                       >
                         <Layout className="h-4 w-4" /> Layout
                       </button>
                       <button
-                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'feeds' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border transition-all duration-200 ${activeTab === 'feeds' ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-transparent shadow-md' : 'hover:bg-slate-50 border-slate-200 text-slate-700'}`}
                         onClick={() => setActiveTab('feeds')}
                       >
                         <Layers className="h-4 w-4" /> Feeds
                       </button>
                       <button
-                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md border ${activeTab === 'bulk' ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'}`}
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border transition-all duration-200 ${activeTab === 'bulk' ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-transparent shadow-md' : 'hover:bg-slate-50 border-slate-200 text-slate-700'}`}
                         onClick={() => setActiveTab('bulk')}
                       >
                         <SlidersHorizontal className="h-4 w-4" /> Bulk
@@ -701,24 +701,24 @@ export default function ShopBuilderClient() {
                         Central Catalog
                       </div>
                       <button
-                        className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-gray-50"
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 transition-all duration-200 text-xs font-medium shadow-sm"
                         onClick={() => reloadProducts()}
                       >
                         Refresh
                       </button>
                     </div>
-                    <div className="flex items-center gap-2 mb-3">
+                    <div className="flex items-center gap-3 mb-4">
                       <div className="relative flex-1">
-                        <Search className="h-4 w-4 absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input
-                          className="pl-7 pr-2 py-2 border rounded-md text-sm w-full"
-                          placeholder="Search products."
+                          className="pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white hover:border-slate-300"
+                          placeholder="Search products..."
                           value={query}
                           onChange={(e) => setQuery(e.target.value)}
                         />
                       </div>
                       <select
-                        className="px-2 py-2 border rounded-md text-sm"
+                        className="px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white hover:border-slate-300 min-w-40"
                         value={shopId}
                         onChange={(e) => setShopId(e.target.value)}
                       >
@@ -734,11 +734,11 @@ export default function ShopBuilderClient() {
                       {products.map((p) => (
                         <div
                           key={p.id}
-                          className="border rounded-md p-2 hover:bg-gray-50 flex items-center gap-2"
+                          className="border border-slate-200 rounded-2xl p-4 hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 flex items-center gap-3 group shadow-sm hover:shadow-md"
                           draggable
                           onDragStart={(e) => onDragStartProduct(e, p.id)}
                         >
-                          <div className="h-8 w-8 rounded bg-gray-200 overflow-hidden flex items-center justify-center">
+                          <div className="h-12 w-12 rounded-xl bg-slate-100 overflow-hidden flex items-center justify-center shadow-sm">
                             <Package className="h-4 w-4 text-gray-600" />
                           </div>
                           <div className="min-w-0">
@@ -750,7 +750,7 @@ export default function ShopBuilderClient() {
                             </div>
                           </div>
                           <button
-                            className="ml-auto text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                            className="ml-auto px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 text-xs font-medium shadow-sm"
                             onClick={() =>
                               setSelectedProducts((sp) =>
                                 sp.includes(p.id) ? sp : [...sp, p.id]
@@ -792,10 +792,10 @@ export default function ShopBuilderClient() {
           </div>
         </div>
 
-        <div className="absolute top-2 left-2 z-50 flex gap-2">
+        <div className="absolute top-4 left-4 z-50 flex gap-3">
           {!showBuilder && (
             <button
-              className="text-xs px-2 py-1 rounded border bg-white hover:bg-gray-50"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 shadow-md text-sm font-medium"
               onClick={() => setShowBuilder(true)}
             >
               Open Builder
@@ -803,14 +803,14 @@ export default function ShopBuilderClient() {
           )}
           {!showCatalog && (
             <button
-              className="text-xs px-2 py-1 rounded border bg-white hover:bg-gray-50"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 shadow-md text-sm font-medium"
               onClick={() => setShowCatalog(true)}
             >
               Open Catalog
             </button>
           )}
           <button
-            className="text-xs px-2 py-1 rounded border bg-white hover:bg-gray-50"
+            className="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 transition-all duration-200 text-sm font-medium shadow-md"
             title="Toggle whether windows scale with canvas"
           ></button>
         </div>
@@ -856,15 +856,15 @@ export default function ShopBuilderClient() {
               </button>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-3 flex items-center gap-3">
+            <div className="bg-white/90 backdrop-blur-md border border-slate-200 rounded-2xl p-4 flex items-center gap-4 shadow-lg">
               <input
-                className="flex-1 border rounded px-2 py-2 text-sm"
+                className="flex-1 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white hover:border-slate-300"
                 value={builderName}
                 onChange={(e) => setBuilderName(e.target.value)}
                 placeholder="Webshop name"
               />
               <select
-                className="border rounded px-2 py-2 text-sm"
+                className="border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white hover:border-slate-300 min-w-48"
                 value={activeBuildId || ''}
                 onChange={(e) =>
                   e.target.value ? loadBuild(e.target.value) : null
@@ -878,13 +878,13 @@ export default function ShopBuilderClient() {
                 ))}
               </select>
               <button
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-md border hover:bg-gray-50"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 transition-all duration-200 shadow-sm font-medium"
                 onClick={saveBuild}
               >
                 Save
               </button>
               <button
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-indigo-600 text-white shadow hover:brightness-110"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 shadow-md font-medium"
                 onClick={exportConfig}
               >
                 <Download className="h-4 w-4" /> Export
@@ -929,20 +929,20 @@ export default function ShopBuilderClient() {
                         </div>
                         <div className="flex items-center gap-2">
                           <button
-                            className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                            className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 transition-all duration-200 text-xs font-medium shadow-sm"
                             onClick={() => renameCategory(c.id)}
                           >
                             Rename
                           </button>
                           <button
-                            className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
+                            className="px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 hover:text-red-800 transition-all duration-200 text-xs font-medium shadow-sm"
                             onClick={() => deleteCategory(c.id)}
                           >
                             Delete
                           </button>
                         </div>
                       </div>
-                      <div className="min-h-[120px] rounded border border-dashed border-gray-300 p-2">
+                      <div className="min-h-32 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/50 p-3 transition-colors hover:border-slate-400 hover:bg-slate-100/50">
                         {c.productIds.length === 0 && (
                           <div className="text-xs text-gray-600">
                             Drop products here.
@@ -989,16 +989,16 @@ export default function ShopBuilderClient() {
             )}
 
             {activeTab === 'layout' && (
-              <div className="bg-white border border-gray-200 rounded-lg p-3 mt-3">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div className="border rounded p-2">
-                    <div className="text-xs font-semibold text-gray-900 mb-1">
+              <div className="bg-white/90 backdrop-blur-md border border-slate-200 rounded-2xl p-4 mt-4 shadow-lg">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="border border-slate-200 rounded-xl p-4 bg-slate-50/50">
+                    <div className="text-sm font-semibold text-slate-900 mb-3">
                       Palette
                     </div>
                     {(['hero', 'grid', 'carousel'] as const).map((t) => (
                       <div
                         key={t}
-                        className="border rounded p-2 mb-1 bg-gray-50"
+                        className="border border-slate-200 rounded-xl p-3 mb-2 bg-white hover:bg-slate-50 transition-all duration-200 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md"
                         draggable
                         onDragStart={(e) => onPaletteDragStart(e, t)}
                       >
@@ -1007,7 +1007,7 @@ export default function ShopBuilderClient() {
                     ))}
                   </div>
                   <div
-                    className="md:col-span-2 border rounded p-2 min-h-[200px]"
+                    className="md:col-span-2 border-2 border-dashed border-slate-300 rounded-xl p-4 min-h-52 bg-slate-50/30 hover:border-slate-400 transition-colors"
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => onCanvasDrop(e)}
                   >

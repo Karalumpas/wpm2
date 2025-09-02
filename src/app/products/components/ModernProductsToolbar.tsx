@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Search,
   Filter,
@@ -90,12 +90,31 @@ export function ModernProductsToolbar({
   const [searchValue, setSearchValue] = useState(params.search || '');
   const [showFilters, setShowFilters] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
+  const filtersRef = useRef<HTMLDivElement>(null);
+  const sortMenuRef = useRef<HTMLDivElement>(null);
 
   // Filter options state
   const [brands, setBrands] = useState<FilterOption[]>([]);
   const [categories, setCategories] = useState<FilterOption[]>([]);
   const [shops, setShops] = useState<FilterOption[]>([]);
   const [filtersLoading, setFiltersLoading] = useState(false);
+
+  // Click outside handler
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (filtersRef.current && !filtersRef.current.contains(event.target as Node)) {
+        setShowFilters(false);
+      }
+      if (sortMenuRef.current && !sortMenuRef.current.contains(event.target as Node)) {
+        setShowSortMenu(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Load filter options
   useEffect(() => {
@@ -203,7 +222,7 @@ export function ModernProductsToolbar({
   ].filter(Boolean).length;
 
   return (
-    <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+    <div className="bg-white border-b border-gray-200 sticky top-0 z-10" ref={filtersRef}>
       {/* Main Toolbar */}
       <div className="px-6 py-4">
         <div className="flex items-center justify-between gap-4">
@@ -245,6 +264,17 @@ export function ModernProductsToolbar({
                   {activeFiltersCount}
                 </span>
               )}
+              {showFilters && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowFilters(false);
+                  }}
+                  className="ml-1 hover:bg-blue-100 rounded-full p-0.5"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
             </button>
 
             {/* Quick Filters */}
@@ -280,7 +310,7 @@ export function ModernProductsToolbar({
             </div>
 
             {/* Sort Dropdown */}
-            <div className="relative">
+            <div className="relative" ref={sortMenuRef}>
               <button
                 onClick={() => setShowSortMenu(!showSortMenu)}
                 className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all"
@@ -358,6 +388,15 @@ export function ModernProductsToolbar({
       {/* Expanded Filters Panel */}
       {showFilters && (
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-gray-900">Advanced Filters</h3>
+            <button
+              onClick={() => setShowFilters(false)}
+              className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-200"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Status Filter */}
             <div>
@@ -482,13 +521,11 @@ export function ModernProductsToolbar({
         </div>
       )}
 
-      {/* Click outside to close dropdowns */}
-      {(showSortMenu || showFilters) && (
+      {/* Click outside to close sort menu only */}
+      {showSortMenu && (
         <div
           className="fixed inset-0 z-0"
-          onClick={() => {
-            setShowSortMenu(false);
-          }}
+          onClick={() => setShowSortMenu(false)}
         />
       )}
     </div>

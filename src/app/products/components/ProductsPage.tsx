@@ -129,26 +129,32 @@ export function ProductsPage({ initialParams }: ProductsPageProps) {
 
       {/* Debug info in development */}
       {process.env.NODE_ENV === 'development' && (
-        <div className="p-4 bg-gray-50 rounded-lg text-sm text-gray-600">
-          <strong>Debug:</strong> Page {stableParams.page}, Search: &quot;
-          {stableParams.search || 'none'}&quot;, View: {stableParams.viewMode}
+        <div className="px-6">
+          <div className="p-4 bg-gray-50 rounded-lg text-sm text-gray-600">
+            <strong>Debug:</strong> Page {stableParams.page}, Search: &quot;
+            {stableParams.search || 'none'}&quot;, View: {stableParams.viewMode}
+          </div>
         </div>
       )}
 
-      {/* Products List */}
-      <ModernProductsList
-        products={data?.products || []}
-        params={stableParams}
-        isLoading={isLoading}
-        isValidating={isValidating}
-      />
-
-      {/* Pagination */}
-      {data?.pagination && data.pagination.totalPages > 1 && (
-        <ModernPagination
-          pagination={data.pagination}
-          onPageChange={handlePageChange}
+      {/* Products List with Padding */}
+      <div className="px-6">
+        <ModernProductsList
+          products={data?.products || []}
+          params={stableParams}
+          isLoading={isLoading}
+          isValidating={isValidating}
         />
+      </div>
+
+      {/* Pagination with Padding */}
+      {data?.pagination && data.pagination.totalPages > 1 && (
+        <div className="px-6">
+          <ModernPagination
+            pagination={data.pagination}
+            onPageChange={handlePageChange}
+          />
+        </div>
       )}
 
       {/* Floating Actions */}

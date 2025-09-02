@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { 
-  Settings, 
-  Code, 
-  Database, 
-  Key, 
+import {
+  Settings,
+  Code,
+  Database,
+  Key,
   Download,
   Upload,
   Trash2,
@@ -13,7 +13,7 @@ import {
   Copy,
   Eye,
   EyeOff,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 
 type AdvancedClientProps = {
@@ -26,7 +26,9 @@ type AdvancedClientProps = {
 export default function AdvancedClient({ user }: AdvancedClientProps) {
   const [apiKey, setApiKey] = useState('wpm_sk_1234567890abcdef...');
   const [showApiKey, setShowApiKey] = useState(false);
-  const [webhookUrl, setWebhookUrl] = useState('https://myapp.com/webhooks/wpm');
+  const [webhookUrl, setWebhookUrl] = useState(
+    'https://myapp.com/webhooks/wpm'
+  );
   const [debugMode, setDebugMode] = useState(false);
   const [exportFormat, setExportFormat] = useState('json');
 
@@ -45,7 +47,11 @@ export default function AdvancedClient({ user }: AdvancedClientProps) {
   };
 
   const handleDeleteAccount = () => {
-    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+    if (
+      confirm(
+        'Are you sure you want to delete your account? This action cannot be undone.'
+      )
+    ) {
       console.log('Deleting account...');
     }
   };
@@ -58,8 +64,12 @@ export default function AdvancedClient({ user }: AdvancedClientProps) {
           <Settings className="h-6 w-6 text-gray-600" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Advanced Settings</h2>
-          <p className="text-sm text-gray-600">Developer tools and advanced configurations</p>
+          <h2 className="text-xl font-semibold text-gray-900">
+            Advanced Settings
+          </h2>
+          <p className="text-sm text-gray-600">
+            Developer tools and advanced configurations
+          </p>
         </div>
       </div>
 
@@ -69,7 +79,7 @@ export default function AdvancedClient({ user }: AdvancedClientProps) {
           <Code className="h-5 w-5 text-blue-600" />
           API Access
         </h3>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -87,7 +97,11 @@ export default function AdvancedClient({ user }: AdvancedClientProps) {
                   onClick={() => setShowApiKey(!showApiKey)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showApiKey ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </div>
               <button
@@ -130,7 +144,7 @@ export default function AdvancedClient({ user }: AdvancedClientProps) {
           <Key className="h-5 w-5 text-green-600" />
           Webhooks
         </h3>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -189,7 +203,7 @@ export default function AdvancedClient({ user }: AdvancedClientProps) {
           <Database className="h-5 w-5 text-purple-600" />
           Data Management
         </h3>
-        
+
         <div className="space-y-6">
           {/* Export Data */}
           <div>
@@ -225,7 +239,9 @@ export default function AdvancedClient({ user }: AdvancedClientProps) {
             </p>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
               <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm text-gray-600 mb-2">Drop files here or click to upload</p>
+              <p className="text-sm text-gray-600 mb-2">
+                Drop files here or click to upload
+              </p>
               <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
                 Choose Files
               </button>
@@ -234,7 +250,9 @@ export default function AdvancedClient({ user }: AdvancedClientProps) {
 
           {/* Database Operations */}
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">Database Operations</h4>
+            <h4 className="font-medium text-gray-900 mb-2">
+              Database Operations
+            </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
                 Optimize Database
@@ -252,13 +270,17 @@ export default function AdvancedClient({ user }: AdvancedClientProps) {
 
       {/* Developer Settings */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Developer Settings</h3>
-        
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Developer Settings
+        </h3>
+
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">Debug Mode</h4>
-              <p className="text-sm text-gray-600">Enable detailed logging and error reporting</p>
+              <p className="text-sm text-gray-600">
+                Enable detailed logging and error reporting
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -274,7 +296,9 @@ export default function AdvancedClient({ user }: AdvancedClientProps) {
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">Beta Features</h4>
-              <p className="text-sm text-gray-600">Access experimental features before public release</p>
+              <p className="text-sm text-gray-600">
+                Access experimental features before public release
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" className="sr-only peer" />
@@ -285,7 +309,9 @@ export default function AdvancedClient({ user }: AdvancedClientProps) {
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">Analytics Tracking</h4>
-              <p className="text-sm text-gray-600">Help improve the app by sharing usage data</p>
+              <p className="text-sm text-gray-600">
+                Help improve the app by sharing usage data
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" defaultChecked className="sr-only peer" />
@@ -297,15 +323,19 @@ export default function AdvancedClient({ user }: AdvancedClientProps) {
 
       {/* System Information */}
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">System Information</h3>
-        
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          System Information
+        </h3>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h4 className="font-medium text-gray-700 mb-3">Account Details</h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">User ID:</span>
-                <span className="font-mono text-gray-900">{user.id || 'user_123456'}</span>
+                <span className="font-mono text-gray-900">
+                  {user.id || 'user_123456'}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Created:</span>
@@ -317,7 +347,7 @@ export default function AdvancedClient({ user }: AdvancedClientProps) {
               </div>
             </div>
           </div>
-          
+
           <div>
             <h4 className="font-medium text-gray-700 mb-3">Application</h4>
             <div className="space-y-2 text-sm">
@@ -344,13 +374,14 @@ export default function AdvancedClient({ user }: AdvancedClientProps) {
           <AlertTriangle className="h-5 w-5 text-red-600" />
           Danger Zone
         </h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-red-900">Delete Account</h4>
               <p className="text-sm text-red-700">
-                Permanently delete your account and all associated data. This action cannot be undone.
+                Permanently delete your account and all associated data. This
+                action cannot be undone.
               </p>
             </div>
             <button

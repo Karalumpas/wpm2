@@ -1,16 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { 
-  CreditCard, 
-  Download, 
-  Calendar, 
+import {
+  CreditCard,
+  Download,
+  Calendar,
   DollarSign,
   TrendingUp,
   AlertCircle,
   Check,
   X,
-  ExternalLink
+  ExternalLink,
 } from 'lucide-react';
 
 type BillingClientProps = {
@@ -82,7 +82,8 @@ export default function BillingClient({ user }: BillingClientProps) {
     expiryYear: 2025,
   });
 
-  const usagePercentage = (usage.currentMonth.aiRequests / usage.currentMonth.limit) * 100;
+  const usagePercentage =
+    (usage.currentMonth.aiRequests / usage.currentMonth.limit) * 100;
 
   return (
     <div className="p-6 space-y-6">
@@ -92,8 +93,12 @@ export default function BillingClient({ user }: BillingClientProps) {
           <CreditCard className="h-6 w-6 text-green-600" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Billing & Usage</h2>
-          <p className="text-sm text-gray-600">Manage your subscription and monitor usage</p>
+          <h2 className="text-xl font-semibold text-gray-900">
+            Billing & Usage
+          </h2>
+          <p className="text-sm text-gray-600">
+            Manage your subscription and monitor usage
+          </p>
         </div>
       </div>
 
@@ -105,10 +110,12 @@ export default function BillingClient({ user }: BillingClientProps) {
             Upgrade Plan
           </button>
         </div>
-        
+
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h4 className="text-xl font-semibold text-gray-900">{currentPlan.name}</h4>
+            <h4 className="text-xl font-semibold text-gray-900">
+              {currentPlan.name}
+            </h4>
             <p className="text-gray-600">
               ${currentPlan.price}/{currentPlan.billing}
             </p>
@@ -140,30 +147,47 @@ export default function BillingClient({ user }: BillingClientProps) {
 
       {/* Usage This Month */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-6">Current Month Usage</h3>
-        
+        <h3 className="text-lg font-medium text-gray-900 mb-6">
+          Current Month Usage
+        </h3>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{usage.currentMonth.aiRequests.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-blue-600">
+              {usage.currentMonth.aiRequests.toLocaleString()}
+            </div>
             <div className="text-sm text-gray-600">AI Requests</div>
             <div className="text-xs text-gray-500 mt-1">
               of {usage.currentMonth.limit.toLocaleString()} limit
             </div>
           </div>
-          
+
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">${usage.currentMonth.cost.toFixed(2)}</div>
+            <div className="text-2xl font-bold text-green-600">
+              ${usage.currentMonth.cost.toFixed(2)}
+            </div>
             <div className="text-sm text-gray-600">Current Cost</div>
             <div className="text-xs text-gray-500 mt-1">
-              +{(((usage.currentMonth.cost - usage.lastMonth.cost) / usage.lastMonth.cost) * 100).toFixed(1)}% from last month
+              +
+              {(
+                ((usage.currentMonth.cost - usage.lastMonth.cost) /
+                  usage.lastMonth.cost) *
+                100
+              ).toFixed(1)}
+              % from last month
             </div>
           </div>
-          
+
           <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">{usagePercentage.toFixed(1)}%</div>
+            <div className="text-2xl font-bold text-purple-600">
+              {usagePercentage.toFixed(1)}%
+            </div>
             <div className="text-sm text-gray-600">Plan Usage</div>
             <div className="text-xs text-gray-500 mt-1">
-              {(usage.currentMonth.limit - usage.currentMonth.aiRequests).toLocaleString()} remaining
+              {(
+                usage.currentMonth.limit - usage.currentMonth.aiRequests
+              ).toLocaleString()}{' '}
+              remaining
             </div>
           </div>
         </div>
@@ -171,14 +195,21 @@ export default function BillingClient({ user }: BillingClientProps) {
         {/* Usage Bar */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">AI Request Usage</span>
-            <span className="text-sm text-gray-600">{usagePercentage.toFixed(1)}%</span>
+            <span className="text-sm font-medium text-gray-700">
+              AI Request Usage
+            </span>
+            <span className="text-sm text-gray-600">
+              {usagePercentage.toFixed(1)}%
+            </span>
           </div>
           <div className="bg-gray-200 rounded-full h-3">
             <div
               className={`h-3 rounded-full transition-all duration-300 ${
-                usagePercentage > 90 ? 'bg-red-500' :
-                usagePercentage > 75 ? 'bg-yellow-500' : 'bg-blue-500'
+                usagePercentage > 90
+                  ? 'bg-red-500'
+                  : usagePercentage > 75
+                    ? 'bg-yellow-500'
+                    : 'bg-blue-500'
               }`}
               style={{ width: `${Math.min(usagePercentage, 100)}%` }}
             />
@@ -190,7 +221,8 @@ export default function BillingClient({ user }: BillingClientProps) {
             <div className="flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-amber-600" />
               <span className="text-sm text-amber-800">
-                You're approaching your monthly limit. Consider upgrading your plan.
+                You&apos;re approaching your monthly limit. Consider upgrading
+                your plan.
               </span>
             </div>
           </div>
@@ -205,7 +237,7 @@ export default function BillingClient({ user }: BillingClientProps) {
             Update
           </button>
         </div>
-        
+
         <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
           <div className="w-12 h-8 bg-blue-600 rounded flex items-center justify-center">
             <CreditCard className="h-4 w-4 text-white" />
@@ -215,7 +247,8 @@ export default function BillingClient({ user }: BillingClientProps) {
               {paymentMethod.brand} ending in {paymentMethod.last4}
             </div>
             <div className="text-sm text-gray-600">
-              Expires {paymentMethod.expiryMonth.toString().padStart(2, '0')}/{paymentMethod.expiryYear}
+              Expires {paymentMethod.expiryMonth.toString().padStart(2, '0')}/
+              {paymentMethod.expiryYear}
             </div>
           </div>
           <div className="text-green-600">
@@ -233,10 +266,13 @@ export default function BillingClient({ user }: BillingClientProps) {
             Download All
           </button>
         </div>
-        
+
         <div className="space-y-4">
           {invoices.map((invoice) => (
-            <div key={invoice.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+            <div
+              key={invoice.id}
+              className="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
+            >
               <div className="flex items-center gap-4">
                 <div className="p-2 bg-gray-100 rounded-lg">
                   <Calendar className="h-4 w-4 text-gray-600" />
@@ -244,22 +280,31 @@ export default function BillingClient({ user }: BillingClientProps) {
                 <div>
                   <div className="font-medium text-gray-900">{invoice.id}</div>
                   <div className="text-sm text-gray-600">
-                    {new Date(invoice.date).toLocaleDateString()} • {invoice.description}
+                    {new Date(invoice.date).toLocaleDateString()} •{' '}
+                    {invoice.description}
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-4">
                 <div className="text-right">
-                  <div className="font-medium text-gray-900">${invoice.amount.toFixed(2)}</div>
-                  <div className={`text-sm ${
-                    invoice.status === 'paid' ? 'text-green-600' :
-                    invoice.status === 'pending' ? 'text-yellow-600' : 'text-red-600'
-                  }`}>
-                    {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                  <div className="font-medium text-gray-900">
+                    ${invoice.amount.toFixed(2)}
+                  </div>
+                  <div
+                    className={`text-sm ${
+                      invoice.status === 'paid'
+                        ? 'text-green-600'
+                        : invoice.status === 'pending'
+                          ? 'text-yellow-600'
+                          : 'text-red-600'
+                    }`}
+                  >
+                    {invoice.status.charAt(0).toUpperCase() +
+                      invoice.status.slice(1)}
                   </div>
                 </div>
-                
+
                 {invoice.downloadUrl && (
                   <button className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100">
                     <Download className="h-4 w-4" />
@@ -277,20 +322,20 @@ export default function BillingClient({ user }: BillingClientProps) {
           <TrendingUp className="h-5 w-5 text-blue-600" />
           Usage Insights
         </h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600">+39%</div>
             <div className="text-sm text-gray-600">Usage growth</div>
             <div className="text-xs text-gray-500 mt-1">vs last month</div>
           </div>
-          
+
           <div className="text-center">
             <div className="text-2xl font-bold text-green-600">$0.019</div>
             <div className="text-sm text-gray-600">Avg cost per request</div>
             <div className="text-xs text-gray-500 mt-1">-12% optimization</div>
           </div>
-          
+
           <div className="text-center">
             <div className="text-2xl font-bold text-purple-600">14:30</div>
             <div className="text-sm text-gray-600">Peak usage time</div>
@@ -301,13 +346,17 @@ export default function BillingClient({ user }: BillingClientProps) {
 
       {/* Cost Management */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Cost Management</h3>
-        
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Cost Management
+        </h3>
+
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">Usage Alerts</h4>
-              <p className="text-sm text-gray-600">Get notified when approaching limits</p>
+              <p className="text-sm text-gray-600">
+                Get notified when approaching limits
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" defaultChecked className="sr-only peer" />
@@ -318,7 +367,9 @@ export default function BillingClient({ user }: BillingClientProps) {
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">Auto-billing</h4>
-              <p className="text-sm text-gray-600">Automatically pay invoices</p>
+              <p className="text-sm text-gray-600">
+                Automatically pay invoices
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" defaultChecked className="sr-only peer" />

@@ -1,19 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import { 
-  Shield, 
-  Key, 
-  Smartphone, 
-  Eye, 
-  EyeOff, 
-  Check, 
+import {
+  Shield,
+  Key,
+  Smartphone,
+  Eye,
+  EyeOff,
+  Check,
   X,
   AlertTriangle,
   Clock,
   Globe,
   Monitor,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 
 type SecurityClientProps = {
@@ -88,9 +88,9 @@ export default function SecurityClient({ user }: SecurityClientProps) {
   };
 
   const togglePasswordVisibility = (field: keyof typeof showPasswords) => {
-    setShowPasswords(prev => ({
+    setShowPasswords((prev) => ({
       ...prev,
-      [field]: !prev[field]
+      [field]: !prev[field],
     }));
   };
 
@@ -111,7 +111,7 @@ export default function SecurityClient({ user }: SecurityClientProps) {
     'bg-orange-500',
     'bg-yellow-500',
     'bg-blue-500',
-    'bg-green-500'
+    'bg-green-500',
   ];
 
   return (
@@ -122,8 +122,12 @@ export default function SecurityClient({ user }: SecurityClientProps) {
           <Shield className="h-6 w-6 text-red-600" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Security Settings</h2>
-          <p className="text-sm text-gray-600">Manage your account security and privacy</p>
+          <h2 className="text-xl font-semibold text-gray-900">
+            Security Settings
+          </h2>
+          <p className="text-sm text-gray-600">
+            Manage your account security and privacy
+          </p>
         </div>
       </div>
 
@@ -133,7 +137,7 @@ export default function SecurityClient({ user }: SecurityClientProps) {
           <Key className="h-5 w-5 text-gray-600" />
           Change Password
         </h3>
-        
+
         <form onSubmit={handlePasswordChange} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -143,7 +147,12 @@ export default function SecurityClient({ user }: SecurityClientProps) {
               <input
                 type={showPasswords.current ? 'text' : 'password'}
                 value={passwordForm.currentPassword}
-                onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                onChange={(e) =>
+                  setPasswordForm({
+                    ...passwordForm,
+                    currentPassword: e.target.value,
+                  })
+                }
                 className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 required
               />
@@ -152,7 +161,11 @@ export default function SecurityClient({ user }: SecurityClientProps) {
                 onClick={() => togglePasswordVisibility('current')}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                {showPasswords.current ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showPasswords.current ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
               </button>
             </div>
           </div>
@@ -165,7 +178,12 @@ export default function SecurityClient({ user }: SecurityClientProps) {
               <input
                 type={showPasswords.new ? 'text' : 'password'}
                 value={passwordForm.newPassword}
-                onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                onChange={(e) =>
+                  setPasswordForm({
+                    ...passwordForm,
+                    newPassword: e.target.value,
+                  })
+                }
                 className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 required
               />
@@ -174,19 +192,30 @@ export default function SecurityClient({ user }: SecurityClientProps) {
                 onClick={() => togglePasswordVisibility('new')}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showPasswords.new ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
               </button>
             </div>
-            
+
             {/* Password Strength Indicator */}
             {passwordForm.newPassword && (
               <div className="mt-2">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs text-gray-600">Password strength:</span>
-                  <span className={`text-xs font-medium ${
-                    passwordStrength >= 3 ? 'text-green-600' : 
-                    passwordStrength >= 2 ? 'text-yellow-600' : 'text-red-600'
-                  }`}>
+                  <span className="text-xs text-gray-600">
+                    Password strength:
+                  </span>
+                  <span
+                    className={`text-xs font-medium ${
+                      passwordStrength >= 3
+                        ? 'text-green-600'
+                        : passwordStrength >= 2
+                          ? 'text-yellow-600'
+                          : 'text-red-600'
+                    }`}
+                  >
                     {strengthLabels[passwordStrength - 1] || 'Very Weak'}
                   </span>
                 </div>
@@ -195,8 +224,8 @@ export default function SecurityClient({ user }: SecurityClientProps) {
                     <div
                       key={index}
                       className={`h-1 flex-1 rounded-full ${
-                        index < passwordStrength 
-                          ? strengthColors[passwordStrength - 1] 
+                        index < passwordStrength
+                          ? strengthColors[passwordStrength - 1]
                           : 'bg-gray-200'
                       }`}
                     />
@@ -214,7 +243,12 @@ export default function SecurityClient({ user }: SecurityClientProps) {
               <input
                 type={showPasswords.confirm ? 'text' : 'password'}
                 value={passwordForm.confirmPassword}
-                onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                onChange={(e) =>
+                  setPasswordForm({
+                    ...passwordForm,
+                    confirmPassword: e.target.value,
+                  })
+                }
                 className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 required
               />
@@ -223,22 +257,30 @@ export default function SecurityClient({ user }: SecurityClientProps) {
                 onClick={() => togglePasswordVisibility('confirm')}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                {showPasswords.confirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showPasswords.confirm ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
               </button>
             </div>
-            
+
             {/* Password Match Indicator */}
             {passwordForm.confirmPassword && (
               <div className="mt-1 flex items-center gap-1">
                 {passwordForm.newPassword === passwordForm.confirmPassword ? (
                   <>
                     <Check className="h-3 w-3 text-green-500" />
-                    <span className="text-xs text-green-600">Passwords match</span>
+                    <span className="text-xs text-green-600">
+                      Passwords match
+                    </span>
                   </>
                 ) : (
                   <>
                     <X className="h-3 w-3 text-red-500" />
-                    <span className="text-xs text-red-600">Passwords do not match</span>
+                    <span className="text-xs text-red-600">
+                      Passwords do not match
+                    </span>
                   </>
                 )}
               </div>
@@ -266,16 +308,18 @@ export default function SecurityClient({ user }: SecurityClientProps) {
               Add an extra layer of security to your account
             </p>
           </div>
-          
+
           <div className="flex items-center gap-3">
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-              twoFactorEnabled 
-                ? 'bg-green-100 text-green-800' 
-                : 'bg-gray-100 text-gray-800'
-            }`}>
+            <span
+              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                twoFactorEnabled
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-gray-100 text-gray-800'
+              }`}
+            >
               {twoFactorEnabled ? 'Enabled' : 'Disabled'}
             </span>
-            
+
             <label className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
@@ -295,19 +339,23 @@ export default function SecurityClient({ user }: SecurityClientProps) {
 
         {twoFactorEnabled && showQRCode && (
           <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-            <h4 className="font-medium text-blue-900 mb-2">Setup Instructions</h4>
+            <h4 className="font-medium text-blue-900 mb-2">
+              Setup Instructions
+            </h4>
             <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
-              <li>Install an authenticator app (Google Authenticator, Authy, etc.)</li>
+              <li>
+                Install an authenticator app (Google Authenticator, Authy, etc.)
+              </li>
               <li>Scan the QR code below with your app</li>
               <li>Enter the 6-digit code to verify setup</li>
             </ol>
-            
+
             <div className="mt-4 flex justify-center">
               <div className="w-32 h-32 bg-white border-2 border-blue-300 rounded-lg flex items-center justify-center">
                 <span className="text-blue-600 text-xs">QR Code</span>
               </div>
             </div>
-            
+
             <div className="mt-4">
               <label className="block text-sm font-medium text-blue-900 mb-1">
                 Enter verification code
@@ -333,25 +381,29 @@ export default function SecurityClient({ user }: SecurityClientProps) {
           <Monitor className="h-5 w-5 text-gray-600" />
           Active Sessions
         </h3>
-        
+
         <div className="space-y-4">
           {loginSessions.map((session) => (
             <div
               key={session.id}
               className={`border rounded-lg p-4 ${
-                session.isCurrent 
-                  ? 'border-green-200 bg-green-50' 
+                session.isCurrent
+                  ? 'border-green-200 bg-green-50'
                   : 'border-gray-200 bg-gray-50'
               }`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-start gap-3">
-                  <Monitor className={`h-5 w-5 mt-0.5 ${
-                    session.isCurrent ? 'text-green-600' : 'text-gray-400'
-                  }`} />
+                  <Monitor
+                    className={`h-5 w-5 mt-0.5 ${
+                      session.isCurrent ? 'text-green-600' : 'text-gray-400'
+                    }`}
+                  />
                   <div>
                     <div className="flex items-center gap-2">
-                      <h4 className="font-medium text-gray-900">{session.device}</h4>
+                      <h4 className="font-medium text-gray-900">
+                        {session.device}
+                      </h4>
                       {session.isCurrent && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                           Current
@@ -370,7 +422,7 @@ export default function SecurityClient({ user }: SecurityClientProps) {
                     </div>
                   </div>
                 </div>
-                
+
                 {!session.isCurrent && (
                   <button
                     onClick={() => handleRevokeSession(session.id)}
@@ -383,7 +435,7 @@ export default function SecurityClient({ user }: SecurityClientProps) {
             </div>
           ))}
         </div>
-        
+
         <div className="mt-4 pt-4 border-t border-gray-200">
           <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
             <RefreshCw className="h-4 w-4" />
@@ -398,16 +450,20 @@ export default function SecurityClient({ user }: SecurityClientProps) {
           <AlertTriangle className="h-5 w-5 text-amber-600" />
           Security Recommendations
         </h3>
-        
+
         <div className="space-y-3">
           <div className="flex items-start gap-3">
             <Check className="h-4 w-4 text-green-500 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-gray-900">Password is strong</p>
-              <p className="text-sm text-gray-600">Your password meets all security requirements</p>
+              <p className="text-sm font-medium text-gray-900">
+                Password is strong
+              </p>
+              <p className="text-sm text-gray-600">
+                Your password meets all security requirements
+              </p>
             </div>
           </div>
-          
+
           <div className="flex items-start gap-3">
             {twoFactorEnabled ? (
               <Check className="h-4 w-4 text-green-500 mt-0.5" />
@@ -415,21 +471,26 @@ export default function SecurityClient({ user }: SecurityClientProps) {
               <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5" />
             )}
             <div>
-              <p className="text-sm font-medium text-gray-900">Two-factor authentication</p>
+              <p className="text-sm font-medium text-gray-900">
+                Two-factor authentication
+              </p>
               <p className="text-sm text-gray-600">
-                {twoFactorEnabled 
+                {twoFactorEnabled
                   ? 'Two-factor authentication is enabled for your account'
-                  : 'Enable 2FA for additional security'
-                }
+                  : 'Enable 2FA for additional security'}
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-start gap-3">
             <Check className="h-4 w-4 text-green-500 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-gray-900">Recent login activity</p>
-              <p className="text-sm text-gray-600">No suspicious login attempts detected</p>
+              <p className="text-sm font-medium text-gray-900">
+                Recent login activity
+              </p>
+              <p className="text-sm text-gray-600">
+                No suspicious login attempts detected
+              </p>
             </div>
           </div>
         </div>

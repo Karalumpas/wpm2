@@ -31,7 +31,9 @@ type NotificationsClientProps = {
   };
 };
 
-export default function NotificationsClient({ user }: NotificationsClientProps) {
+export default function NotificationsClient({
+  user,
+}: NotificationsClientProps) {
   const [settings, setSettings] = useState<NotificationSettings>({
     email: {
       productUpdates: true,
@@ -55,12 +57,16 @@ export default function NotificationsClient({ user }: NotificationsClientProps) 
 
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleToggle = (category: keyof NotificationSettings, setting: string) => {
-    setSettings(prev => ({
+  const handleToggle = (
+    category: keyof NotificationSettings,
+    setting: string
+  ) => {
+    setSettings((prev) => ({
       ...prev,
       [category]: {
         ...prev[category],
-        [setting]: !prev[category][setting as keyof typeof prev[typeof category]],
+        [setting]:
+          !prev[category][setting as keyof (typeof prev)[typeof category]],
       },
     }));
   };
@@ -82,11 +88,15 @@ export default function NotificationsClient({ user }: NotificationsClientProps) 
             <Bell className="h-6 w-6 text-yellow-600" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Notification Settings</h2>
-            <p className="text-sm text-gray-600">Configure how you receive notifications</p>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Notification Settings
+            </h2>
+            <p className="text-sm text-gray-600">
+              Configure how you receive notifications
+            </p>
           </div>
         </div>
-        
+
         <button
           onClick={handleSave}
           disabled={isSaving}
@@ -110,14 +120,18 @@ export default function NotificationsClient({ user }: NotificationsClientProps) 
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="flex items-center gap-3 mb-6">
           <Mail className="h-5 w-5 text-blue-600" />
-          <h3 className="text-lg font-medium text-gray-900">Email Notifications</h3>
+          <h3 className="text-lg font-medium text-gray-900">
+            Email Notifications
+          </h3>
         </div>
-        
+
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">Product Updates</h4>
-              <p className="text-sm text-gray-600">Notifications about product synchronization and changes</p>
+              <p className="text-sm text-gray-600">
+                Notifications about product synchronization and changes
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -133,7 +147,9 @@ export default function NotificationsClient({ user }: NotificationsClientProps) 
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">AI Task Completion</h4>
-              <p className="text-sm text-gray-600">When AI tasks like content generation are completed</p>
+              <p className="text-sm text-gray-600">
+                When AI tasks like content generation are completed
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -149,7 +165,9 @@ export default function NotificationsClient({ user }: NotificationsClientProps) 
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">Security Alerts</h4>
-              <p className="text-sm text-gray-600">Important security notifications and login alerts</p>
+              <p className="text-sm text-gray-600">
+                Important security notifications and login alerts
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -165,7 +183,9 @@ export default function NotificationsClient({ user }: NotificationsClientProps) 
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">System Updates</h4>
-              <p className="text-sm text-gray-600">Notifications about app updates and maintenance</p>
+              <p className="text-sm text-gray-600">
+                Notifications about app updates and maintenance
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -181,7 +201,9 @@ export default function NotificationsClient({ user }: NotificationsClientProps) 
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">Marketing Emails</h4>
-              <p className="text-sm text-gray-600">Tips, feature announcements, and promotional content</p>
+              <p className="text-sm text-gray-600">
+                Tips, feature announcements, and promotional content
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -200,14 +222,18 @@ export default function NotificationsClient({ user }: NotificationsClientProps) 
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="flex items-center gap-3 mb-6">
           <Smartphone className="h-5 w-5 text-green-600" />
-          <h3 className="text-lg font-medium text-gray-900">Push Notifications</h3>
+          <h3 className="text-lg font-medium text-gray-900">
+            Push Notifications
+          </h3>
         </div>
-        
+
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">Sync Complete</h4>
-              <p className="text-sm text-gray-600">When product synchronization finishes</p>
+              <p className="text-sm text-gray-600">
+                When product synchronization finishes
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -223,7 +249,9 @@ export default function NotificationsClient({ user }: NotificationsClientProps) 
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">Order Updates</h4>
-              <p className="text-sm text-gray-600">New orders and order status changes</p>
+              <p className="text-sm text-gray-600">
+                New orders and order status changes
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -239,7 +267,9 @@ export default function NotificationsClient({ user }: NotificationsClientProps) 
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">AI Tasks</h4>
-              <p className="text-sm text-gray-600">AI content generation and processing updates</p>
+              <p className="text-sm text-gray-600">
+                AI content generation and processing updates
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -255,7 +285,9 @@ export default function NotificationsClient({ user }: NotificationsClientProps) 
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">System Alerts</h4>
-              <p className="text-sm text-gray-600">Critical system notifications and errors</p>
+              <p className="text-sm text-gray-600">
+                Critical system notifications and errors
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -274,14 +306,18 @@ export default function NotificationsClient({ user }: NotificationsClientProps) 
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="flex items-center gap-3 mb-6">
           <Monitor className="h-5 w-5 text-purple-600" />
-          <h3 className="text-lg font-medium text-gray-900">In-App Notifications</h3>
+          <h3 className="text-lg font-medium text-gray-900">
+            In-App Notifications
+          </h3>
         </div>
-        
+
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">Real-time Updates</h4>
-              <p className="text-sm text-gray-600">Live notifications while using the app</p>
+              <p className="text-sm text-gray-600">
+                Live notifications while using the app
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -297,7 +333,9 @@ export default function NotificationsClient({ user }: NotificationsClientProps) 
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">Task Completion</h4>
-              <p className="text-sm text-gray-600">Notifications when background tasks finish</p>
+              <p className="text-sm text-gray-600">
+                Notifications when background tasks finish
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -313,7 +351,9 @@ export default function NotificationsClient({ user }: NotificationsClientProps) 
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-medium text-gray-900">Error Alerts</h4>
-              <p className="text-sm text-gray-600">Immediate notifications for errors and issues</p>
+              <p className="text-sm text-gray-600">
+                Immediate notifications for errors and issues
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -330,21 +370,27 @@ export default function NotificationsClient({ user }: NotificationsClientProps) 
 
       {/* Notification Frequency */}
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Notification Frequency</h3>
-        
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Notification Frequency
+        </h3>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="text-center p-4 bg-white rounded-lg border border-gray-200">
-            <div className="text-2xl font-bold text-blue-600 mb-2">Real-time</div>
+            <div className="text-2xl font-bold text-blue-600 mb-2">
+              Real-time
+            </div>
             <div className="text-sm text-gray-600">Immediate notifications</div>
           </div>
-          
+
           <div className="text-center p-4 bg-white rounded-lg border border-gray-200">
             <div className="text-2xl font-bold text-green-600 mb-2">Daily</div>
             <div className="text-sm text-gray-600">Summary emails</div>
           </div>
-          
+
           <div className="text-center p-4 bg-white rounded-lg border border-gray-200">
-            <div className="text-2xl font-bold text-purple-600 mb-2">Weekly</div>
+            <div className="text-2xl font-bold text-purple-600 mb-2">
+              Weekly
+            </div>
             <div className="text-sm text-gray-600">Analytics reports</div>
           </div>
         </div>

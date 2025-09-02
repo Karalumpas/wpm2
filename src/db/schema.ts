@@ -362,7 +362,9 @@ export const aiConfigurations = pgTable(
   'ai_configurations',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    userId: uuid('user_id').references(() => users.id).notNull(),
+    userId: uuid('user_id')
+      .references(() => users.id)
+      .notNull(),
     provider: aiProviderEnum('provider').notNull(),
     name: text('name').notNull(), // User-friendly name
     apiKeyEnc: text('api_key_enc'), // Encrypted API key
@@ -393,7 +395,9 @@ export const socialIntegrations = pgTable(
   'social_integrations',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    userId: uuid('user_id').references(() => users.id).notNull(),
+    userId: uuid('user_id')
+      .references(() => users.id)
+      .notNull(),
     provider: socialProviderEnum('provider').notNull(),
     accountName: text('account_name').notNull(), // Display name
     accountId: text('account_id'), // Provider's account ID
@@ -418,7 +422,9 @@ export const aiUsageLog = pgTable(
   'ai_usage_log',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    userId: uuid('user_id').references(() => users.id).notNull(),
+    userId: uuid('user_id')
+      .references(() => users.id)
+      .notNull(),
     aiConfigId: uuid('ai_config_id').references(() => aiConfigurations.id),
     action: text('action').notNull(), // 'generate_description', 'translate', etc.
     inputTokens: numeric('input_tokens'),

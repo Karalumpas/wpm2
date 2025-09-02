@@ -5,19 +5,19 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ProductListItem } from '@/types/product';
 import { formatPrice } from '@/lib/formatters';
-import { 
-  ExternalLink, 
-  Eye, 
-  Package, 
-  Edit3, 
-  Store, 
+import {
+  ExternalLink,
+  Eye,
+  Package,
+  Edit3,
+  Store,
   Heart,
   ShoppingCart,
   MoreVertical,
   Star,
   Clock,
   TrendingUp,
-  Zap
+  Zap,
 } from 'lucide-react';
 
 interface ModernProductCardProps {
@@ -25,15 +25,25 @@ interface ModernProductCardProps {
   viewMode?: 'grid' | 'list';
 }
 
-export function ModernProductCard({ product, viewMode = 'grid' }: ModernProductCardProps) {
+export function ModernProductCard({
+  product,
+  viewMode = 'grid',
+}: ModernProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(null);
+  const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(
+    null
+  );
   const [isHovered, setIsHovered] = useState(false);
   const [showActions, setShowActions] = useState(false);
 
   // Prepare image gallery
-  const allImages = [product.featuredImage, ...(product.images || [])].filter(Boolean) as string[];
-  const currentImage = hoveredImageIndex !== null ? allImages[hoveredImageIndex] : allImages[currentImageIndex] || null;
+  const allImages = [product.featuredImage, ...(product.images || [])].filter(
+    Boolean
+  ) as string[];
+  const currentImage =
+    hoveredImageIndex !== null
+      ? allImages[hoveredImageIndex]
+      : allImages[currentImageIndex] || null;
   const hasMultipleImages = allImages.length > 1;
 
   const handleImageHover = (index: number) => {
@@ -74,7 +84,7 @@ export function ModernProductCard({ product, viewMode = 'grid' }: ModernProductC
 
   if (viewMode === 'list') {
     return (
-      <div 
+      <div
         className="bg-white border border-gray-200 rounded-lg hover:shadow-md transition-all duration-200 group"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -122,7 +132,9 @@ export function ModernProductCard({ product, viewMode = 'grid' }: ModernProductC
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(product.status)}`}>
+                  <span
+                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(product.status)}`}
+                  >
                     {getTypeIcon(product.type)}
                     {product.status}
                   </span>
@@ -154,7 +166,7 @@ export function ModernProductCard({ product, viewMode = 'grid' }: ModernProductC
   }
 
   return (
-    <div 
+    <div
       className="bg-white rounded-xl border border-gray-200 hover:border-blue-300 transition-all duration-300 hover:shadow-xl group overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -185,7 +197,9 @@ export function ModernProductCard({ product, viewMode = 'grid' }: ModernProductC
                   onMouseEnter={() => handleImageHover(index)}
                   onMouseLeave={handleImageLeave}
                   className={`w-2 h-2 rounded-full transition-all ${
-                    (hoveredImageIndex !== null ? hoveredImageIndex : currentImageIndex) === index
+                    (hoveredImageIndex !== null
+                      ? hoveredImageIndex
+                      : currentImageIndex) === index
                       ? 'bg-white shadow-md'
                       : 'bg-white/50 hover:bg-white/75'
                   }`}
@@ -202,16 +216,20 @@ export function ModernProductCard({ product, viewMode = 'grid' }: ModernProductC
 
         {/* Status Badge */}
         <div className="absolute top-3 left-3">
-          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border backdrop-blur-sm ${getStatusColor(product.status)}`}>
+          <span
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border backdrop-blur-sm ${getStatusColor(product.status)}`}
+          >
             {getTypeIcon(product.type)}
             {product.status}
           </span>
         </div>
 
         {/* Quick Actions - Show on Hover */}
-        <div className={`absolute top-3 right-3 flex flex-col gap-2 transition-all duration-300 ${
-          isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'
-        }`}>
+        <div
+          className={`absolute top-3 right-3 flex flex-col gap-2 transition-all duration-300 ${
+            isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'
+          }`}
+        >
           <button className="p-2 bg-white/90 hover:bg-white rounded-lg shadow-md transition-all hover:scale-105">
             <Heart className="h-4 w-4 text-gray-600 hover:text-red-500" />
           </button>
@@ -261,7 +279,9 @@ export function ModernProductCard({ product, viewMode = 'grid' }: ModernProductC
           )}
           <div className="flex items-center gap-1 ml-auto">
             <Clock className="h-3 w-3" />
-            <span>Updated {new Date(product.updatedAt).toLocaleDateString()}</span>
+            <span>
+              Updated {new Date(product.updatedAt).toLocaleDateString()}
+            </span>
           </div>
         </div>
 
@@ -275,7 +295,8 @@ export function ModernProductCard({ product, viewMode = 'grid' }: ModernProductC
             </div>
             {product.variantCount && (
               <span className="text-xs text-gray-500">
-                {product.variantCount} variant{product.variantCount !== 1 ? 's' : ''}
+                {product.variantCount} variant
+                {product.variantCount !== 1 ? 's' : ''}
               </span>
             )}
           </div>
@@ -289,14 +310,14 @@ export function ModernProductCard({ product, viewMode = 'grid' }: ModernProductC
             >
               <Edit3 className="h-4 w-4" />
             </Link>
-            
+
             <button
               className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
               title="View Shops"
             >
               <Store className="h-4 w-4" />
             </button>
-            
+
             <button
               className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-all"
               title="More Actions"
@@ -318,12 +339,12 @@ export function ModernProductCard({ product, viewMode = 'grid' }: ModernProductC
               <span>{Math.floor(Math.random() * 50) + 5} sales</span>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-1">
             {[...Array(5)].map((_, i) => (
-              <Star 
-                key={i} 
-                className={`h-3 w-3 ${i < 4 ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
+              <Star
+                key={i}
+                className={`h-3 w-3 ${i < 4 ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
               />
             ))}
             <span className="text-xs text-gray-500 ml-1">4.0</span>

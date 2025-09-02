@@ -14,7 +14,10 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export function ModernPagination({ pagination, onPageChange }: PaginationProps) {
+export function ModernPagination({
+  pagination,
+  onPageChange,
+}: PaginationProps) {
   const { page, totalPages, hasNext, hasPrev, total } = pagination;
 
   const getPageNumbers = () => {
@@ -68,7 +71,8 @@ export function ModernPagination({ pagination, onPageChange }: PaginationProps) 
       {/* Results info */}
       <div className="flex items-center text-sm text-gray-600">
         <span>
-          Showing page {page} of {totalPages} ({total.toLocaleString()} total products)
+          Showing page {page} of {totalPages} ({total.toLocaleString()} total
+          products)
         </span>
       </div>
 

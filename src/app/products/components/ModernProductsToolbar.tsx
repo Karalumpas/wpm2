@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { 
-  Search, 
-  Filter, 
-  Grid3X3, 
-  List, 
-  RotateCcw, 
+import {
+  Search,
+  Filter,
+  Grid3X3,
+  List,
+  RotateCcw,
   ChevronDown,
   SlidersHorizontal,
   X,
@@ -16,7 +16,7 @@ import {
   Star,
   TrendingUp,
   Eye,
-  MoreHorizontal
+  MoreHorizontal,
 } from 'lucide-react';
 import { ProcessedSearchParams } from '../params';
 
@@ -54,10 +54,22 @@ const SORT_OPTIONS = [
 ];
 
 const STATUS_OPTIONS = [
-  { value: 'published', label: 'Published', color: 'bg-green-100 text-green-800' },
+  {
+    value: 'published',
+    label: 'Published',
+    color: 'bg-green-100 text-green-800',
+  },
   { value: 'draft', label: 'Draft', color: 'bg-gray-100 text-gray-800' },
-  { value: 'private', label: 'Private', color: 'bg-purple-100 text-purple-800' },
-  { value: 'pending', label: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
+  {
+    value: 'private',
+    label: 'Private',
+    color: 'bg-purple-100 text-purple-800',
+  },
+  {
+    value: 'pending',
+    label: 'Pending',
+    color: 'bg-yellow-100 text-yellow-800',
+  },
 ];
 
 const TYPE_OPTIONS = [
@@ -78,7 +90,7 @@ export function ModernProductsToolbar({
   const [searchValue, setSearchValue] = useState(params.search || '');
   const [showFilters, setShowFilters] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
-  
+
   // Filter options state
   const [brands, setBrands] = useState<FilterOption[]>([]);
   const [categories, setCategories] = useState<FilterOption[]>([]);
@@ -144,14 +156,15 @@ export function ModernProductsToolbar({
   };
 
   const currentSort = `${params.sortBy}-${params.sortOrder}`;
-  const currentSortLabel = SORT_OPTIONS.find(opt => opt.value === currentSort)?.label || 'Name A-Z';
+  const currentSortLabel =
+    SORT_OPTIONS.find((opt) => opt.value === currentSort)?.label || 'Name A-Z';
 
   const handleSortChange = (sortValue: string) => {
     const [sortBy, sortOrder] = sortValue.split('-');
     onParamsUpdate({
       sortBy: sortBy as 'name' | 'basePrice' | 'createdAt',
       sortOrder: sortOrder as 'asc' | 'desc',
-      page: 1
+      page: 1,
     });
     setShowSortMenu(false);
   };
@@ -162,15 +175,21 @@ export function ModernProductsToolbar({
 
   const handleStatusFilter = (status: string) => {
     onParamsUpdate({
-      status: params.status === status ? undefined : status as 'published' | 'draft' | 'private',
-      page: 1
+      status:
+        params.status === status
+          ? undefined
+          : (status as 'published' | 'draft' | 'private'),
+      page: 1,
     });
   };
 
   const handleTypeFilter = (type: string) => {
     onParamsUpdate({
-      type: params.type === type ? undefined : type as 'simple' | 'variable' | 'grouped',
-      page: 1
+      type:
+        params.type === type
+          ? undefined
+          : (type as 'simple' | 'variable' | 'grouped'),
+      page: 1,
     });
   };
 
@@ -180,7 +199,7 @@ export function ModernProductsToolbar({
     params.type && 1,
     params.brandIds.length,
     params.categoryIds.length,
-    params.shopIds.length
+    params.shopIds.length,
   ].filter(Boolean).length;
 
   return (
@@ -254,7 +273,8 @@ export function ModernProductsToolbar({
                 <div className="animate-pulse bg-gray-200 h-4 w-20 rounded"></div>
               ) : (
                 <span>
-                  {totalCount.toLocaleString()} product{totalCount !== 1 ? 's' : ''}
+                  {totalCount.toLocaleString()} product
+                  {totalCount !== 1 ? 's' : ''}
                 </span>
               )}
             </div>
@@ -397,7 +417,7 @@ export function ModernProductsToolbar({
                     const brandId = e.target.value;
                     onParamsUpdate({
                       brandIds: brandId ? [brandId] : [],
-                      page: 1
+                      page: 1,
                     });
                   }}
                   value={params.brandIds[0] || ''}
@@ -426,7 +446,7 @@ export function ModernProductsToolbar({
                     const categoryId = e.target.value;
                     onParamsUpdate({
                       categoryIds: categoryId ? [categoryId] : [],
-                      page: 1
+                      page: 1,
                     });
                   }}
                   value={params.categoryIds[0] || ''}

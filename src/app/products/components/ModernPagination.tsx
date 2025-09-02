@@ -12,11 +12,15 @@ interface PaginationProps {
     hasPrev: boolean;
   };
   onPageChange: (page: number) => void;
+  itemsPerPage?: number;
+  onItemsPerPageChange?: (limit: number) => void;
 }
 
 export function ModernPagination({
   pagination,
   onPageChange,
+  itemsPerPage,
+  onItemsPerPageChange,
 }: PaginationProps) {
   const { page, totalPages, hasNext, hasPrev, total } = pagination;
 
@@ -62,18 +66,38 @@ export function ModernPagination({
 
   const pages = getPageNumbers();
 
-  if (totalPages <= 1) {
-    return null;
-  }
+  // Temporarily always show for testing
+  // if (totalPages <= 1) {
+  //   return null;
+  // }
 
   return (
     <div className="flex items-center justify-between px-6 py-4 bg-white border-t border-gray-200">
-      {/* Results info */}
-      <div className="flex items-center text-sm text-gray-600">
-        <span>
+      {/* Results info and items per page */}
+      <div className="flex items-center gap-4">
+        <span className="text-sm text-gray-600">
           Showing page {page} of {totalPages} ({total.toLocaleString()} total
           products)
         </span>
+        
+        {onItemsPerPageChange && (
+          <div className="flex items-center gap-2">
+            <label htmlFor="items-per-page" className="text-sm text-gray-600">
+              Per side:
+            </label>
+            <select
+              id="items-per-page"
+              value={itemsPerPage || pagination.limit}
+              onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
+              className="border border-gray-300 rounded-md px-3 py-1 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value={12}>12</option>
+              <option value={24}>24</option>
+              <option value={48}>48</option>
+              <option value={96}>96</option>
+            </select>
+          </div>
+        )}
       </div>
 
       {/* Pagination controls */}

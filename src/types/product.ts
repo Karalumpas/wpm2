@@ -4,6 +4,17 @@
  * Shared type definitions for product-related data structures
  */
 
+export interface Shop {
+  id: string;
+  name: string;
+  url: string;
+  status: 'active' | 'inactive' | 'error';
+  lastConnectionCheckAt?: string;
+  lastConnectionOk?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Brand {
   id: string;
   name: string;
@@ -73,6 +84,8 @@ export interface Product {
   };
 
   // Relationships
+  shopId?: string;
+  shop?: Shop;
   brandId?: string;
   brand?: Brand;
   categoryIds: string[];
@@ -122,6 +135,8 @@ export interface ProductListItem {
   images?: string[];
   categoryIds?: string[];
   brandId?: string;
+  shopId?: string;
+  shop?: Shop;
   isActive?: boolean;
   isFeatured?: boolean;
   createdAt?: string;

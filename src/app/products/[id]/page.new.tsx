@@ -14,9 +14,10 @@ import {
   formatPrice,
 } from '@/lib/formatters';
 import { SwipeableMediaGallery } from './components/SwipeableMediaGallery';
+import { InlineEditor, RichTextInlineEditor } from './components/InlineEditor';
 import { ProductActions } from './components/ProductActions';
 import VariantsTable from './variants/VariantsTable';
-import { ArrowLeft, Package, Calendar, DollarSign, BarChart3, Copy } from 'lucide-react';
+import { ArrowLeft, Package, Calendar, DollarSign, BarChart3 } from 'lucide-react';
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -69,6 +70,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
     alt: product.name,
   }));
 
+  // Dummy save functions - to be implemented with actual API calls
+  const handleSaveField = async (field: string, value: string) => {
+    console.log(`Saving ${field}:`, value);
+    // TODO: Implement API call to update product
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -87,9 +94,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
             <div className="flex-1">
               <div className="mb-2">
-                <h1 className="text-3xl font-bold text-gray-900">
-                  {product.name}
-                </h1>
+                <InlineEditor
+                  value={product.name}
+                  onSave={(value) => handleSaveField('name', value)}
+                  placeholder="Produktnavn"
+                  displayClassName="text-3xl font-bold text-gray-900"
+                />
               </div>
               
               <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
@@ -133,18 +143,26 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Basispris
                   </label>
-                  <div className="text-lg font-medium text-gray-900">
-                    {product.basePrice ? formatPrice(product.basePrice) : '-'}
-                  </div>
+                  <InlineEditor
+                    value={product.basePrice ? formatPrice(product.basePrice) : ''}
+                    onSave={(value) => handleSaveField('basePrice', value)}
+                    type="text"
+                    placeholder="0,00 DKK"
+                    displayClassName="text-lg font-medium text-gray-900"
+                  />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Almindelig pris
                   </label>
-                  <div className="text-gray-900">
-                    {product.regularPrice ? formatPrice(product.regularPrice) : '-'}
-                  </div>
+                  <InlineEditor
+                    value={product.regularPrice ? formatPrice(product.regularPrice) : ''}
+                    onSave={(value) => handleSaveField('regularPrice', value)}
+                    type="text"
+                    placeholder="0,00 DKK"
+                    displayClassName="text-gray-900"
+                  />
                 </div>
                 
                 {product.salePrice && (
@@ -152,9 +170,13 @@ export default async function ProductDetailPage({ params }: PageProps) {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Tilbudspris
                     </label>
-                    <div className="text-green-600 font-medium">
-                      {formatPrice(product.salePrice)}
-                    </div>
+                    <InlineEditor
+                      value={formatPrice(product.salePrice)}
+                      onSave={(value) => handleSaveField('salePrice', value)}
+                      type="text"
+                      placeholder="0,00 DKK"
+                      displayClassName="text-green-600 font-medium"
+                    />
                   </div>
                 )}
               </div>
@@ -171,27 +193,51 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Status
                   </label>
-                  <div className="text-gray-900 capitalize">
-                    {product.status}
-                  </div>
+                  <InlineEditor
+                    value={product.status}
+                    onSave={(value) => handleSaveField('status', value)}
+                    type="select"
+                    options={[
+                      { value: 'published', label: 'Udgivet' },
+                      { value: 'draft', label: 'Kladde' },
+                      { value: 'private', label: 'Privat' },
+                    ]}
+                    displayClassName="text-gray-900"
+                  />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Type
                   </label>
-                  <div className="text-gray-900 capitalize">
-                    {product.type}
-                  </div>
+                  <InlineEditor
+                    value={product.type}
+                    onSave={(value) => handleSaveField('type', value)}
+                    type="select"
+                    options={[
+                      { value: 'simple', label: 'Simpelt' },
+                      { value: 'variable', label: 'Variabelt' },
+                      { value: 'grouped', label: 'Grupperet' },
+                    ]}
+                    displayClassName="text-gray-900"
+                  />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Lagerstatus
                   </label>
-                  <div className="text-gray-900">
-                    {product.stockStatus || 'På lager'}
-                  </div>
+                  <InlineEditor
+                    value={product.stockStatus || 'instock'}
+                    onSave={(value) => handleSaveField('stockStatus', value)}
+                    type="select"
+                    options={[
+                      { value: 'instock', label: 'På lager' },
+                      { value: 'outofstock', label: 'Udsolgt' },
+                      { value: 'onbackorder', label: 'Restordre' },
+                    ]}
+                    displayClassName="text-gray-900"
+                  />
                 </div>
               </div>
             </div>
@@ -234,18 +280,18 @@ export default async function ProductDetailPage({ params }: PageProps) {
                     {product.updatedAt ? formatDateTime(product.updatedAt) : '-'}
                   </span>
                 </div>
-                {product.dimensions && typeof product.dimensions === 'object' ? (
+                {product.dimensions && typeof product.dimensions === 'object' && (
                   <div className="flex justify-between">
                     <span className="text-gray-500">Dimensioner:</span>
                     <span className="text-gray-900">
                       {formatDimensions(
-                        (product.dimensions as Record<string, any>)?.length,
-                        (product.dimensions as Record<string, any>)?.width,
-                        (product.dimensions as Record<string, any>)?.height
+                        (product.dimensions as any)?.length,
+                        (product.dimensions as any)?.width,
+                        (product.dimensions as any)?.height
                       )}
                     </span>
                   </div>
-                ) : null}
+                )}
               </div>
             </div>
           </div>
@@ -257,23 +303,25 @@ export default async function ProductDetailPage({ params }: PageProps) {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Kort beskrivelse
             </h3>
-            <div className="text-gray-700">
-              {product.shortDescription || 'Ingen kort beskrivelse'}
-            </div>
+            <InlineEditor
+              value={product.shortDescription || ''}
+              onSave={(value) => handleSaveField('shortDescription', value)}
+              type="textarea"
+              placeholder="Tilføj en kort beskrivelse..."
+              multiline
+              displayClassName="text-gray-700"
+            />
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Fuldstændig beskrivelse
             </h3>
-            {product.description ? (
-              <div
-                className="prose prose-sm max-w-none text-gray-700"
-                dangerouslySetInnerHTML={{ __html: product.description }}
-              />
-            ) : (
-              <div className="text-gray-400 italic">Ingen detaljeret beskrivelse</div>
-            )}
+            <RichTextInlineEditor
+              value={product.description || ''}
+              onSave={(value) => handleSaveField('description', value)}
+              placeholder="Tilføj en detaljeret beskrivelse..."
+            />
           </div>
         </div>
 

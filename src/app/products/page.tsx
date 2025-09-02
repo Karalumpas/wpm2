@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { auth } from '@/lib/auth-utils';
 import { redirect } from 'next/navigation';
 import { parseSearchParams, normalizeParams } from './params';
-import { ProductsPage } from './components/ProductsPage';
+import { NewProductsPage } from './components/NewProductsPage';
 import { ProductsPageSkeleton } from './components/ProductsPageSkeleton';
 
 /**
@@ -29,9 +29,11 @@ export default async function Page({ searchParams }: ProductsPageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Suspense fallback={<ProductsPageSkeleton />}>
-        <ProductsPage initialParams={params} />
-      </Suspense>
+      <div className="px-4 sm:px-6 py-6 sm:py-8">
+        <Suspense fallback={<ProductsPageSkeleton />}>
+          <NewProductsPage initialParams={params} />
+        </Suspense>
+      </div>
     </div>
   );
 }

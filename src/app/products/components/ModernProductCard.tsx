@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ProductListItem } from '@/types/product';
 import { formatPrice } from '@/lib/formatters';
+import { SwipeableMediaGallery } from '../[id]/components/SwipeableMediaGallery';
 import {
   ExternalLink,
   Eye,
@@ -18,41 +19,32 @@ import {
   Clock,
   TrendingUp,
   Zap,
+  Link as LinkIcon,
 } from 'lucide-react';
 
 interface ModernProductCardProps {
   product: ProductListItem;
   viewMode?: 'grid' | 'list';
+  isSelected?: boolean;
+  onSelectionChange?: (productId: string, selected: boolean) => void;
 }
 
 export function ModernProductCard({
   product,
   viewMode = 'grid',
+  isSelected = false,
+  onSelectionChange,
 }: ModernProductCardProps) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(
-    null
-  );
-  const [isHovered, setIsHovered] = useState(false);
-  const [showActions, setShowActions] = useState(false);
-
-  // Prepare image gallery
+  // Prepare image gallery for SwipeableMediaGallery
   const allImages = [product.featuredImage, ...(product.images || [])].filter(
     Boolean
   ) as string[];
-  const currentImage =
-    hoveredImageIndex !== null
-      ? allImages[hoveredImageIndex]
-      : allImages[currentImageIndex] || null;
-  const hasMultipleImages = allImages.length > 1;
-
-  const handleImageHover = (index: number) => {
-    setHoveredImageIndex(index);
-  };
-
-  const handleImageLeave = () => {
-    setHoveredImageIndex(null);
-  };
+  
+  const mediaItems = allImages.map(url => ({
+    url,
+    type: 'image' as const,
+    alt: product.name,
+  }));
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -84,18 +76,14 @@ export function ModernProductCard({
 
   if (viewMode === 'list') {
     return (
-      <div
-        className="bg-white border border-gray-200 rounded-lg hover:shadow-md transition-all duration-200 group"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
+      <div className="bg-white border border-gray-200 rounded-lg hover:shadow-md transition-all duration-200 group">
         <div className="flex items-center p-4 gap-4">
           {/* Image */}
           <div className="relative w-16 h-16 flex-shrink-0">
             <div className="w-full h-full bg-gray-100 rounded-lg overflow-hidden">
-              {currentImage ? (
+              {mediaItems.length > 0 ? (
                 <Image
-                  src={currentImage}
+                  src={mediaItems[0].url}
                   alt={product.name}
                   width={64}
                   height={64}
@@ -121,6 +109,23 @@ export function ModernProductCard({
                 <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                   {product.description}
                 </p>
+                {product.shop && (
+                  <div className="flex items-center gap-1 mt-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${
+                      product.shop.status === 'active' 
+                        ? 'bg-blue-50 text-blue-700' 
+                        : product.shop.status === 'error'
+                        ? 'bg-red-50 text-red-700'
+                        : 'bg-gray-50 text-gray-700'
+                    }`}>
+                      <LinkIcon className="h-3 w-3" />
+                      {product.shop.name}
+                      {product.shop.status === 'error' && (
+                        <span className="w-1 h-1 bg-red-500 rounded-full ml-1"></span>
+                      )}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Price and Status */}
@@ -166,20 +171,17 @@ export function ModernProductCard({
   }
 
   return (
-    <div
-      className="bg-white rounded-xl border border-gray-200 hover:border-blue-300 transition-all duration-300 hover:shadow-xl group overflow-hidden"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="bg-white rounded-xl border border-gray-200 hover:border-blue-300 transition-all duration-300 hover:shadow-xl group overflow-hidden h-full flex flex-col">
       {/* Image Section */}
-      <div className="relative aspect-square bg-gray-100 overflow-hidden">
-        {currentImage ? (
-          <Image
-            src={currentImage}
-            alt={product.name}
-            width={300}
-            height={300}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      <div className="relative aspect-square bg-gray-100 overflow-hidden flex-shrink-0">
+        {mediaItems.length > 0 ? (
+          <SwipeableMediaGallery
+            media={mediaItems}
+            className="w-full h-full"
+            showArrows={false}
+            showIndicators={true}
+            showThumbnailGrid={false}
+            compact={true}
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
@@ -187,35 +189,8 @@ export function ModernProductCard({
           </div>
         )}
 
-        {/* Image Gallery Dots */}
-        {hasMultipleImages && (
-          <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2">
-            <div className="flex gap-1">
-              {allImages.slice(0, 5).map((_, index) => (
-                <button
-                  key={index}
-                  onMouseEnter={() => handleImageHover(index)}
-                  onMouseLeave={handleImageLeave}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    (hoveredImageIndex !== null
-                      ? hoveredImageIndex
-                      : currentImageIndex) === index
-                      ? 'bg-white shadow-md'
-                      : 'bg-white/50 hover:bg-white/75'
-                  }`}
-                />
-              ))}
-              {allImages.length > 5 && (
-                <span className="text-white text-xs bg-black/50 px-1 rounded">
-                  +{allImages.length - 5}
-                </span>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* Status Badge */}
-        <div className="absolute top-3 left-3">
+        <div className="absolute top-3 left-3 z-10">
           <span
             className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border backdrop-blur-sm ${getStatusColor(product.status)}`}
           >
@@ -223,50 +198,39 @@ export function ModernProductCard({
             {product.status}
           </span>
         </div>
-
-        {/* Quick Actions - Show on Hover */}
-        <div
-          className={`absolute top-3 right-3 flex flex-col gap-2 transition-all duration-300 ${
-            isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'
-          }`}
-        >
-          <button className="p-2 bg-white/90 hover:bg-white rounded-lg shadow-md transition-all hover:scale-105">
-            <Heart className="h-4 w-4 text-gray-600 hover:text-red-500" />
-          </button>
-          <Link
-            href={`/products/${product.id}`}
-            className="p-2 bg-white/90 hover:bg-white rounded-lg shadow-md transition-all hover:scale-105"
-          >
-            <Eye className="h-4 w-4 text-gray-600 hover:text-blue-500" />
-          </Link>
-        </div>
-
-        {/* Sale Badge */}
-        {product.isFeatured && (
-          <div className="absolute top-3 right-3">
-            <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-              FEATURED
-            </span>
-          </div>
-        )}
       </div>
 
       {/* Content Section */}
-      <div className="p-4">
+      <div className="p-4 flex-1 flex flex-col">
         {/* Product Name */}
         <Link href={`/products/${product.id}`} className="group">
-          <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 mb-2">
+          <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 mb-2 h-12 flex items-start">
             {product.name}
           </h3>
         </Link>
 
         {/* Description */}
-        <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+        <p className="text-sm text-gray-600 line-clamp-2 mb-3 flex-1">
           {product.description}
         </p>
 
         {/* Metadata Row */}
         <div className="flex items-center gap-2 text-xs text-gray-500 mb-3">
+          {product.shop && (
+            <span className={`px-2 py-1 rounded-full flex items-center gap-1 ${
+              product.shop.status === 'active' 
+                ? 'bg-blue-50 text-blue-700' 
+                : product.shop.status === 'error'
+                ? 'bg-red-50 text-red-700'
+                : 'bg-gray-50 text-gray-700'
+            }`}>
+              <LinkIcon className="h-3 w-3" />
+              {product.shop.name}
+              {product.shop.status === 'error' && (
+                <span className="w-1 h-1 bg-red-500 rounded-full ml-1"></span>
+              )}
+            </span>
+          )}
           {product.brandId && (
             <span className="bg-gray-100 px-2 py-1 rounded-full">
               Brand {product.brandId}
@@ -274,7 +238,7 @@ export function ModernProductCard({
           )}
           {product.categoryIds && product.categoryIds.length > 0 && (
             <span className="bg-gray-100 px-2 py-1 rounded-full">
-              {product.categoryIds.length} categories
+              {product.categoryIds?.length || 0} categories
             </span>
           )}
           <div className="flex items-center gap-1 ml-auto">
@@ -340,25 +304,20 @@ export function ModernProductCard({
             </div>
           </div>
 
-          <div className="flex items-center gap-1">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`h-3 w-3 ${i < 4 ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+          {/* Selection Checkbox */}
+          {onSelectionChange && (
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={(e) => onSelectionChange(product.id, e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
               />
-            ))}
-            <span className="text-xs text-gray-500 ml-1">4.0</span>
-          </div>
+              <span className="ml-2 text-xs text-gray-600">Select</span>
+            </label>
+          )}
         </div>
       </div>
-
-      {/* Click outside to close actions */}
-      {showActions && (
-        <div
-          className="fixed inset-0 z-0"
-          onClick={() => setShowActions(false)}
-        />
-      )}
     </div>
   );
 }

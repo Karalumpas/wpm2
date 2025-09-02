@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProcessedSearchParams } from '../params';
 import { AdvancedFilterToolbar } from './AdvancedToolbar';

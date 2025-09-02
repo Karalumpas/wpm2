@@ -174,7 +174,7 @@ interface AdvancedFilterToolbarProps {
     dateFrom?: string;
     dateTo?: string;
   };
-  onFiltersChange: (filters: Record<string, any>) => void;
+  onFiltersChange: (filters: Record<string, unknown>) => void;
 }
 
 export function AdvancedFilterToolbar({

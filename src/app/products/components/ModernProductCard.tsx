@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ProductListItem } from '@/types/product';
@@ -12,10 +11,7 @@ import {
   Package,
   Edit3,
   Store,
-  Heart,
-  ShoppingCart,
   MoreVertical,
-  Star,
   Clock,
   TrendingUp,
   Zap,

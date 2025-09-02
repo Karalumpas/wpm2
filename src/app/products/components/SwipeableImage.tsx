@@ -56,7 +56,7 @@ export function SwipeableImage({
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging || !hasMultipleImages) return;
-    
+
     const currentX = e.touches[0].clientX;
     const diffX = currentX - startX;
     setTranslateX(diffX);
@@ -64,12 +64,14 @@ export function SwipeableImage({
 
   const handleTouchEnd = () => {
     if (!isDragging || !hasMultipleImages) return;
-    
+
     setIsDragging(false);
-    
+
     // Threshold for swipe (30% of container width)
-    const threshold = containerRef.current ? containerRef.current.offsetWidth * 0.3 : 100;
-    
+    const threshold = containerRef.current
+      ? containerRef.current.offsetWidth * 0.3
+      : 100;
+
     if (Math.abs(translateX) > threshold) {
       if (translateX > 0) {
         prevImage();
@@ -77,7 +79,7 @@ export function SwipeableImage({
         nextImage();
       }
     }
-    
+
     setTranslateX(0);
   };
 
@@ -90,7 +92,7 @@ export function SwipeableImage({
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging || !hasMultipleImages) return;
-    
+
     const currentX = e.clientX;
     const diffX = currentX - startX;
     setTranslateX(diffX);
@@ -98,12 +100,14 @@ export function SwipeableImage({
 
   const handleMouseUp = () => {
     if (!isDragging || !hasMultipleImages) return;
-    
+
     setIsDragging(false);
-    
+
     // Threshold for swipe
-    const threshold = containerRef.current ? containerRef.current.offsetWidth * 0.3 : 100;
-    
+    const threshold = containerRef.current
+      ? containerRef.current.offsetWidth * 0.3
+      : 100;
+
     if (Math.abs(translateX) > threshold) {
       if (translateX > 0) {
         prevImage();
@@ -111,13 +115,15 @@ export function SwipeableImage({
         nextImage();
       }
     }
-    
+
     setTranslateX(0);
   };
 
   if (!hasImages) {
     return (
-      <div className={`bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center ${className}`}>
+      <div
+        className={`bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center ${className}`}
+      >
         {fallbackIcon}
       </div>
     );

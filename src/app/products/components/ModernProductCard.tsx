@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ProductListItem } from '@/types/product';
 import { formatPrice } from '@/lib/formatters';
-import { SwipeableImage } from './SwipeableImage';
 import {
   ExternalLink,
   Eye,
@@ -30,6 +29,10 @@ export function ModernProductCard({
   product,
   viewMode = 'grid',
 }: ModernProductCardProps) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(
+    null
+  );
   const [isHovered, setIsHovered] = useState(false);
   const [showActions, setShowActions] = useState(false);
 
@@ -37,6 +40,19 @@ export function ModernProductCard({
   const allImages = [product.featuredImage, ...(product.images || [])].filter(
     Boolean
   ) as string[];
+  const currentImage =
+    hoveredImageIndex !== null
+      ? allImages[hoveredImageIndex]
+      : allImages[currentImageIndex] || null;
+  const hasMultipleImages = allImages.length > 1;
+
+  const handleImageHover = (index: number) => {
+    setHoveredImageIndex(index);
+  };
+
+  const handleImageLeave = () => {
+    setHoveredImageIndex(null);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -76,12 +92,21 @@ export function ModernProductCard({
         <div className="flex items-center p-4 gap-4">
           {/* Image */}
           <div className="relative w-16 h-16 flex-shrink-0">
-            <SwipeableImage
-              images={allImages}
-              alt={product.name}
-              className="w-full h-full rounded-lg"
-              fallbackIcon={<Package className="h-6 w-6 text-gray-400" />}
-            />
+            <div className="w-full h-full bg-gray-100 rounded-lg overflow-hidden">
+              {currentImage ? (
+                <Image
+                  src={currentImage}
+                  alt={product.name}
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <Package className="h-6 w-6 text-gray-400" />
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Content */}
@@ -148,12 +173,46 @@ export function ModernProductCard({
     >
       {/* Image Section */}
       <div className="relative aspect-square bg-gray-100 overflow-hidden">
-        <SwipeableImage
-          images={allImages}
-          alt={product.name}
-          className="w-full h-full"
-          fallbackIcon={<Package className="h-12 w-12 text-gray-400" />}
-        />
+        {currentImage ? (
+          <Image
+            src={currentImage}
+            alt={product.name}
+            width={300}
+            height={300}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+            <Package className="h-12 w-12 text-gray-400" />
+          </div>
+        )}
+
+        {/* Image Gallery Dots */}
+        {hasMultipleImages && (
+          <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2">
+            <div className="flex gap-1">
+              {allImages.slice(0, 5).map((_, index) => (
+                <button
+                  key={index}
+                  onMouseEnter={() => handleImageHover(index)}
+                  onMouseLeave={handleImageLeave}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    (hoveredImageIndex !== null
+                      ? hoveredImageIndex
+                      : currentImageIndex) === index
+                      ? 'bg-white shadow-md'
+                      : 'bg-white/50 hover:bg-white/75'
+                  }`}
+                />
+              ))}
+              {allImages.length > 5 && (
+                <span className="text-white text-xs bg-black/50 px-1 rounded">
+                  +{allImages.length - 5}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Status Badge */}
         <div className="absolute top-3 left-3">

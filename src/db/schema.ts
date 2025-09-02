@@ -349,6 +349,94 @@ export const mediaFiles = pgTable(
   })
 );
 
+// AI Provider configurations
+export const aiProviderEnum = pgEnum('ai_provider', [
+  'openai',
+  'anthropic',
+  'ollama',
+  'groq',
+  'local',
+]);
+
+export const aiConfigurations = pgTable(
+  'ai_configurations',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id).notNull(),
+    provider: aiProviderEnum('provider').notNull(),
+    name: text('name').notNull(), // User-friendly name
+    apiKeyEnc: text('api_key_enc'), // Encrypted API key
+    baseUrl: text('base_url'), // For Ollama/local instances
+    model: text('model'), // Specific model to use
+    isActive: boolean('is_active').default(false).notNull(),
+    config: jsonb('config').default('{}').notNull(), // Additional settings
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userIdIdx: index('ai_configurations_user_id_idx').on(table.userId),
+    activeIdx: index('ai_configurations_active_idx').on(table.isActive),
+  })
+);
+
+// Social Media integrations
+export const socialProviderEnum = pgEnum('social_provider', [
+  'facebook',
+  'instagram',
+  'twitter',
+  'linkedin',
+  'tiktok',
+  'pinterest',
+]);
+
+export const socialIntegrations = pgTable(
+  'social_integrations',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id).notNull(),
+    provider: socialProviderEnum('provider').notNull(),
+    accountName: text('account_name').notNull(), // Display name
+    accountId: text('account_id'), // Provider's account ID
+    accessTokenEnc: text('access_token_enc'), // Encrypted access token
+    refreshTokenEnc: text('refresh_token_enc'), // Encrypted refresh token
+    expiresAt: timestamp('expires_at'),
+    isActive: boolean('is_active').default(true).notNull(),
+    permissions: jsonb('permissions').default('[]').notNull(), // Granted permissions
+    config: jsonb('config').default('{}').notNull(), // Provider-specific settings
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userIdIdx: index('social_integrations_user_id_idx').on(table.userId),
+    providerIdx: index('social_integrations_provider_idx').on(table.provider),
+    activeIdx: index('social_integrations_active_idx').on(table.isActive),
+  })
+);
+
+// AI usage tracking and analytics
+export const aiUsageLog = pgTable(
+  'ai_usage_log',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id).notNull(),
+    aiConfigId: uuid('ai_config_id').references(() => aiConfigurations.id),
+    action: text('action').notNull(), // 'generate_description', 'translate', etc.
+    inputTokens: numeric('input_tokens'),
+    outputTokens: numeric('output_tokens'),
+    cost: numeric('cost', { precision: 10, scale: 6 }), // Calculated cost
+    executionTime: numeric('execution_time'), // In milliseconds
+    success: boolean('success').notNull(),
+    errorMessage: text('error_message'),
+    metadata: jsonb('metadata').default('{}').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userIdIdx: index('ai_usage_log_user_id_idx').on(table.userId),
+    createdAtIdx: index('ai_usage_log_created_at_idx').on(table.createdAt),
+    actionIdx: index('ai_usage_log_action_idx').on(table.action),
+  })
+);
+
 // Shop Builder persistence (save/load builds)
 export const shopBuilds = pgTable(
   'shop_builds',

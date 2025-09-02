@@ -3,9 +3,10 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ProcessedSearchParams } from '../params';
-import { ProductsToolbar } from './ProductsToolbar';
-import { ProductsList } from './ProductsList';
-import { Pagination } from './Pagination';
+import { ModernProductsToolbar } from './ModernProductsToolbar';
+import { ModernProductsList } from './ModernProductsList';
+import { ModernPagination } from './ModernPagination';
+import { ProductsFloatingActions } from './ProductsFloatingActions';
 import { useProducts } from '../hooks/useProducts';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
@@ -104,18 +105,10 @@ export function ProductsPage({ initialParams }: ProductsPageProps) {
   if (error) {
     return (
       <div className="space-y-8">
-        <ProductsToolbar
-          params={params}
-          onParamsUpdate={handleParamsUpdate}
-          onReset={handleReset}
-          isLoading={isLoading}
-          totalCount={0}
-          onPageChange={handlePageChange}
-        />
-        <Alert variant="destructive">
+        <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Failed to load products. Please try again or check your connection.
+            Failed to load products. Please try refreshing the page.
           </AlertDescription>
         </Alert>
       </div>
@@ -123,40 +116,43 @@ export function ProductsPage({ initialParams }: ProductsPageProps) {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Toolbar */}
-      <ProductsToolbar
-        params={params}
+    <div className="space-y-6">
+      {/* Main Toolbar */}
+      <ModernProductsToolbar
+        params={stableParams}
         onParamsUpdate={handleParamsUpdate}
         onReset={handleReset}
-        isLoading={isLoading || isValidating}
+        isLoading={isLoading}
         totalCount={data?.pagination?.total || 0}
         pagination={data?.pagination}
-        onPageChange={handlePageChange}
       />
 
-      {/* Pagination chips above products (when using pages mode) */}
-      {params.paginationMode === 'pages' && data?.pagination && (
-        <div className="-mt-4">
-          <Pagination
-            pagination={data.pagination}
-            onPageChange={handlePageChange}
-          />
+      {/* Debug info in development */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="p-4 bg-gray-50 rounded-lg text-sm text-gray-600">
+          <strong>Debug:</strong> Page {stableParams.page}, Search: &quot;
+          {stableParams.search || 'none'}&quot;, View: {stableParams.viewMode}
         </div>
       )}
 
       {/* Products List */}
-      <ProductsList
+      <ModernProductsList
         products={data?.products || []}
-        pagination={data?.pagination}
-        viewMode={params.viewMode}
-        paginationMode={params.paginationMode}
+        params={stableParams}
         isLoading={isLoading}
-        isLoadingMore={isLoadingMore}
-        hasMore={hasMore}
-        onPageChange={handlePageChange}
-        onLoadMore={handleLoadMore}
+        isValidating={isValidating}
       />
+
+      {/* Pagination */}
+      {data?.pagination && data.pagination.totalPages > 1 && (
+        <ModernPagination
+          pagination={data.pagination}
+          onPageChange={handlePageChange}
+        />
+      )}
+
+      {/* Floating Actions */}
+      <ProductsFloatingActions />
     </div>
   );
 }
